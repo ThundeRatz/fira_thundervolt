@@ -13,7 +13,6 @@ class Pose2D:
     def __str__(self):
         return f'x: {self.x:.02f}  y: {self.y:.02f}  th: {self.theta:.02f}'
 
-
 class EntityData:
     def __init__(self, position: Pose2D = Pose2D(), velocity: Pose2D = Pose2D()):
         self.position = position
@@ -25,7 +24,6 @@ class EntityData:
             f'Velocity: {self.velocity}\n'
         )
         return msg
-
 
 class FieldData:
     def __init__(self):
