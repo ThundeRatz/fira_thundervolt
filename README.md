@@ -45,3 +45,19 @@ Para desativar o ambiente virtual, rode no terminal:
 ```bash
 deactivate
 ```
+
+## Rodando o pacote
+
+Para rodar o pacote, estando na raiz do repositório, faça o seguinte:
+
+```bash
+python3 -m thundervolt
+```
+
+## Rodando os testes
+
+Para rodar os testes, rode o seguinte comando:
+
+```bash
+python3 /caminho/até/o/teste/teste.py
+```
