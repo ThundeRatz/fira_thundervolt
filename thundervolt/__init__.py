@@ -1,2 +1,2 @@
-from thundervolt import core
-from thundervolt import game
+from . import core
+from . import game

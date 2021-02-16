@@ -1,1 +1,1 @@
-from thundervolt.core import data
+from . import data
