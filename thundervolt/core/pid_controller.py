@@ -3,13 +3,14 @@ import logging
 
 class pidController:
 
-    def __init__(self, kp, ki, kd, set_point=0, freq=1, saturation=None, integral_fade_rate=0.7, settling_value=1e-2):
+    def __init__(self, kp, ki, kd, set_point=0, freq=1, saturation=None, max_integral=10, integral_fade_rate=1, settling_value=1e-2):
         self.kp = kp
         self.ki = ki
         self.kd = kd
         self.freq = freq
         self._set_point = set_point
         self.saturation = saturation
+        self.max_integral = max_integral
         self.integral_fade_rate = integral_fade_rate
         self.settling_value = settling_value
 
@@ -33,7 +34,7 @@ class pidController:
         self.set_point_changed = True
 
     def update(self, state):
-        error = state - self._set_point
+        error = self._set_point - state
 
         # Prevents spikes when set point is changed
         if self.set_point_changed:
@@ -41,14 +42,19 @@ class pidController:
             self.set_point_changed = False
 
         dedt = (error - self.prev_error)*self.freq
+        self.prev_error = error
 
         # Anti-windup system to decrease integrative instability
-        if (self.saturation is None or error*self.kp <= self.saturation) and error >= self.settling_value and error*self.error_acc >= 0:
+        if self.saturation is None or error*self.kp <= self.saturation:
             self.error_acc += error/self.freq
         else:
-            self.error_acc *= self.integral_fade_rate/self.freq
+            self.error_acc *= self.integral_fade_rate**(1/self.freq)
 
-        response = error*self.kp + self.error_acc*self.ki + dedt*self.kd
+        if abs(self.ki*self.error_acc) > self.max_integral:
+            self.error_acc = self.max_integral * \
+                self.error_acc/abs(self.error_acc)
+
+        response = self.kp*(error + self.ki*self.error_acc + self.kd*dedt)
 
         if self.saturation is not None and response >= self.saturation:
             logging.warn('Control response larger than saturation')
