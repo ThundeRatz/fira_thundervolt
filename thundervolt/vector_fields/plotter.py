@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from thundervolt.core import math
+from thundervolt.core import math, data
 from thundervolt.vector_fields import fields
 
 class FieldPlotter():
@@ -25,7 +25,8 @@ class FieldPlotter():
             for j in range(len(X[i])):
                 x = X[i][j]
                 y = Y[i][j]
-                u, v = vector_field.compute((x,y))
+                vec = vector_field.compute(data.Pose2D(x,y))
+                u, v = vec[0], vec[1]
                 norm = np.linalg.norm((u,v))
                 if norm > self.threshold:
                     M[i][j] = norm

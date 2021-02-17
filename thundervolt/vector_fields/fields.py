@@ -4,20 +4,10 @@ import json
 
 from thundervolt.core import math, data
 
-MIN_WEIGHT_ACTIVE = 0.0
-
 def call_or_return(func, field_data):
     if callable(func):
         return func(field_data)
     return func
-
-def apply_decay(decay_fn, value):
-    if decay_fn is None:
-        return value
-
-    out = decay_fn(abs(value))
-
-    return out if value >= 0 else -out
 
 class PotentialDataExporter(object):
     def __init__(self, name):
@@ -56,79 +46,74 @@ class PotentialDataExporter(object):
 
         self.file.write(json.dumps(plot_file) + "||")
 
-class PotentialField(object):
+class VectorField(object):
     def __init__(self, field_data, **kwargs):
         self.field_data = field_data
         self.name = kwargs.get('name', '{}|{}'.format(self.__class__, random.random() * 10000))
-        self.weight = kwargs.get('weight', 1)
         self.output = None
         self.field_childrens = []
 
 
-    def add_field(self, field):
+    def add(self, field):
         self.field_childrens.append(field)
 
 
-    def compute(self, input):
-        output_sum = [0, 0] # velocity x, velocity y
-
-        output_sum_weight = 0
+    def compute(self, pose: data.Pose2D):
+        output_sum = np.zeros(2)
 
         for field in self.field_childrens:
-            weight = field.weight
-            output = field.compute(input)
-            self.output = output
-
-            output_sum_weight += weight
-
-            output_sum[0] += output[0] * min(1, max(0, weight))
-            output_sum[1] += output[1] * min(1, max(0, weight))
-
-        if output_sum_weight < MIN_WEIGHT_ACTIVE:
-            output_sum = (0, 0)
+            output = field.compute(pose)
+            output_sum += output
 
         self.output = output_sum
 
         return output_sum
 
-class PointField(PotentialField):
+class RadialField(VectorField):
     def __init__(self, field_data, **kwargs):
         super().__init__(field_data, **kwargs)
-        self.target = kwargs['target']
-        self.decay = kwargs['decay']
-        self.radius = kwargs.get('radius', kwargs.get('radius_max'))
-        self.radius_max = kwargs.get('radius_max')
-        self.multiplier = kwargs.get('multiplier', 1)
 
+        # Point definition
+        self.target = kwargs.get('target')
+        self.repelling = kwargs.get('repelling', False)
+
+        # Geometric configuration
+        self.max_radius = kwargs.get('max_radius', None)
+        self.decay_radius = kwargs.get('decay_radius', None)
         self.field_limits = kwargs.get('field_limits', None)
 
-    def compute(self, input):
-        target_go_to = call_or_return(self.target, self.field_data)
-        radius_max = call_or_return(self.radius_max, self.field_data)
+        # Weight
+        self.multiplier = kwargs.get('multiplier', 1)
+
+    def compute(self, pose: data.Pose2D):
+        position = np.array([pose.x, pose.y])
+
+        if self.field_limits and not(-self.field_limits[0] <= position[0] <= self.field_limits[0]):
+            return np.zeros(2)
+
+        if self.field_limits and not(-self.field_limits[1] <= position[1] <= self.field_limits[1]):
+            return np.zeros(2)
+
+        target_go_to = np.array(call_or_return(self.target, self.field_data))
+        max_radius = call_or_return(self.max_radius, self.field_data)
         multiplier = call_or_return(self.multiplier, self.field_data)
 
-        to_target = np.subtract(target_go_to, input)
+        to_target = np.subtract(target_go_to, position)
         to_taget_scalar = np.linalg.norm(to_target)
+        to_target = math.versor(to_target)
 
-        if self.field_limits and not(-self.field_limits[0] <= input[0] <= self.field_limits[0]):
-            return (0, 0)
+        if max_radius and to_taget_scalar > max_radius:
+            return np.zeros(2)
 
-        if self.field_limits and not(-self.field_limits[1] <= input[1] <= self.field_limits[1]):
-            return (0, 0)
+        if self.repelling:
+            multiplier *= -1
 
-        if radius_max and to_taget_scalar > radius_max:
-            return (0, 0)
+        decay = 1
+        if self.max_radius and self.decay_radius:
+            decay = max(0, min(1, (self.max_radius - to_taget_scalar)/(self.max_radius - self.decay_radius)))
 
-        to_target_norm = math.versor(to_target)
+        return to_target * decay * multiplier
 
-        to_target_scalar_norm = max(0, min(1, to_taget_scalar/self.radius))
-
-        force = apply_decay(self.decay, to_target_scalar_norm)
-
-        return (
-            to_target_norm[0] * force * multiplier,
-            to_target_norm[1] * force * multiplier
-        )
 
 class LineField(PotentialField):
     def __init__(self, field_data, **kwargs):
