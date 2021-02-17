@@ -119,73 +119,69 @@ class RadialField(VectorField):
         return to_target * decay * multiplier
 
 
-class LineField(PotentialField):
+class LineField(VectorField):
     def __init__(self, field_data, **kwargs):
         super().__init__(field_data, **kwargs)
-        self.target = kwargs['target']
-        self.decay = kwargs['decay']
 
-        self.multiplier = kwargs.get('multiplier', 1)
+        # Line definition
+        self.target = kwargs.get('target')
+        self.theta = kwargs.get('theta')
+        self.size = kwargs.get('size')
+        self.repelling = kwargs.get('repelling', False)
 
-        # line definition
-        self.theta = kwargs['theta']
-        self.line_size = kwargs['line_size']
-        self.line_dist = kwargs['line_dist']
-        self.line_dist_max = kwargs.get('line_dist_max')
-
-        self.line_size_single_side = kwargs.get('line_size_single_side', False)
-        self.line_dist_single_side = kwargs.get('line_dist_single_side', False)
-
-        self.inverse = kwargs.get('inverse', False)
-
+        # Geometric configuration
+        self.decay_dist = kwargs.get('decay_dist', None)
+        self.max_dist = kwargs.get('max_dist', None)
         self.field_limits = kwargs.get('field_limits', None)
 
-    def compute(self, input):
-        target_line = call_or_return(self.target, self.field_data)
-        target_theta = call_or_return(self.theta, self.field_data)
+        # Weight
+        self.multiplier = kwargs.get('multiplier', 1)
 
+    def compute(self, pose: data.Pose2D):
+        position = np.array([pose.x, pose.y])
+
+        field_limits = call_or_return(self.field_limits, self.field_data)
+
+        if field_limits and not(-field_limits[0] <= position[0] <= field_limits[0]):
+            return np.zeros(2)
+
+        if field_limits and not(-field_limits[1] <= position[1] <= field_limits[1]):
+            return np.zeros(2)
+
+        target = np.array(call_or_return(self.target, self.field_data))
+        theta = call_or_return(self.theta, self.field_data)
+        max_dist = call_or_return(self.max_dist, self.field_data)
+        size = call_or_return(self.size, self.field_data)
+
+        to_target = target - position
+        line_dir = math.from_polar(theta)
+        axis_dir = math.from_polar(theta + np.pi / 2)
+
+        dist_to_line = math.distance_to_line(position, target, axis_dir)
+        dist_to_axis = math.distance_to_line(position, target, line_dir)
+
+        if self.size and dist_to_axis > self.size:
+            return np.zeros(2)
+
+        if max_dist and dist_to_line > max_dist:
+            return np.zeros(2)
+
+        output = axis_dir
+        if np.dot(axis_dir, to_target) < 0:
+            output *= -1
+
+        decay_dist = call_or_return(self.decay_dist, self.field_data)
+        repelling = call_or_return(self.repelling, self.field_data)
         multiplier = call_or_return(self.multiplier, self.field_data)
-        line_dist_max = call_or_return(self.line_dist_max, self.field_data)
 
-        to_line = np.subtract(target_line, input)
-        to_line_with_theta = math.rotate(to_line, -target_theta)
+        if self.repelling:
+            multiplier *= -1
 
-        if self.field_limits and not(0 <= input[0] <= self.field_limits[0]):
-            return (0, 0)
+        decay = 1
+        if max_dist and decay_dist:
+            decay = max(0, min(1, abs((max_dist - dist_to_line)/(max_dist - decay_dist))))
 
-        if self.field_limits and not(0 <= input[1] <= self.field_limits[1]):
-            return (0, 0)
-
-        if self.line_size and abs(to_line_with_theta[0]) > self.line_size:
-            return (0, 0)
-
-        if self.line_size_single_side and to_line_with_theta[0] < 0:
-            return (0, 0)
-
-        if self.line_dist_max and abs(to_line_with_theta[1]) > line_dist_max:
-            return (0, 0)
-
-        if self.line_dist_single_side and to_line_with_theta[1] < 0 and not self.inverse:
-            return(0, 0)
-
-        if self.line_dist_single_side and to_line_with_theta[1] > 0 and self.inverse:
-            return(0, 0)
-
-        to_line_norm = math.versor(
-            math.rotate(
-                np.array([0, to_line_with_theta[1]]),
-                target_theta
-            )
-        )
-
-        to_line_scalar_norm = max(0, min(1, abs(to_line_with_theta[1]/self.line_dist)))
-
-        force = apply_decay(self.decay, to_line_scalar_norm)
-
-        return (
-            to_line_norm[0] * force * multiplier,
-            to_line_norm[1] * force * multiplier
-        )
+        return output * decay * multiplier
 
 class TangentialField(PotentialField):
     def __init__(self, field_data, **kwargs):
