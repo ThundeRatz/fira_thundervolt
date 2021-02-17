@@ -1,9 +1,9 @@
-
 import test_base  # pylint: disable=import-error
 
 from thundervolt.comm.referee import RefereeComm
 
 import json
+
 
 def main():
     referee = RefereeComm()
@@ -19,4 +19,4 @@ def main():
 
 
 if __name__ == '__main__':
-  main()
+    main()

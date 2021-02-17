@@ -4,6 +4,7 @@ from thundervolt.comm.vision import FiraVision
 
 import json
 
+
 def main():
     vision = FiraVision()
 
@@ -16,4 +17,4 @@ def main():
 
 
 if __name__ == '__main__':
-  main()
+    main()
