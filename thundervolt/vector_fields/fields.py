@@ -127,11 +127,13 @@ class LineField(VectorField):
         self.target = kwargs.get('target')
         self.theta = kwargs.get('theta')
         self.size = kwargs.get('size')
+        self.only_forward = kwargs.get('only_forward', False)
+        self.side = kwargs.get('side', 'both')
         self.repelling = kwargs.get('repelling', False)
 
         # Geometric configuration
-        self.decay_dist = kwargs.get('decay_dist', None)
         self.max_dist = kwargs.get('max_dist', None)
+        self.decay_dist = kwargs.get('decay_dist', None)
         self.field_limits = kwargs.get('field_limits', None)
 
         # Weight
@@ -152,34 +154,51 @@ class LineField(VectorField):
         theta = call_or_return(self.theta, self.field_data)
         max_dist = call_or_return(self.max_dist, self.field_data)
         size = call_or_return(self.size, self.field_data)
+        only_forward = call_or_return(self.only_forward, self.field_data)
+        side = call_or_return(self.side, self.field_data)
 
-        to_target = target - position
+        # Ortogonal Projections
+        to_position = position - target
         line_dir = math.from_polar(theta)
-        axis_dir = math.from_polar(theta + np.pi / 2)
+        axis_dir = math.from_polar(theta - np.pi / 2)
 
-        dist_to_line = math.distance_to_line(position, target, axis_dir)
-        dist_to_axis = math.distance_to_line(position, target, line_dir)
+        proj_line = np.dot(to_position, line_dir)
+        proj_axis = np.dot(to_position, axis_dir)
 
-        if self.size and dist_to_axis > self.size:
+        # Check axis direction conditions
+        if side == 'positive' and proj_axis < 0:
             return np.zeros(2)
 
-        if max_dist and dist_to_line > max_dist:
+        if side == 'negative' and proj_axis > 0:
             return np.zeros(2)
 
+        if max_dist and abs(proj_axis) > max_dist:
+            return np.zeros(2)
+
+        # Check line direction conditions
+        if only_forward and proj_line < 0:
+            return np.zeros(2)
+
+        if size and abs(proj_line) > size:
+            return np.zeros(2)
+
+        # Define direction
         output = axis_dir
-        if np.dot(axis_dir, to_target) < 0:
+        if proj_axis > 0:
             output *= -1
 
-        decay_dist = call_or_return(self.decay_dist, self.field_data)
         repelling = call_or_return(self.repelling, self.field_data)
         multiplier = call_or_return(self.multiplier, self.field_data)
 
         if self.repelling:
             multiplier *= -1
 
+        # Calculate decay
+        decay_dist = call_or_return(self.decay_dist, self.field_data)
+
         decay = 1
         if max_dist and decay_dist:
-            decay = max(0, min(1, abs((max_dist - dist_to_line)/(max_dist - decay_dist))))
+            decay = max(0, min(1, abs((max_dist - abs(proj_axis))/(max_dist - decay_dist))))
 
         return output * decay * multiplier
 
