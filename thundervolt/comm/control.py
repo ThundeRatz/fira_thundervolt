@@ -20,13 +20,13 @@ class FiraControl(Transmitter):
     def _fill_command_packet(self, robot_id, left_speed, right_speed):
         cmd_packet = command_pb2.Commands()
 
-        robot = cmd_packet.robot_commands.add()
+        robot = cmd_packet.robot_commands.add() # pylint: disable=no-member
         robot.id          = robot_id
         robot.yellowteam  = self.team_color_yellow
         robot.wheel_left  = left_speed
         robot.wheel_right = right_speed
 
         packet = packet_pb2.Packet()
-        packet.cmd.CopyFrom(cmd_packet)
+        packet.cmd.CopyFrom(cmd_packet) # pylint: disable=no-member
 
         return packet

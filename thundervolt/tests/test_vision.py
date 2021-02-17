@@ -1,4 +1,4 @@
-import test_base
+import test_base  # pylint: disable=import-error
 
 from thundervolt.comm.vision import FiraVision
 

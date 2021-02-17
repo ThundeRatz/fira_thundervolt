@@ -14,7 +14,7 @@ class FiraVision(Receiver):
         """
 
         data = super().receive()
-        decoded_data = packet_pb2.Environment().FromString(data)
+        decoded_data = packet_pb2.Environment().FromString(data) # pylint: disable=no-member
         vision_frame = decoded_data.frame
 
         vision_data = json.loads(MessageToJson(vision_frame))

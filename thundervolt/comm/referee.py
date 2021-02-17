@@ -14,7 +14,7 @@ class RefereeComm(Receiver):
         """
 
         data = super().receive()
-        decoded_data = vssref_command_pb2.VSSRef_Command().FromString(data)
+        decoded_data = vssref_command_pb2.VSSRef_Command().FromString(data) # pylint: disable=no-member
 
         referee_data = json.loads(MessageToJson(decoded_data))
 
