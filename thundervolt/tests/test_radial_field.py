@@ -28,4 +28,3 @@ my_field.add(repell_field)
 my_field.add(attract_field)
 
 my_plotter.plot(my_field)
-my_plotter.hold()
