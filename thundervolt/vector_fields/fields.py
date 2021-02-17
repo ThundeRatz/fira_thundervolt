@@ -87,30 +87,34 @@ class RadialField(VectorField):
 
     def compute(self, pose: data.Pose2D):
         position = np.array([pose.x, pose.y])
+        field_limits = call_or_return(self.field_limits, self.field_data)
 
-        if self.field_limits and not(-self.field_limits[0] <= position[0] <= self.field_limits[0]):
+        if field_limits and not(-field_limits[0] <= position[0] <= field_limits[0]):
             return np.zeros(2)
 
-        if self.field_limits and not(-self.field_limits[1] <= position[1] <= self.field_limits[1]):
+        if field_limits and not(-field_limits[1] <= position[1] <= field_limits[1]):
             return np.zeros(2)
 
-        target_go_to = np.array(call_or_return(self.target, self.field_data))
+        target = np.array(call_or_return(self.target, self.field_data))
         max_radius = call_or_return(self.max_radius, self.field_data)
-        multiplier = call_or_return(self.multiplier, self.field_data)
 
-        to_target = np.subtract(target_go_to, position)
+        to_target = np.subtract(target, position)
         to_taget_scalar = np.linalg.norm(to_target)
         to_target = math.versor(to_target)
 
         if max_radius and to_taget_scalar > max_radius:
             return np.zeros(2)
 
-        if self.repelling:
+        decay_radius = call_or_return(self.decay_radius, self.field_data)
+        repelling = call_or_return(self.repelling, self.field_data)
+        multiplier = call_or_return(self.multiplier, self.field_data)
+
+        if repelling:
             multiplier *= -1
 
         decay = 1
-        if self.max_radius and self.decay_radius:
-            decay = max(0, min(1, (self.max_radius - to_taget_scalar)/(self.max_radius - self.decay_radius)))
+        if max_radius and decay_radius:
+            decay = max(0, min(1, (max_radius - to_taget_scalar)/(max_radius - decay_radius)))
 
         return to_target * decay * multiplier
 
