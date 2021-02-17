@@ -33,7 +33,7 @@ class FieldPlotter():
                     U[i][j], V[i][j] = math.versor((u,v))
 
         # Set the quiver vectors
-        plt.quiver(X, Y, U, V, M, units='dots', pivot='tip', scale=0.1)
+        plt.quiver(X, Y, U, V, M, units='dots', pivot='mid', scale=0.1)
 
         # Set title
         plt.title(f'Vector Field Plot: {self.name}')
