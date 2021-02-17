@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 from thundervolt.core import math, data
 from thundervolt.vector_fields import fields
 
+
+GAME_FIELD = np.array(
+    [[-0.75, -0.75, -0.85, -0.85, -0.75, -0.75, 0.75, 0.75, 0.85,  0.85,  0.75,  0.75, -0.75],
+     [-0.65, -0.20, -0.20,  0.20,  0.20,  0.65, 0.65, 0.20, 0.20, -0.20, -0.20, -0.65, -0.65]]
+)
 class FieldPlotter():
     def __init__(self, name, **kwargs):
         self.name = name
@@ -14,7 +19,7 @@ class FieldPlotter():
 
     def plot(self, vector_field):
         # Create the meshgrid
-        X, Y = np.meshgrid(np.linspace(-0.75, 0.75, num=self.width),
+        X, Y = np.meshgrid(np.linspace(-0.85, 0.85, num=self.width),
                             np.linspace(-0.65, 0.65, num=self.height))
         U = np.empty(X.shape)
         V = np.empty(X.shape)
@@ -35,11 +40,14 @@ class FieldPlotter():
         # Set the quiver vectors
         plt.quiver(X, Y, U, V, M, units='dots', pivot='mid', scale=0.1)
 
+        # Draw field
+        plt.plot(GAME_FIELD[0], GAME_FIELD[1], c='k')
+
         # Set title
         plt.title(f'Vector Field Plot: {self.name}')
 
         # Set x, y boundary limits
-        plt.xlim(-0.8, 0.8)
+        plt.xlim(-0.9, 0.9)
         plt.ylim(-0.7, 0.7)
 
         # Show plot with gird
