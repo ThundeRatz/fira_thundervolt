@@ -1,9 +1,8 @@
 import socket
-from abc import ABC, abstractmethod
 
 from .protocols import packet_pb2
 
-class Transmitter(ABC):
+class Transmitter():
     def __init__(self, transmitter_ip='224.0.0.1', transmitter_port=10002):
         """
         Init Client object.
@@ -22,7 +21,6 @@ class Transmitter(ABC):
         # Create socket
         self.transmitter_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    @abstractmethod
     def transmit(self, packet):
         """
         Transmit packet.
