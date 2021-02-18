@@ -84,18 +84,6 @@ class FieldData:
         if 'ball' in raw_data_dict:
             self.ball._from_dict(raw_data_dict['ball'], rotate_field)
 
-        # self.ball.position.x = -0.375
-        # self.ball.position.theta = 0
-
-        # print(self.ball)
-        # print(self.robots[0])
-
-        # self.robots[0].velocity.y = 2.29e-05
-        # self.robots[0].velocity.theta = 4.70
-
-        # print(self.ball)
-        # print(self.robots[0])
-
         for i in range(len(team_list_of_dicts)):
             self.robots[i]._from_dict(team_list_of_dicts[i], rotate_field)
 
