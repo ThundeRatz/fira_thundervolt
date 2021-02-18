@@ -37,6 +37,7 @@ def test_creation_team_command():
 
     assert type(team_cmd.commands[0]) is RobotCommand
 
+
 def test_singleton_team_command():
     team_cmd_one = TeamCommand()
     team_cmd_two = TeamCommand()
@@ -54,3 +55,20 @@ def test_singleton_team_command():
     team_cmd_three = TeamCommand()
 
     assert team_cmd_three.commands[0].left_speed == pytest.approx(42)
+
+
+def test_team_command_reset():
+    team_cmd = TeamCommand()
+
+    for robot in team_cmd.commands:
+        robot.left_speed = 43
+        robot.right_speed = 24
+
+    team_cmd.reset()
+
+    assert team_cmd.commands[0].left_speed == pytest.approx(0)
+    assert team_cmd.commands[0].right_speed == pytest.approx(0)
+    assert team_cmd.commands[1].left_speed == pytest.approx(0)
+    assert team_cmd.commands[1].right_speed == pytest.approx(0)
+    assert team_cmd.commands[2].left_speed == pytest.approx(0)
+    assert team_cmd.commands[2].right_speed == pytest.approx(0)
