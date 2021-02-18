@@ -98,7 +98,7 @@ def test_field_from_dict():
     assert test_field_data.robots[0].velocity.y == pytest.approx(2.29e-05)
     assert test_field_data.robots[0].velocity.theta == pytest.approx(4.70)
 
-def test_field_from_dict():
+def test_field_from_dict_and_rotate():
     field_dict = {
         'ball': {
             'x': -0.375,
