@@ -81,7 +81,7 @@ class thundervolt.vector_fields.LineField(field_data, **kwargs)
 | field_data | thundervolt.core.data.FieldData | Posição e velocidade de todas as entidade do jogo. |
 | name | str | Nome do campo, por default será gerado automaticamente. |
 | target | tuple / list / numpy.array | Coordenadas xy do centro da linha utilizada como base para o campo. |
-| theta | float | Ângulo em radianos que define a direção da reta. Atenção que o sentido aqui pode ser relevante dependendo dos outro parâmtros. Ou seja, PI e -PI podem ter resultados diferentes. |
+| theta | float | Ângulo em radianos que define a direção da reta. Atenção que o sentido aqui pode ser relevante dependendo dos outro parâmetros. Ou seja, 0 e PI podem ter resultados diferentes. |
 | size | float | Tamanho da linha que será desenhada a partir de `target` na direção `theta`. |
 | only_forward | bool | Quando `True`, a linha será desenhada apenas na direção positiva de `theta`. Default `False`. |
 | side | str | Define de qual lado da linha haverá campo. Pode ser `positive`, `negative` ou `both`. Default `both`. |
@@ -115,7 +115,7 @@ class thundervolt.vector_fields.TangentField(field_data, **kwargs)
 | target | tuple / list / numpy.array | Coordenadas xy do foco do campo. |
 | radius | float | Raio da espiral, corresponde ao raio que o robô orbitaria o foco. |
 | clockwise | bool | Quando `True`, o sentido de rotação do campo é horário. Default `False` |
-| K | float | Constante de amortecimento da espiral. Quanto maior mais suave. Defualt `1/2500` |
+| damping | float | Constante de amortecimento da espiral. Quanto maior mais suave. Defualt `1/2500` |
 | max_radius | float | Raio até onde o campo tem efeito. Default `None`. |
 | decay_radius | float | Raio a partir do qual o campo começa a decair linearmente. Default `None`. |
 | field_limits | tuple / list | Define um retângulo onde o campo será válido. Default `None`. |

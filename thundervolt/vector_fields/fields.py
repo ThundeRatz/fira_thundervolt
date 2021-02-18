@@ -210,7 +210,7 @@ class TangentField(VectorField):
         self.target = kwargs.get('target')
         self.radius = kwargs.get('radius')
         self.clockwise = kwargs.get('clockwise', False)
-        self.K = kwargs.get('K', 1/2500)
+        self.damping = kwargs.get('damping', 1/2500)
 
         # Geometric configuration
         self.max_radius = kwargs.get('max_radius', None)
@@ -243,13 +243,14 @@ class TangentField(VectorField):
         multiplier = call_or_return(self.multiplier, self.field_data)
         decay_radius = call_or_return(self.decay_radius, self.field_data)
         radius = call_or_return(self.radius, self.field_data)
+        damping = call_or_return(self.damping, self.field_data)
         rotation_dir = -1 if call_or_return(self.clockwise, self.field_data) else 1
         angle_to_position = np.arctan2(to_position[1], to_position[0])
 
         if to_position_scalar > self.radius:
-            end_angle = angle_to_position + rotation_dir * (np.pi/2) * (2 - ((self.radius + self.K)/(to_position_scalar + self.K)))
+            end_angle = angle_to_position + rotation_dir * (np.pi/2) * (2 - ((radius + damping) / (to_position_scalar + damping)))
         else:
-            end_angle = angle_to_position + rotation_dir * (np.pi/2) * np.sqrt(to_position_scalar/self.radius)
+            end_angle = angle_to_position + rotation_dir * (np.pi/2) * np.sqrt(to_position_scalar / radius)
 
         output = math.from_polar(end_angle)
 
