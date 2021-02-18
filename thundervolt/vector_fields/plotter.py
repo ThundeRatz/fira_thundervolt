@@ -12,15 +12,15 @@ GAME_FIELD = np.array(
 class FieldPlotter():
     def __init__(self, name, **kwargs):
         self.name = name
-        self.width = kwargs.get("width", 60)
-        self.height = kwargs.get("height", 40)
+        self.width = kwargs.get("width", 50)
+        self.height = kwargs.get("height", 35)
         self.threshold = kwargs.get("threshold", 1e-5)
 
 
     def plot(self, vector_field):
         # Create the meshgrid
-        X, Y = np.meshgrid(np.linspace(-0.85, 0.85, num=self.width),
-                            np.linspace(-0.65, 0.65, num=self.height))
+        X, Y = np.meshgrid(np.linspace(-0.849, 0.849, num=self.width),
+                            np.linspace(-0.649, 0.649, num=self.height))
         U = np.empty(X.shape)
         V = np.empty(X.shape)
         M = np.empty(X.shape)
@@ -30,7 +30,7 @@ class FieldPlotter():
             for j in range(len(X[i])):
                 x = X[i][j]
                 y = Y[i][j]
-                vec = vector_field.compute(data.Pose2D(x,y))
+                vec = vector_field.compute((x,y))
                 u, v = vec[0], vec[1]
                 norm = np.linalg.norm((u,v))
                 if norm > self.threshold:

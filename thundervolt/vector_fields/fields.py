@@ -4,11 +4,6 @@ import json
 
 from thundervolt.core import math, data
 
-def call_or_return(func, field_data):
-    if callable(func):
-        return func(field_data)
-    return func
-
 class PotentialDataExporter(object):
     def __init__(self, name):
         self.file = open(
@@ -47,18 +42,19 @@ class PotentialDataExporter(object):
         self.file.write(json.dumps(plot_file) + "||")
 
 class VectorField(object):
-    def __init__(self, field_data, **kwargs):
-        self.field_data = field_data
+    def __init__(self, **kwargs):
         self.name = kwargs.get('name', '{}|{}'.format(self.__class__, random.random() * 10000))
         self.output = None
         self.field_childrens = []
 
-
     def add(self, field):
         self.field_childrens.append(field)
 
+    def update(self, field_data, robot_id):
+        for field in self.field_childrens:
+            field.update(field_data, robot_id)
 
-    def compute(self, pose: data.Pose2D):
+    def compute(self, pose):
         output_sum = np.zeros(2)
 
         for field in self.field_childrens:
@@ -70,8 +66,8 @@ class VectorField(object):
         return output_sum
 
 class RadialField(VectorField):
-    def __init__(self, field_data, **kwargs):
-        super().__init__(field_data, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         # Point definition
         self.target = kwargs.get('target')
@@ -82,46 +78,45 @@ class RadialField(VectorField):
         self.decay_radius = kwargs.get('decay_radius', None)
         self.field_limits = kwargs.get('field_limits', None)
 
-        # Weight
+        # General
         self.multiplier = kwargs.get('multiplier', 1)
+        self.update_rule = kwargs.get('update_rule', None)
 
-    def compute(self, pose: data.Pose2D):
-        position = np.array([pose.x, pose.y])
-        field_limits = call_or_return(self.field_limits, self.field_data)
+    def update(self, field_data, robot_id):
+        if callable(self.update_rule):
+            self.update_rule(self, field_data, robot_id)
 
-        if field_limits and not(-field_limits[0] <= position[0] <= field_limits[0]):
+    def compute(self, pose):
+        position = np.array(pose)
+
+        if self.field_limits and not(-self.field_limits[0] <= position[0] <= self.field_limits[0]):
             return np.zeros(2)
 
-        if field_limits and not(-field_limits[1] <= position[1] <= field_limits[1]):
+        if self.field_limits and not(-self.field_limits[1] <= position[1] <= self.field_limits[1]):
             return np.zeros(2)
 
-        target = np.array(call_or_return(self.target, self.field_data))
-        max_radius = call_or_return(self.max_radius, self.field_data)
-
-        to_target = np.subtract(target, position)
+        to_target = np.subtract(np.array(self.target), position)
         to_taget_scalar = np.linalg.norm(to_target)
         to_target = math.versor(to_target)
 
-        if max_radius and to_taget_scalar > max_radius:
+        if self.max_radius and to_taget_scalar > self.max_radius:
             return np.zeros(2)
 
-        decay_radius = call_or_return(self.decay_radius, self.field_data)
-        repelling = call_or_return(self.repelling, self.field_data)
-        multiplier = call_or_return(self.multiplier, self.field_data)
-
-        if repelling:
-            multiplier *= -1
+        # Define direction
+        output = to_target
+        if self.repelling:
+            output *= -1
 
         decay = 1
-        if max_radius and decay_radius:
-            decay = max(0, min(1, (max_radius - to_taget_scalar)/(max_radius - decay_radius)))
+        if self.max_radius and self.decay_radius:
+            decay = max(0, min(1, (self.max_radius - to_taget_scalar)/(self.max_radius - self.decay_radius)))
 
-        return to_target * decay * multiplier
+        return output * decay * self.multiplier
 
 
 class LineField(VectorField):
-    def __init__(self, field_data, **kwargs):
-        super().__init__(field_data, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         # Line definition
         self.target = kwargs.get('target')
@@ -136,50 +131,46 @@ class LineField(VectorField):
         self.decay_dist = kwargs.get('decay_dist', None)
         self.field_limits = kwargs.get('field_limits', None)
 
-        # Weight
+        # General
         self.multiplier = kwargs.get('multiplier', 1)
+        self.update_rule = kwargs.get('update_rule', None)
 
-    def compute(self, pose: data.Pose2D):
-        position = np.array([pose.x, pose.y])
+    def update(self, field_data, robot_id):
+        if callable(self.update_rule):
+            self.update_rule(self, field_data, robot_id)
 
-        field_limits = call_or_return(self.field_limits, self.field_data)
+    def compute(self, pose):
+        position = np.array(pose)
 
-        if field_limits and not(-field_limits[0] <= position[0] <= field_limits[0]):
+        if self.field_limits and not(-self.field_limits[0] <= position[0] <= self.field_limits[0]):
             return np.zeros(2)
 
-        if field_limits and not(-field_limits[1] <= position[1] <= field_limits[1]):
+        if self.field_limits and not(-self.field_limits[1] <= position[1] <= self.field_limits[1]):
             return np.zeros(2)
-
-        target = np.array(call_or_return(self.target, self.field_data))
-        theta = call_or_return(self.theta, self.field_data)
-        max_dist = call_or_return(self.max_dist, self.field_data)
-        size = call_or_return(self.size, self.field_data)
-        only_forward = call_or_return(self.only_forward, self.field_data)
-        side = call_or_return(self.side, self.field_data)
 
         # Ortogonal Projections
-        to_position = position - target
-        line_dir = math.from_polar(theta)
-        axis_dir = math.from_polar(theta - np.pi / 2)
+        to_position = position - np.array(self.target)
+        line_dir = math.from_polar(self.theta)
+        axis_dir = math.from_polar(self.theta - np.pi / 2)
 
         proj_line = np.dot(to_position, line_dir)
         proj_axis = np.dot(to_position, axis_dir)
 
         # Check axis direction conditions
-        if side == 'positive' and proj_axis < 0:
+        if self.side == 'positive' and proj_axis < 0:
             return np.zeros(2)
 
-        if side == 'negative' and proj_axis > 0:
+        if self.side == 'negative' and proj_axis > 0:
             return np.zeros(2)
 
-        if max_dist and abs(proj_axis) > max_dist:
+        if self.max_dist and abs(proj_axis) > self.max_dist:
             return np.zeros(2)
 
         # Check line direction conditions
-        if only_forward and proj_line < 0:
+        if self.only_forward and proj_line < 0:
             return np.zeros(2)
 
-        if size and abs(proj_line) > size:
+        if self.size and abs(proj_line) > self.size:
             return np.zeros(2)
 
         # Define direction
@@ -187,24 +178,19 @@ class LineField(VectorField):
         if proj_axis > 0:
             output *= -1
 
-        repelling = call_or_return(self.repelling, self.field_data)
-        multiplier = call_or_return(self.multiplier, self.field_data)
-
         if self.repelling:
-            multiplier *= -1
+            output *= -1
 
         # Calculate decay
-        decay_dist = call_or_return(self.decay_dist, self.field_data)
-
         decay = 1
-        if max_dist and decay_dist:
-            decay = max(0, min(1, abs((max_dist - abs(proj_axis))/(max_dist - decay_dist))))
+        if self.max_dist and self.decay_dist:
+            decay = max(0, min(1, abs((self.max_dist - abs(proj_axis))/(self.max_dist - self.decay_dist))))
 
-        return output * decay * multiplier
+        return output * decay * self.multiplier
 
 class TangentField(VectorField):
-    def __init__(self, field_data, **kwargs):
-        super().__init__(field_data, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         # Hyperbolic spiral definition
         self.target = kwargs.get('target')
@@ -217,45 +203,41 @@ class TangentField(VectorField):
         self.decay_radius = kwargs.get('decay_radius', None)
         self.field_limits = kwargs.get('field_limits', None)
 
-        # Weight
+        # General
         self.multiplier = kwargs.get('multiplier', 1)
+        self.update_rule = kwargs.get('update_rule', None)
 
-    def compute(self, pose: data.Pose2D):
-        position = np.array([pose.x, pose.y])
+    def update(self, field_data, robot_id):
+        if callable(self.update_rule):
+            self.update_rule(self, field_data, robot_id)
 
-        field_limits = call_or_return(self.field_limits, self.field_data)
+    def compute(self, pose):
+        position = np.array(pose)
 
-        if field_limits and not(-field_limits[0] <= position[0] <= field_limits[0]):
+        if self.field_limits and not(-self.field_limits[0] <= position[0] <= self.field_limits[0]):
             return np.zeros(2)
 
-        if field_limits and not(-field_limits[1] <= position[1] <= field_limits[1]):
+        if self.field_limits and not(-self.field_limits[1] <= position[1] <= self.field_limits[1]):
             return np.zeros(2)
 
-        target = np.array(call_or_return(self.target, self.field_data))
-        max_radius = call_or_return(self.max_radius, self.field_data)
-
-        to_position = position - target
+        to_position = position - np.array(self.target)
         to_position_scalar = np.linalg.norm(to_position)
 
-        if max_radius and to_position_scalar > max_radius:
+        if self.max_radius and to_position_scalar > self.max_radius:
             return np.zeros(2)
 
-        multiplier = call_or_return(self.multiplier, self.field_data)
-        decay_radius = call_or_return(self.decay_radius, self.field_data)
-        radius = call_or_return(self.radius, self.field_data)
-        damping = call_or_return(self.damping, self.field_data)
-        rotation_dir = -1 if call_or_return(self.clockwise, self.field_data) else 1
+        rotation_dir = -1 if self.clockwise else 1
         angle_to_position = np.arctan2(to_position[1], to_position[0])
 
         if to_position_scalar > self.radius:
-            end_angle = angle_to_position + rotation_dir * (np.pi/2) * (2 - ((radius + damping) / (to_position_scalar + damping)))
+            end_angle = angle_to_position + rotation_dir * (np.pi/2) * (2 - ((self.radius + self.damping) / (to_position_scalar + self.damping)))
         else:
-            end_angle = angle_to_position + rotation_dir * (np.pi/2) * np.sqrt(to_position_scalar / radius)
+            end_angle = angle_to_position + rotation_dir * (np.pi/2) * np.sqrt(to_position_scalar / self.radius)
 
         output = math.from_polar(end_angle)
 
         decay = 1
-        if max_radius and decay_radius:
-            decay = max(0, min(1, (max_radius - to_position_scalar)/(max_radius - decay_radius)))
+        if self.max_radius and self.decay_radius:
+            decay = max(0, min(1, (self.max_radius - to_position_scalar)/(self.max_radius - self.decay_radius)))
 
-        return output * decay * multiplier
+        return output * decay * self.multiplier
