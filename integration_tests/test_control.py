@@ -4,6 +4,7 @@ from thundervolt.comm.control import FiraControl
 
 import time
 
+
 def main():
     blue_control = FiraControl(team_color_yellow=False)
     yellow_control = FiraControl()
@@ -31,4 +32,4 @@ def main():
 
 
 if __name__ == '__main__':
-  main()
+    main()

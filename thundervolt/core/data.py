@@ -4,6 +4,7 @@ FIELD_LENGTH = 1.5
 GOAL_WIDTH = 0.4
 GOAL_DEPTH = 0.1
 
+
 class Pose2D:
     def __init__(self, x: float = 0, y: float = 0, theta: float = 0):
         self.x = x
@@ -12,6 +13,10 @@ class Pose2D:
 
     def __str__(self):
         return f'x: {self.x:.02f}  y: {self.y:.02f}  th: {self.theta:.02f}'
+
+    def __repr__(self):
+        return f'Pose2D({self})'
+
 
 class EntityData:
     def __init__(self, position: Pose2D = Pose2D(), velocity: Pose2D = Pose2D()):
@@ -24,6 +29,10 @@ class EntityData:
             f'Velocity: {self.velocity}\n'
         )
         return msg
+
+    def __repr__(self):
+        return f'EntityData({self})'
+
 
 class FieldData:
     def __init__(self):
@@ -38,3 +47,6 @@ class FieldData:
         for i in range(3):
             msg += f'\nFOE_{i}\n{self.foes[i]}'
         return msg
+
+    def __repr__(self):
+        return f'FieldData({self})'

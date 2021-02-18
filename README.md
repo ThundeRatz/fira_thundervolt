@@ -1,5 +1,7 @@
 # 🔥 FIRA ThunderVolt ⚽
 
+![pytest CI](https://github.com/ThundeRatz/fira_thundervolt/workflows/pytest%20CI/badge.svg)
+
 Implementação especial do ThunderVolt para o simulador FIRASim
 
 ## Ambiente virtual de Python
@@ -56,8 +58,18 @@ python3 -m thundervolt
 
 ## Rodando os testes
 
-Para rodar os testes, rode o seguinte comando:
+### Testes de integração
+
+Para rodar os testes de integração, rode o seguinte comando:
 
 ```bash
-python3 /caminho/até/o/teste/teste.py
+python3 ./integration_tests/nome_do_teste.py
+```
+
+### Testes unitários
+
+Para rodar os testes unitários, rode o seguinte comando:
+
+```bash
+python3 -m pytest
 ```
