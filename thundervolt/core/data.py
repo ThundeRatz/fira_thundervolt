@@ -54,11 +54,14 @@ class EntityData:
 class FieldData:
     _instance = None
 
-    def __init__(self, team_color='blue'):
-        self.robots = [EntityData() for i in range(3)]
-        self.foes = [EntityData() for i in range(3)]
-        self.ball = EntityData()
+    robots = [EntityData() for i in range(3)]
+    foes = [EntityData() for i in range(3)]
+    ball = EntityData()
 
+    team_color = 'blue'
+    foes_team_color = 'yellow' if team_color == 'blue' else 'blue'
+
+    def __init__(self, team_color='blue'):
         self.team_color = team_color
         self.foes_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
