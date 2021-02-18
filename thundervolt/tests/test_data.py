@@ -128,3 +128,25 @@ def test_field_from_dict():
     assert test_field_data.robots[0].position.theta == pytest.approx(-0.771592654)
     assert test_field_data.foes[0].velocity.y == pytest.approx(-2.29e-05)
     assert test_field_data.foes[0].velocity.theta == pytest.approx(4.70)
+
+def test_singleton_field():
+    field_one = FieldData()
+    field_two = FieldData()
+
+    assert field_one is field_two
+
+    field_one.ball.position.x = 42
+
+    assert field_one.ball.position.x is field_two.ball.position.x
+    assert field_two.team_color is 'blue'
+
+    field_one.team_color = 'yellow'
+
+    assert field_two.team_color is 'yellow'
+
+    field_one.team_color = 'blue'
+
+    field_three = FieldData('yellow')
+
+    assert field_one.team_color is 'yellow'
+    assert field_three.team_color is 'yellow'

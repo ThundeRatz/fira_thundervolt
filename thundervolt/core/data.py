@@ -52,6 +52,8 @@ class EntityData:
         self.velocity.theta = data_dict.get('vorientation', 0)
 
 class FieldData:
+    _instance = None
+
     def __init__(self, team_color='blue'):
         self.robots = [EntityData() for i in range(3)]
         self.foes = [EntityData() for i in range(3)]
@@ -59,6 +61,11 @@ class FieldData:
 
         self.team_color = team_color
         self.foes_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls, *args, **kwargs)
+        return cls._instance
 
     def __str__(self):
         msg = f'BALL\n{self.ball}'
