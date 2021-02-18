@@ -91,8 +91,6 @@ def test_field_from_dict():
 
     test_field_data.from_vision_raw(field_dict)
 
-    print(data)
-
     assert test_field_data.ball.position.x == pytest.approx(-0.375)
     assert test_field_data.ball.position.theta == pytest.approx(0)
     assert test_field_data.foes[0].position.x == pytest.approx(0.68)
