@@ -19,9 +19,9 @@ class Pose2D:
 
 
 class EntityData:
-    def __init__(self, position: Pose2D = Pose2D(), velocity: Pose2D = Pose2D()):
-        self.position = position
-        self.velocity = velocity
+    def __init__(self):
+        self.position = Pose2D()
+        self.velocity = Pose2D()
 
     def __str__(self):
         msg = (
