@@ -13,16 +13,8 @@ class RobotCommand(object):
 
 
 class TeamCommand(object):
-    _instance = None
-    commands = [RobotCommand() for i in range(3)]
-
     def __init__(self):
-        pass
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
+        self.commands = [RobotCommand() for i in range(3)]
 
     def reset(self):
         for cmd in self.commands:
