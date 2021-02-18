@@ -1,5 +1,4 @@
 import numpy as np
-from .math import assert_angle
 
 FIELD_WIDTH = 1.3
 FIELD_LENGTH = 1.5
@@ -35,30 +34,12 @@ class EntityData:
     def __repr__(self):
         return f'EntityData({self})'
 
-    def _from_dict(self, data_dict, rotate_field=False):
-        multiplier = 1 if rotate_field is False else -1
-        sum_to_angle = 0 if rotate_field is False else np.pi
-
-        self.position.x = data_dict.get('x', 0) * multiplier
-        self.position.y = data_dict.get('y', 0) * multiplier
-
-        # The ball dict does not contain 'orientation' so it will always be 0
-        self.position.theta = assert_angle(data_dict.get('orientation', 0) + sum_to_angle)
-
-        self.velocity.x = data_dict.get('vx', 0) * multiplier
-        self.velocity.y = data_dict.get('vy', 0) * multiplier
-
-        # The ball dict does not contain 'vorientation' so it will always be 0
-        self.velocity.theta = data_dict.get('vorientation', 0)
 
 class FieldData:
-    def __init__(self, team_color='blue'):
+    def __init__(self):
         self.robots = [EntityData() for i in range(3)]
         self.foes = [EntityData() for i in range(3)]
         self.ball = EntityData()
-
-        self.team_color = team_color
-        self.foes_team_color = 'yellow' if self.team_color == 'blue' else 'blue'
 
     def __str__(self):
         msg = f'BALL\n{self.ball}'
@@ -70,22 +51,3 @@ class FieldData:
 
     def __repr__(self):
         return f'FieldData({self})'
-
-    def from_vision_raw(self, raw_data_dict):
-        if self.team_color == 'yellow':
-            team_list_of_dicts = raw_data_dict.get('robotsYellow')
-            foes_list_of_dicts = raw_data_dict.get('robotsBlue')
-            rotate_field = True
-        else:
-            team_list_of_dicts = raw_data_dict.get('robotsBlue')
-            foes_list_of_dicts = raw_data_dict.get('robotsYellow')
-            rotate_field = False
-
-        if 'ball' in raw_data_dict:
-            self.ball._from_dict(raw_data_dict['ball'], rotate_field)
-
-        for i in range(len(team_list_of_dicts)):
-            self.robots[i]._from_dict(team_list_of_dicts[i], rotate_field)
-
-        for i in range(len(foes_list_of_dicts)):
-            self.foes[i]._from_dict(foes_list_of_dicts[i], rotate_field)

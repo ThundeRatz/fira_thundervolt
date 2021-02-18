@@ -4,7 +4,7 @@ from .protocols import command_pb2
 from ..core.command import TeamCommand
 
 class FiraControl(Transmitter):
-    def __init__(self, team_color_yellow=True, control_ip='127.0.0.1', control_port=20011):
+    def __init__(self, team_color_yellow=False, control_ip='127.0.0.1', control_port=20011):
         super(FiraControl, self).__init__(control_ip, control_port)
 
         self.team_color_yellow = team_color_yellow

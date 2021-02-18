@@ -9,11 +9,11 @@ def main():
     vision = FiraVision()
 
     while True:
-        vision_data = vision.receive()
+        vision_data = vision.receive_dict()
         print(json.dumps(vision_data, indent=4))
 
         # Acess test
-        print(f"\r\nPosição x da bola: {vision_data['ball']['x']}\r\n")
+        print(f"\r\nPosição z da bola: {vision_data['ball']['z']}\r\n")
 
 
 if __name__ == '__main__':
