@@ -97,3 +97,34 @@ def test_field_from_dict():
     assert test_field_data.foes[0].position.theta == pytest.approx(2.37)
     assert test_field_data.robots[0].velocity.y == pytest.approx(2.29e-05)
     assert test_field_data.robots[0].velocity.theta == pytest.approx(4.70)
+
+def test_field_from_dict():
+    field_dict = {
+        'ball': {
+            'x': -0.375,
+            'z': 0.021
+        },
+        'robotsYellow': [
+            {
+                'x': 0.68,
+                'orientation': 2.37
+            }
+        ],
+        'robotsBlue': [
+            {
+                'vy': 2.29e-05,
+                'vorientation': 4.70
+            }
+        ]
+    }
+
+    test_field_data = FieldData(team_color='yellow')
+
+    test_field_data.from_vision_raw(field_dict)
+
+    assert test_field_data.ball.position.x == pytest.approx(0.375)
+    assert test_field_data.ball.position.theta == (pytest.approx(np.pi))
+    assert test_field_data.robots[0].position.x == pytest.approx(-0.68)
+    assert test_field_data.robots[0].position.theta == pytest.approx(-0.771592654)
+    assert test_field_data.foes[0].velocity.y == pytest.approx(-2.29e-05)
+    assert test_field_data.foes[0].velocity.theta == pytest.approx(4.70)
