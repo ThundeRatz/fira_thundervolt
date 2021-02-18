@@ -2,14 +2,12 @@ import base_example
 
 import numpy as np
 
-from thundervolt.core import math, data
+from thundervolt.core import data
 from thundervolt.vector_fields import fields, plotter
 
-field_data = data.FieldData()
 my_plotter = plotter.FieldPlotter('Walls')
 
 top_wall = fields.LineField(
-    field_data,
     target = (0, data.FIELD_WIDTH / 2),
     theta = 0.0,
     size = data.FIELD_LENGTH / 2,
@@ -20,7 +18,6 @@ top_wall = fields.LineField(
 )
 
 botton_wall = fields.LineField(
-    field_data,
     target = (0, -data.FIELD_WIDTH / 2),
     theta = 0.0,
     size = data.FIELD_LENGTH / 2,
@@ -31,7 +28,6 @@ botton_wall = fields.LineField(
 )
 
 left_top_wall = fields.LineField(
-    field_data,
     target = (-data.FIELD_LENGTH / 2, data.FIELD_WIDTH / 2),
     theta = -np.pi / 2,
     size = (data.FIELD_WIDTH - data.GOAL_WIDTH) / 2,
@@ -43,7 +39,6 @@ left_top_wall = fields.LineField(
 )
 
 left_botton_wall = fields.LineField(
-    field_data,
     target = (-data.FIELD_LENGTH / 2, -data.FIELD_WIDTH / 2),
     theta = np.pi / 2,
     size = (data.FIELD_WIDTH - data.GOAL_WIDTH) / 2,
@@ -56,7 +51,6 @@ left_botton_wall = fields.LineField(
 
 
 right_top_wall = fields.LineField(
-    field_data,
     target = (data.FIELD_LENGTH / 2, data.FIELD_WIDTH / 2),
     theta = -np.pi / 2,
     size = (data.FIELD_WIDTH - data.GOAL_WIDTH) / 2,
@@ -68,7 +62,6 @@ right_top_wall = fields.LineField(
 )
 
 right_botton_wall = fields.LineField(
-    field_data,
     target = (data.FIELD_LENGTH / 2, -data.FIELD_WIDTH / 2),
     theta = np.pi / 2,
     size = (data.FIELD_WIDTH - data.GOAL_WIDTH) / 2,
@@ -79,7 +72,7 @@ right_botton_wall = fields.LineField(
     decay_dist = 0.08,
 )
 
-my_field = fields.VectorField(field_data)
+my_field = fields.VectorField()
 my_field.add(top_wall)
 my_field.add(botton_wall)
 my_field.add(left_top_wall)

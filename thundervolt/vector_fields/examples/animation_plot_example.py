@@ -9,21 +9,19 @@ from thundervolt.vector_fields import fields
 
 field_data = data.FieldData()
 repell_field = fields.RadialField(
-    field_data,
     target = (-0.3,0),
     max_radius = 1.0,
     decay_radius = 0.3,
     repelling = True,
 )
 attract_field = fields.RadialField(
-    field_data,
     target = (0.3,0),
     max_radius = 3.0,
     decay_radius = 0.3,
     repelling = False,
 )
 
-my_field = fields.VectorField(field_data)
+my_field = fields.VectorField()
 my_field.add(repell_field)
 my_field.add(attract_field)
 
@@ -55,7 +53,7 @@ def update_quiver(num, Q, X, Y, M):
         for j in range(len(X[i])):
             x = X[i][j]
             y = Y[i][j]
-            vec = my_field.compute(data.Pose2D(x,y))
+            vec = my_field.compute((x,y))
             u, v = vec[0], vec[1]
             norm = np.linalg.norm((u,v))
             if norm > 1e-5:
