@@ -10,7 +10,7 @@ def rotate(vector, radians):
     """Use numpy to build a rotation matrix and take the dot product."""
     c, s = np.cos(radians), np.sin(radians)
     R = np.array([[c, -s], [s, c]])
-    return np.dot(R, vector.T)
+    return np.dot(R, vector)
 
 def assert_angle(theta):
     while (theta < -np.pi):
