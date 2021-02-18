@@ -9,6 +9,11 @@ class FiraControl(Transmitter):
 
         self.team_color_yellow = team_color_yellow
 
+
+    def transmit(self, packet: packet_pb2.Packet):
+        super().transmit(packet)
+
+
     def transmit_robot(self, robot_id, left_speed, right_speed):
         """
         Encode package and transmit.
@@ -16,7 +21,7 @@ class FiraControl(Transmitter):
 
         packet = self._fill_robot_command_packet(robot_id, left_speed, right_speed)
 
-        super().transmit(packet)
+        self.transmit(packet)
 
 
     def _fill_robot_command_packet(self, robot_id, left_speed, right_speed):
@@ -46,7 +51,7 @@ class FiraControl(Transmitter):
 
         packet = self._fill_team_command_packet(team_command)
 
-        super().transmit(packet)
+        self.transmit(packet)
 
 
     def _fill_team_command_packet(self, team_command : TeamCommand):
