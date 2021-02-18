@@ -202,54 +202,59 @@ class LineField(VectorField):
 
         return output * decay * multiplier
 
-class TangentialField(PotentialField):
+class TangentField(VectorField):
     def __init__(self, field_data, **kwargs):
         super().__init__(field_data, **kwargs)
-        self.target = kwargs['target']
+
+        # Hyperbolic spiral definition
+        self.target = kwargs.get('target')
+        self.radius = kwargs.get('radius')
         self.clockwise = kwargs.get('clockwise', False)
-        self.decay = kwargs['decay']
-        self.radius = kwargs.get('radius', kwargs.get('radius_max'))
-        self.radius_max = kwargs.get('radius_max')
-        self.multiplier = kwargs.get('multiplier', 1)
-        self.orbitation_speed = kwargs.get('orbitation_speed', self.multiplier)
+        self.K = kwargs.get('K', 1/2500)
 
-        self.K = kwargs.get('K', 1/25000)
-
+        # Geometric configuration
+        self.max_radius = kwargs.get('max_radius', None)
+        self.decay_radius = kwargs.get('decay_radius', None)
         self.field_limits = kwargs.get('field_limits', None)
 
-    def compute(self, input):
-        target_go_to = call_or_return(self.target, self.field_data)
-        radius_max = call_or_return(self.radius_max, self.field_data)
+        # Weight
+        self.multiplier = kwargs.get('multiplier', 1)
+
+    def compute(self, pose: data.Pose2D):
+        position = np.array([pose.x, pose.y])
+
+        field_limits = call_or_return(self.field_limits, self.field_data)
+
+        if field_limits and not(-field_limits[0] <= position[0] <= field_limits[0]):
+            return np.zeros(2)
+
+        if field_limits and not(-field_limits[1] <= position[1] <= field_limits[1]):
+            return np.zeros(2)
+
+        target = np.array(call_or_return(self.target, self.field_data))
+        max_radius = call_or_return(self.max_radius, self.field_data)
+
+        to_position = position - target
+        to_position_scalar = np.linalg.norm(to_position)
+
+        if max_radius and to_position_scalar > max_radius:
+            return np.zeros(2)
+
         multiplier = call_or_return(self.multiplier, self.field_data)
+        decay_radius = call_or_return(self.decay_radius, self.field_data)
+        radius = call_or_return(self.radius, self.field_data)
+        rotation_dir = -1 if call_or_return(self.clockwise, self.field_data) else 1
+        angle_to_position = np.arctan2(to_position[1], to_position[0])
 
-        cwo = 1 if call_or_return(self.clockwise, self.field_data) else -1 # clockwise ou counterclockwise
-
-        to_target = np.subtract(target_go_to, input)
-        to_taget_scalar = np.linalg.norm(to_target)
-
-        angle_to_target = np.arctan2(target_go_to[1] - input[1], target_go_to[0] - input[0] )
-
-        if self.field_limits and not(0 <= input[0] <= self.field_limits[0]):
-            return (0, 0)
-
-        if self.field_limits and not(0 <= input[1] <= self.field_limits[1]):
-            return (0, 0)
-
-        if radius_max and to_taget_scalar > radius_max:
-            return (0, 0)
-
-        to_target_scalar_norm = max(0, min(1, abs((self.radius - to_taget_scalar)/radius_max)))
-        end_angle = 0
-        if to_taget_scalar > self.radius:
-            end_angle = angle_to_target + cwo * (np.pi/2) * (2 - ( (self.radius + self.K)/(to_taget_scalar + self.K) ))
+        if to_position_scalar > self.radius:
+            end_angle = angle_to_position + rotation_dir * (np.pi/2) * (2 - ((self.radius + self.K)/(to_position_scalar + self.K)))
         else:
-            end_angle = angle_to_target + cwo * (np.pi/2) * np.sqrt(to_taget_scalar/self.radius)
+            end_angle = angle_to_position + rotation_dir * (np.pi/2) * np.sqrt(to_position_scalar/self.radius)
 
-        to_target_norm = -math.versor( (np.cos(end_angle), np.sin(end_angle)) )
+        output = math.from_polar(end_angle)
 
-        force = apply_decay(self.decay, to_target_scalar_norm)
+        decay = 1
+        if max_radius and decay_radius:
+            decay = max(0, min(1, (max_radius - to_position_scalar)/(max_radius - decay_radius)))
 
-        return (
-            to_target_norm[0] * force * multiplier,
-            to_target_norm[1] * force * multiplier
-        )
+        return output * decay * multiplier
