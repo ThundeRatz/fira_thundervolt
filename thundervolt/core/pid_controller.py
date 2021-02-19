@@ -1,5 +1,79 @@
 import logging
+import numpy as np
 
+class ButterworthSecondOrder:
+    """
+    Implementation of Butterworth second order low-pass filter
+
+    A generic digital filter follows the relation
+
+        a0 * y[k] = sum(bi * x[k - i]) - sum(aj * y[k - j])
+
+    Where
+
+        x[k] - measurement at instant k
+        y[k] - filtered signal at instant k
+
+    The Butterworth filter have the special property of being a
+    maximally flat magnitude filter, in other words, is the best
+    filter that doesn't present distortions around the cutoff
+    frequency
+
+    The formula for the continuos coefficients of the Butterworth
+    filter is available here:
+
+    https://en.wikipedia.org/wiki/Butterworth_filter
+
+    The discrete version were computed with the Tustin method:
+
+    https://en.wikipedia.org/wiki/Bilinear_transform
+
+    """
+
+    def __init__(self, cutoff_frequency, sampling_frequency=1.0):
+        """
+        Create a second order Butterworth filter
+
+        Args:
+            cutoff_frequency (float): Low-pass cutoff frequency in Hz
+            sampling_frequency (float, optional): Sampling frequency in Hz.
+                Defaults to 1.0.
+        """
+        w = cutoff_frequency/sampling_frequency
+
+        if w > 0.5:
+            logging.warn('Filter cutoff frequency larger than Nyquist frequency')
+
+        b0 = 1
+        b1 = 2
+        b2 = 1
+
+        a0 = 1 + 2*np.sqrt(2)/w + 4/w**2
+        a1 = 2 - 8/w**2
+        a2 = 1 - 2*np.sqrt(2)/w + 4/w**2
+
+        self.x = np.array([0,0,0])
+        self.y = np.array([0,0])
+
+        self.a = np.array([a2,a1])/a0
+        self.b = np.array([b2,b1,b0])/a0
+
+    def update(self, x0):
+        """
+        Produces a new value from measured data
+
+        Args:
+            x0 (float): Last measure
+
+        Returns:
+            float: Filtered value
+        """
+
+        self.x = np.append(self.x, x0)[1:]
+        y0 = np.dot(self.x, self.b) - np.dot(self.y, self.a)
+
+        self.y = np.append(self.y, y0)[1:]
+        return y0
 
 class pidController:
 
@@ -17,6 +91,9 @@ class pidController:
         self.set_point_changed = True
         self.error_acc = 0  # accumulated error for i term
         self.prev_error = 0  # previous error for d term
+
+        # cutoff frequency is 1/5 of sampling frequency
+        self.dedt_filter = ButterworthSecondOrder(1/5)
 
     def __str__(self):
         return f"PID - Kp: {self.kp:.02f} Ki: {self.ki:.02f} Kd: {self.kd:.02f} SP: {self._set_point:.02f} Freq: {self.freq:.02f} Hz"
@@ -41,7 +118,8 @@ class pidController:
             self.prev_error = error
             self.set_point_changed = False
 
-        dedt = (error - self.prev_error)*self.freq
+        dedt = self.dedt_filter.update((error - self.prev_error)*self.freq)
+
         self.prev_error = error
 
         # Anti-windup system to decrease integrative instability
