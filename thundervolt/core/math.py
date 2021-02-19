@@ -12,11 +12,10 @@ def rotate(vector, radians):
     R = np.array([[c, -s], [s, c]])
     return np.dot(R, vector)
 
-def assert_angle(theta):
-    while (theta < -np.pi):
-        theta += 2 * np.pi
+def assert_angle(angle):
+    angle = angle % (2 * np.pi)
 
-    while (theta > np.pi):
-        theta -= 2 * np.pi
+    if angle > np.pi:
+        angle -= 2 * np.pi
 
-    return theta
+    return angle
