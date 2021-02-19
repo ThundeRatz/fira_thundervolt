@@ -1,4 +1,4 @@
-# Import this module in the start of your test module to be able to import thundervolt package
+# Import this module in the start of your example module to be able to import thundervolt package
 
 import sys
 import pathlib

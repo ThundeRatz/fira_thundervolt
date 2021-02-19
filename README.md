@@ -63,7 +63,7 @@ python3 -m thundervolt
 Para rodar os testes de integração, rode o seguinte comando:
 
 ```bash
-python3 /integration_tests/nome_do_teste.py
+python3 ./integration_tests/nome_do_teste.py
 ```
 
 ### Testes unitários
