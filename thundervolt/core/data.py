@@ -1,5 +1,3 @@
-import numpy as np
-
 FIELD_WIDTH = 1.3
 FIELD_LENGTH = 1.5
 
