@@ -7,10 +7,10 @@ import time
 
 
 def main():
-    blue_control = FiraControl(team_color_yellow=False)
-    yellow_control = FiraControl(team_color_yellow=True)
-
     team_command = TeamCommand()
+
+    blue_control = FiraControl(team_color_yellow=False, team_command=team_command)
+    yellow_control = FiraControl(team_color_yellow=True, team_command=team_command)
 
     current_time = time.time()
 
@@ -18,8 +18,8 @@ def main():
     team_command.commands[0].right_speed = 10
 
     while (time.time() - current_time < 5):
-        blue_control.transmit_team(team_command)
-        yellow_control.transmit_team(team_command)
+        blue_control.transmit_team()
+        yellow_control.transmit_team()
 
     current_time = time.time()
 
@@ -27,8 +27,8 @@ def main():
     team_command.commands[1].right_speed = 5
 
     while (time.time() - current_time < 5):
-        blue_control.transmit_team(team_command)
-        yellow_control.transmit_team(team_command)
+        blue_control.transmit_team()
+        yellow_control.transmit_team()
 
     current_time = time.time()
 
@@ -36,13 +36,13 @@ def main():
     team_command.commands[2].right_speed = -15
 
     while (time.time() - current_time < 5):
-        blue_control.transmit_team(team_command)
-        yellow_control.transmit_team(team_command)
+        blue_control.transmit_team()
+        yellow_control.transmit_team()
 
     team_command.reset()
 
-    blue_control.transmit_team(team_command)
-    yellow_control.transmit_team(team_command)
+    blue_control.transmit_team()
+    yellow_control.transmit_team()
 
 
 if __name__ == '__main__':

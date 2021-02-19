@@ -1,3 +1,5 @@
+import logging
+
 from .receiver import Receiver
 from .protocols import packet_pb2
 from ..core.data import FieldData, EntityData
@@ -8,10 +10,11 @@ from google.protobuf.json_format import MessageToJson
 import numpy as np
 
 class FiraVision(Receiver):
-    def __init__(self, team_color_yellow: bool, vision_ip='224.0.0.1', vision_port=10002):
+    def __init__(self, team_color_yellow: bool, field_data: FieldData = None, vision_ip='224.0.0.1', vision_port=10002):
         super(FiraVision, self).__init__(vision_ip, vision_port)
 
         self.team_color_yellow = team_color_yellow
+        self.field_data = field_data
 
 
     def receive(self):
@@ -33,13 +36,13 @@ class FiraVision(Receiver):
         return vision_data
 
 
-    def receive_field_data(self) -> FieldData:
-        vision_data_dict = self.receive_dict()
+    def receive_field_data(self):
+        if self.field_data is None:
+            logging.warn('FieldData not instantiated')
+        else:
+            vision_data_dict = self.receive_dict()
 
-        field_data = FieldData()
-        self._field_data_from_dict(field_data, vision_data_dict)
-
-        return field_data
+            self._field_data_from_dict(self.field_data, vision_data_dict)
 
 
     def _entity_from_dict(self, entity_data: EntityData, data_dict, rotate_field=False):

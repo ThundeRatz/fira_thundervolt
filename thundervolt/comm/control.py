@@ -1,13 +1,16 @@
+import logging
+
 from .transmitter import Transmitter
 from .protocols import packet_pb2
 from .protocols import command_pb2
 from ..core.command import TeamCommand
 
 class FiraControl(Transmitter):
-    def __init__(self, team_color_yellow: bool, control_ip='127.0.0.1', control_port=20011):
+    def __init__(self, team_color_yellow: bool, team_command: TeamCommand = None, control_ip='127.0.0.1', control_port=20011):
         super(FiraControl, self).__init__(control_ip, control_port)
 
         self.team_color_yellow = team_color_yellow
+        self.team_command = team_command
 
 
     def transmit(self, packet: packet_pb2.Packet):
@@ -39,7 +42,7 @@ class FiraControl(Transmitter):
         return packet
 
 
-    def transmit_team(self, team_command : TeamCommand):
+    def transmit_team(self):
         """
         Encode package and transmit.
 
@@ -49,9 +52,12 @@ class FiraControl(Transmitter):
             Commands to all robots
         """
 
-        packet = self._fill_team_command_packet(team_command)
+        if self.team_command is None:
+            logging.warn('TeamCommand not instantiated')
+        else:
+            packet = self._fill_team_command_packet(self.team_command)
 
-        self.transmit(packet)
+            self.transmit(packet)
 
 
     def _fill_team_command_packet(self, team_command : TeamCommand):
