@@ -74,3 +74,11 @@ def test_rotate():
     assert rotated_vec[0] == pytest.approx(rotated_vec_2[0])
     assert rotated_vec[1] == pytest.approx(rotated_vec_2[1])
 
+def test_assert_angle():
+    assert math.assert_angle(2 * np.pi) == pytest.approx(0)
+    assert math.assert_angle(np.pi) == pytest.approx(np.pi)
+    assert math.assert_angle(3 * np.pi) == pytest.approx(np.pi)
+    assert math.assert_angle(5 * np.pi) == pytest.approx(np.pi)
+    assert math.assert_angle(5 * np.pi + np.pi / 4) == pytest.approx(- 3 * np.pi / 4)
+    assert math.assert_angle(- 7 * np.pi / 2) == pytest.approx(np.pi / 2)
+

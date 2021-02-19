@@ -15,3 +15,11 @@ def rotate(vector, radians):
     c, s = np.cos(radians), np.sin(radians)
     R = np.array([[c, -s], [s, c]])
     return np.dot(R, vector)
+
+def assert_angle(angle):
+    angle = angle % (2 * np.pi)
+
+    if angle > np.pi:
+        angle -= 2 * np.pi
+
+    return angle

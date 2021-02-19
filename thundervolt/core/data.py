@@ -17,7 +17,6 @@ class Pose2D:
     def __repr__(self):
         return f'Pose2D({self})'
 
-
 class EntityData:
     def __init__(self):
         self.position = Pose2D()
