@@ -7,7 +7,7 @@ import time
 
 def main():
     blue_control = FiraControl(team_color_yellow=False)
-    yellow_control = FiraControl()
+    yellow_control = FiraControl(team_color_yellow=True)
 
     current_time = time.time()
 

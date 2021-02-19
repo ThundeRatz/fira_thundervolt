@@ -6,7 +6,7 @@ import json
 
 
 def main():
-    vision = FiraVision()
+    vision = FiraVision(team_color_yellow=False)
 
     while True:
         vision_data = vision.receive_dict()

@@ -8,7 +8,7 @@ from google.protobuf.json_format import MessageToJson
 import numpy as np
 
 class FiraVision(Receiver):
-    def __init__(self, team_color_yellow=False, vision_ip='224.0.0.1', vision_port=10002):
+    def __init__(self, team_color_yellow: bool, vision_ip='224.0.0.1', vision_port=10002):
         super(FiraVision, self).__init__(vision_ip, vision_port)
 
         self.team_color_yellow = team_color_yellow
