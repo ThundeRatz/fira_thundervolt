@@ -78,7 +78,7 @@ class FiraControl(Transmitter):
         return packet
 
 class FiraControlThread(Job):
-    def __init__(self, team_color_yellow: bool, team_command: TeamCommand = None, control_ip='224.0.0.1', control_port=10002):
+    def __init__(self, team_color_yellow: bool, team_command: TeamCommand = None, control_ip='127.0.0.1', control_port=20011):
         self.control = FiraControl(team_color_yellow, team_command, control_ip, control_port)
 
         super(FiraControlThread, self).__init__(self.control.transmit_team)
