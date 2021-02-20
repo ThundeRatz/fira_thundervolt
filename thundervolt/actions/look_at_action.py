@@ -12,11 +12,13 @@ class LookAtAction(Action):
         self.tolerance = tolerance
         self.controller = pidController(kp, ki, kd)
 
-    def initialize(self, robot_id, angle):
+    def initialize(self, robot_id):
         super().initialize(robot_id)
-        self.final_angle = assert_angle(angle)
         self.last_received_angle = None
         self.controller.reset()
+
+    def set_angle(self, angle):
+        self.final_angle = assert_angle(angle)
         self.controller.set_point = self.final_angle
 
     def update(self, field_data: FieldData) -> (RobotCommand, bool):

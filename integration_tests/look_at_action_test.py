@@ -17,7 +17,8 @@ def main():
 
     blue_control.transmit_robot(TEST_ROBOT, 0, 0)
 
-    action.initialize(TEST_ROBOT, (np.pi)/2)
+    action.initialize(TEST_ROBOT)
+    action.set_angle(np.pi/2)
 
     while True:
         vision_data = vision.receive_field_data()
