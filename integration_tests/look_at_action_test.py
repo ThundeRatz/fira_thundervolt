@@ -3,6 +3,7 @@ import test_base  # pylint: disable=import-error
 from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
 from thundervolt.actions.look_at_action import LookAtAction
+import numpy as np
 
 TEST_ROBOT = 1
 
@@ -16,7 +17,7 @@ def main():
 
     blue_control.transmit_robot(TEST_ROBOT, 0, 0)
 
-    action.initialize(TEST_ROBOT, 90)
+    action.initialize(TEST_ROBOT, (np.pi)/2)
 
     while True:
         vision_data = vision.receive_field_data()
