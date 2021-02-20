@@ -82,3 +82,14 @@ class FiraControlThread(Job):
         self.control = FiraControl(team_color_yellow, team_command, control_ip, control_port)
 
         super(FiraControlThread, self).__init__(self.control.transmit_team)
+
+    def pause(self):
+        super().pause()
+        [self.control.transmit_robot(i, 0, 0) for i in range(3)]
+
+    def resume(self):
+        super().resume()
+
+    def stop(self):
+        super().pause()
+        [self.control.transmit_robot(i, 0, 0) for i in range(3)]
