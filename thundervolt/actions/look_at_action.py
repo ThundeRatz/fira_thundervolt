@@ -4,6 +4,7 @@ from .action import Action
 from thundervolt.core.utils import assert_angle
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import RobotCommand
+from thundervolt.core.pid_controller import pidController
 
 class LookAtAction(Action):
     def __init__(self, kp, ki, kd, tolerance):
