@@ -100,7 +100,7 @@ class pidController:
         self.ki = ki
         self.kd = kd
         self.freq = freq
-        self._set_point = set_point
+        self.set_point = set_point
         self.saturation = saturation
         self.max_integral = max_integral
         self.integral_fade_rate = integral_fade_rate
@@ -113,26 +113,17 @@ class pidController:
         self.dedt_filter = ButterworthSecondOrder(1/5)
 
     def __str__(self):
-        return f"PID - Kp: {self.kp:.02f} Ki: {self.ki:.02f} Kd: {self.kd:.02f} SP: {self._set_point:.02f} Freq: {self.freq:.02f} Hz"
+        return f"PID - Kp: {self.kp:.02f} Ki: {self.ki:.02f} Kd: {self.kd:.02f} SP: {self.set_point:.02f} Freq: {self.freq:.02f} Hz"
 
     def __repr__(self):
-        return f"pidController(Kp: {self.kp:.02f} Ki: {self.ki:.02f} Kd: {self.kd:.02f} SP: {self._set_point:.02f} Freq: {self.freq:.02f} Hz)"
-
-    @property
-    def set_point(self):
-        return self._set_point
-
-    @set_point.setter
-    def set_point(self, value):
-        self._set_point = value
-        self.set_point_changed = True
+        return f"pidController(Kp: {self.kp:.02f} Ki: {self.ki:.02f} Kd: {self.kd:.02f} SP: {self.set_point:.02f} Freq: {self.freq:.02f} Hz)"
 
     def reset(self):
         self.error_acc = 0
         self.prev_error = 0
 
     def update(self, state):
-        error = self._set_point - state
+        error = self.set_point - state
 
         # Prevents spikes when set point is changed
         if self.set_point_changed:
