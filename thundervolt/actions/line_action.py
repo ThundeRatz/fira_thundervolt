@@ -4,13 +4,13 @@ from .action import Action
 from thundervolt.core.pid_controller import pidController
 from thundervolt.core.data import FieldData, Pose2D
 from thundervolt.core.command import RobotCommand
+from thundervolt.core.utils import versor
 
 class LineAction(Action):
-    def __init__(self, kp_lin, ki_lin, kd_lin, tolerance_lin, kp_ang, ki_ang, kd_ang, tolerance_ang):
+    def __init__(self, kp_lin, ki_lin, kd_lin, tolerance, kp_ang, ki_ang, kd_ang):
         super().__init__()
-        self.tolerance_lin = tolerance_lin
+        self.tolerance = tolerance
         self.controller_lin = pidController(kp_lin, ki_lin, kd_lin)
-        self.tolerance_ang = tolerance_ang
         self.controller_ang = pidController(kp_ang, ki_ang, kd_ang)
 
 
@@ -31,7 +31,7 @@ class LineAction(Action):
     def set_goal(self, pointC):
         u = pointC - self.pointA
         v = self.pointB - self.pointA
-        v_versor = utils.versor(v)
+        v_versor = versor(v)
         u_dot_v = np.dot(u, v_versor)
 
         if u_dot_v < 0:
@@ -56,7 +56,7 @@ class LineAction(Action):
         goal_ang = np.arctan2(actual_point-self.goal)
         self.controller_ang.set_point(goal_ang)
 
-        response_ang = self.controller.update(actual_ang)
+        response_ang = self.controller_ang.update(actual_ang)
         response_lin = self.controller_lin.update(np.linalg.norm(self.goal-actual_point))
 
         return (RobotCommand(response_lin - response_ang, response_lin + response_ang), False)
