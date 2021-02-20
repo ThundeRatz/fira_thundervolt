@@ -27,5 +27,4 @@ class LineAction(Action):
         self.goal = goal
 
     def update(self, field_data: FieldData) -> RobotCommand:
-
         return
