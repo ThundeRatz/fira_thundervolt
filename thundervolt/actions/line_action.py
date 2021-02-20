@@ -4,13 +4,14 @@ from .action import Action
 from thundervolt.core.pid_controller import pidController
 from thundervolt.core.data import FieldData, Pose2D
 from thundervolt.core.command import RobotCommand
-from thundervolt.core.utils import versor
+from thundervolt.core.utils import versor, assert_angle
 
 class LineAction(Action):
-    def __init__(self, kp_lin, ki_lin, kd_lin, tolerance, kp_ang, ki_ang, kd_ang):
+    def __init__(self, kp_lin, ki_lin, kd_lin, tolerance_lin, kp_ang, ki_ang, kd_ang, tolerance_ang):
         super().__init__()
-        self.tolerance = tolerance
+        self.tolerance_lin = tolerance_lin
         self.controller_lin = pidController(kp_lin, ki_lin, kd_lin)
+        self.tolerance_ang = tolerance_ang
         self.controller_ang = pidController(kp_ang, ki_ang, kd_ang)
 
 
@@ -24,12 +25,11 @@ class LineAction(Action):
 
         self.pointA = pointA
         self.pointB = pointB
-        self.aux = (pointB[1] - pointA[1]) / (pointB[0] - pointA[0])
 
-        self.controller_lin.set_point(0)
+        self.controller_lin.set_point = 0
 
-    def set_goal(self, pointC):
-        u = pointC - self.pointA
+    def set_goal(self, point_goal):
+        u = point_goal - self.pointA
         v = self.pointB - self.pointA
         v_versor = versor(v)
         u_dot_v = np.dot(u, v_versor)
@@ -50,13 +50,26 @@ class LineAction(Action):
         actual_point[1] = field_data.robots[self.robot_id].position.y
         actual_ang = field_data.robots[self.robot_id].position.theta
 
-        if np.linalg.norm(self.goal-actual_point) < self.tolerance:
-            return (RobotCommand(), True)
+        goal_vector = self.goal - actual_point
 
-        goal_ang = np.arctan2(actual_point-self.goal)
-        self.controller_ang.set_point(goal_ang)
+        line = self.pointA - self.pointB
 
+        if np.linalg.norm(goal_vector) < self.tolerance_lin:
+            goal_ang = np.arctan2(line[1], line[0])
+            if abs(goal_ang - actual_ang) < self.tolerance_ang:
+                return (RobotCommand(), True)
+            response_lin = 0
+        else:
+            goal_ang = np.arctan2(goal_vector[1], goal_vector[0])
+            response_lin = -self.controller_lin.update(np.linalg.norm(goal_vector))
+
+        if abs(assert_angle(goal_ang - actual_ang)) > np.pi/2:
+            goal_ang = assert_angle(goal_ang + np.pi)
+            response_lin *= -1
+
+        response_lin *= np.cos(assert_angle(goal_ang - actual_ang))**2
+
+        self.controller_ang.set_point = goal_ang
         response_ang = self.controller_ang.update(actual_ang)
-        response_lin = self.controller_lin.update(np.linalg.norm(self.goal-actual_point))
 
         return (RobotCommand(response_lin - response_ang, response_lin + response_ang), False)
