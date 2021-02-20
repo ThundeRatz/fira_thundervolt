@@ -11,6 +11,7 @@ class LookAtAction(Action):
         super().__init__()
         self.tolerance = tolerance
         self.controller = pidController(kp, ki, kd)
+        self.controller.set_point = 0.0
 
     def initialize(self, robot_id):
         super().initialize(robot_id)
@@ -19,7 +20,6 @@ class LookAtAction(Action):
 
     def set_angle(self, angle):
         self.final_angle = assert_angle(angle)
-        self.controller.set_point = self.final_angle
 
     def update(self, field_data: FieldData) -> (RobotCommand, bool):
         self.last_received_angle = field_data.robots[self.robot_id].position.theta
@@ -29,5 +29,5 @@ class LookAtAction(Action):
             return (RobotCommand(), True)
 
         # Calculate controller response
-        response = self.controller.update(self.last_received_angle)
+        response = self.controller.update(assert_angle(last_received_angle - self.final_angle))
         return (RobotCommand(-response, response), False)
