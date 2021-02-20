@@ -76,8 +76,26 @@ class ButterworthSecondOrder:
         return y0
 
 class pidController:
+    """
+    Implementation of simple PID controller
 
-    def __init__(self, kp, ki, kd, set_point=0, freq=1, saturation=None, max_integral=10, integral_fade_rate=1):
+        Response = Kp(error + Ki * integral(error) Kd * d/dt(error))
+    """
+
+    def __init__(self, kp, ki, kd, set_point=0.0, freq=1.0, saturation=None, max_integral=10.0, integral_fade_rate=1.0):
+        """
+        Creation of PID controller
+
+        Args:
+            kp (float): Proportional constant
+            ki (float): Integrative constant
+            kd (float): Derivative constant
+            set_point (float, optional): Reference to be achieved. Defaults to 0.0
+            freq (int, optional): Discretization frequency, in Hz. Defaults to 1.0
+            saturation (float, optional): Max allowable response. Defaults to None.
+            max_integral (int, optional): Anti-windup integral limit. Defaults to 10.0
+            integral_fade_rate (int, optional): Integral decay when out of controllable region. Defaults to 1.0
+        """
         self.kp = kp
         self.ki = ki
         self.kd = kd
