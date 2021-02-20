@@ -123,7 +123,7 @@ class pidController:
         self.prev_error = error
 
         # Anti-windup system to decrease integrative instability
-        if self.saturation is None or error*self.kp <= self.saturation:
+        if self.saturation is None or abs(error*self.kp) <= self.saturation:
             self.error_acc += error/self.freq
         else:
             self.error_acc *= self.integral_fade_rate**(1/self.freq)
@@ -134,7 +134,7 @@ class pidController:
 
         response = self.kp*(error + self.ki*self.error_acc + self.kd*dedt)
 
-        if self.saturation is not None and response >= self.saturation:
+        if self.saturation is not None and abs(response) >= self.saturation:
             logging.warn('Control response larger than saturation')
 
         return response
