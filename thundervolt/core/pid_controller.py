@@ -127,6 +127,10 @@ class pidController:
         self._set_point = value
         self.set_point_changed = True
 
+    def reset(self):
+        self.error_acc = 0
+        self.prev_error = 0
+
     def update(self, state):
         error = self._set_point - state
 
