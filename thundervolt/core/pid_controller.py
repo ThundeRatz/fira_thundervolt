@@ -77,7 +77,7 @@ class ButterworthSecondOrder:
 
 class pidController:
 
-    def __init__(self, kp, ki, kd, set_point=0, freq=1, saturation=None, max_integral=10, integral_fade_rate=1, settling_value=1e-2):
+    def __init__(self, kp, ki, kd, set_point=0, freq=1, saturation=None, max_integral=10, integral_fade_rate=1):
         self.kp = kp
         self.ki = ki
         self.kd = kd
@@ -86,7 +86,6 @@ class pidController:
         self.saturation = saturation
         self.max_integral = max_integral
         self.integral_fade_rate = integral_fade_rate
-        self.settling_value = settling_value
 
         self.set_point_changed = True
         self.error_acc = 0  # accumulated error for i term
