@@ -1,9 +1,9 @@
 import test_base  # pylint: disable=import-error
+import numpy as np
 
 from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
 from thundervolt.actions.look_at_action import LookAtAction
-import numpy as np
 
 TEST_ROBOT = 1
 
