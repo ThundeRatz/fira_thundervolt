@@ -5,6 +5,8 @@ from .protocols import packet_pb2
 from .protocols import command_pb2
 from ..core.command import TeamCommand
 
+from .thread_job import Job
+
 class FiraControl(Transmitter):
     def __init__(self, team_color_yellow: bool, team_command: TeamCommand = None, control_ip='127.0.0.1', control_port=20011):
         super(FiraControl, self).__init__(control_ip, control_port)
@@ -74,3 +76,9 @@ class FiraControl(Transmitter):
         packet.cmd.CopyFrom(cmd_packet) # pylint: disable=no-member
 
         return packet
+
+class FiraControlThread(Job):
+    def __init__(self, team_color_yellow: bool, field_data: FieldData = None, vision_ip='224.0.0.1', vision_port=10002):
+        self.control = FiraControl(team_color_yellow, field_data, vision_ip, vision_port)
+
+        super(FiraControlThread, self).__init__(self.control.transmit_team)

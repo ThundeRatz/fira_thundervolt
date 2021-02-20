@@ -4,10 +4,12 @@ from .receiver import Receiver
 from .protocols import packet_pb2
 from ..core.data import FieldData, EntityData
 from ..core.math import assert_angle
+from .thread_job import Job
 
 import json
 from google.protobuf.json_format import MessageToJson
 import numpy as np
+
 
 class FiraVision(Receiver):
     def __init__(self, team_color_yellow: bool, field_data: FieldData = None, vision_ip='224.0.0.1', vision_port=10002):
@@ -80,3 +82,11 @@ class FiraVision(Receiver):
 
         for i in range(len(foes_list_of_dicts)):
             self._entity_from_dict(field_data.foes[i], foes_list_of_dicts[i], rotate_field)
+
+
+class FiraVisionThread(Job):
+    def __init__(self, team_color_yellow: bool, field_data: FieldData = None, vision_ip='224.0.0.1', vision_port=10002):
+        self.vision = FiraVision(team_color_yellow, field_data, vision_ip, vision_port)
+
+        super(FiraVisionThread, self).__init__(self.vision.receive_field_data)
+
