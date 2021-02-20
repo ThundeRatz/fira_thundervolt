@@ -2,7 +2,7 @@ import numpy as np
 import random
 import json
 
-from thundervolt.core import math, data
+from thundervolt.core import utils, data
 
 class PotentialDataExporter(object):
     def __init__(self, name):
@@ -97,7 +97,7 @@ class RadialField(VectorField):
 
         to_target = np.subtract(np.array(self.target), position)
         to_taget_scalar = np.linalg.norm(to_target)
-        to_target = math.versor(to_target)
+        to_target = utils.versor(to_target)
 
         if self.max_radius and to_taget_scalar > self.max_radius:
             return np.zeros(2)
@@ -150,8 +150,8 @@ class LineField(VectorField):
 
         # Ortogonal Projections
         to_position = position - np.array(self.target)
-        line_dir = math.from_polar(self.theta)
-        axis_dir = math.from_polar(self.theta - np.pi / 2)
+        line_dir = utils.from_polar(self.theta)
+        axis_dir = utils.from_polar(self.theta - np.pi / 2)
 
         proj_line = np.dot(to_position, line_dir)
         proj_axis = np.dot(to_position, axis_dir)
@@ -234,7 +234,7 @@ class TangentField(VectorField):
         else:
             end_angle = angle_to_position + rotation_dir * (np.pi/2) * np.sqrt(to_position_scalar / self.radius)
 
-        output = math.from_polar(end_angle)
+        output = utils.from_polar(end_angle)
 
         decay = 1
         if self.max_radius and self.decay_radius:
