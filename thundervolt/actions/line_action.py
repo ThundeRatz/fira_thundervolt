@@ -69,7 +69,7 @@ class LineAction(Action):
 
         response_lin *= np.cos(assert_angle(goal_ang - actual_ang))**2
 
-        self.controller_ang.set_point = goal_ang
-        response_ang = self.controller_ang.update(actual_ang)
+        distance_to_goal = actual_ang - goal_ang
+        response_ang = self.controller_ang.update(distance_to_goal)
 
         return (RobotCommand(response_lin - response_ang, response_lin + response_ang), False)
