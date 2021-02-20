@@ -43,7 +43,7 @@ class LineAction(Action):
 
         self.goal = goal
 
-    def update(self, field_data: FieldData) -> RobotCommand:
+    def update(self, field_data: FieldData) -> (RobotCommand, bool):
         actual_point = np.zeros(2)
 
         actual_point[0] = field_data.robots[self.robot_id].position.x
