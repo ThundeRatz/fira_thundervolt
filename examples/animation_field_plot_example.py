@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 
-from thundervolt.core import math, data
+from thundervolt.core import utils, data
 from thundervolt.vector_fields import fields
 
 field_data = data.FieldData()
@@ -58,7 +58,7 @@ def update_quiver(num, Q, X, Y, M):
             norm = np.linalg.norm((u,v))
             if norm > 1e-5:
                 M[i][j] = norm
-                U[i][j], V[i][j] = math.versor((u,v))
+                U[i][j], V[i][j] = utils.versor((u,v))
 
     Q.set_UVC(U,V,M)
 

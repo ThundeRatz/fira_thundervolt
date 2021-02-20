@@ -1,7 +1,7 @@
 from .receiver import Receiver
 from .protocols import packet_pb2
 from ..core.data import FieldData, EntityData
-from ..core.math import assert_angle
+from ..core.utils import assert_angle
 
 import json
 from google.protobuf.json_format import MessageToJson

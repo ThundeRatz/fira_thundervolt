@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from thundervolt.core import math, data
+from thundervolt.core import utils, data
 from thundervolt.vector_fields import fields
 
 
@@ -35,7 +35,7 @@ class FieldPlotter():
                 norm = np.linalg.norm((u,v))
                 if norm > self.threshold:
                     M[i][j] = norm
-                    U[i][j], V[i][j] = math.versor((u,v))
+                    U[i][j], V[i][j] = utils.versor((u,v))
 
         # Set the quiver vectors
         plt.quiver(X, Y, U, V, M, units='dots', pivot='mid', scale=0.1)
