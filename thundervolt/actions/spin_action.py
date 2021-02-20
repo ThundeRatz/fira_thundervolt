@@ -8,15 +8,14 @@ from thundervolt.core.command import RobotCommand
 class SpinAction(Action):
     def __init__(self, kp, ki, kd, tolerance):
         super().__init__(kp, ki, kd, tolerance)
+        self.controller.saturation = np.pi * 2 * kp
 
     def initialize(self, robot_id, turns):
         super().initialize(robot_id)
         self.total_angular_dist = turns * 2 * np.pi
         self.actual_angular_dist = 0
         self.last_angle = None
-        print(type(self.controller))
-        self.controller.set_point(self.total_angular_dist)
-        self.controller.saturation = np.pi * 2 * self.kp
+        self.controller.set_point = self.total_angular_dist
 
     def update(self, field_data: FieldData) -> (RobotCommand, bool):
         if self.last_angle is not None:
