@@ -11,7 +11,6 @@ class LookAtAction(Action):
         super().__init__()
         self.tolerance = tolerance
         self.controller = pidController(kp, ki, kd)
-        self.controller.set_point = 0.0
         self.controller.saturation = kp * np.pi
 
     def initialize(self, robot_id):
