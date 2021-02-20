@@ -4,6 +4,7 @@ FIELD_LENGTH = 1.5
 GOAL_WIDTH = 0.4
 GOAL_DEPTH = 0.1
 
+ROBOT_SIZE = 0.075
 
 class Pose2D:
     def __init__(self, x: float = 0, y: float = 0, theta: float = 0):
