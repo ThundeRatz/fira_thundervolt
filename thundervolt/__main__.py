@@ -2,27 +2,46 @@ import thundervolt
 import logging
 import argparse
 import json
+import os
 
 def main():
+    logging.basicConfig(filename='logfile.log',
+                        level=logging.DEBUG)
+
+    # Loads config from file
     parser = argparse.ArgumentParser(description='ThunderVolt')
     parser.add_argument('--config_file', default='config.json')
 
     args = parser.parse_args()
     config_file = args.config_file
 
-    config = json.loads(open(config_file, 'r').read())
+    config_from_file = json.loads(open(config_file, 'r').read())
 
-    print(config)
+    # loads env variables config
+    env_config = json.loads(open("env_config.json", 'r').read())
 
-    logging.basicConfig(filename='logfile.log',
-                        level=logging.DEBUG)
+    # Sets game config
+    game_config = {}
 
-    my_game = thundervolt.game.Game(config)
+    for key in config_from_file:
+        if isinstance(config_from_file[key], dict):
+            game_config[key] = {}
+
+            for sub_key in config_from_file[key]:
+                game_config[key][sub_key] = os.environ.get(env_config[key][sub_key], config_from_file[key][sub_key])
+
+            continue
+
+        game_config[key] = os.environ.get(env_config[key], config_from_file[key])
+
+
+    # Create game and run
+    my_game = thundervolt.game.Game(game_config)
 
     try:
         my_game.run()
     except KeyboardInterrupt:
-        logging.warn("Ending")
+        logging.warning("Ending")
 
 
 if __name__ == '__main__':

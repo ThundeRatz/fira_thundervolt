@@ -7,7 +7,7 @@ from .core.command import TeamCommand
 # Faz toda a parte de comunicação e cria o Coach
 
 class Game():
-    def __init__(self, *args, **kwargs):
+    def __init__(self, config):
         print("Starting...")
 
     def run(self):

@@ -1,0 +1,12 @@
+{
+    "network" : {
+        "visiom_ip": "VISION_IP",
+        "vision_port": "VISION_PORT",
+        "referee_ip": "REFEREE_IP",
+        "referee_port": "REFEREE_PORT",
+        "command_ip": "COMMAND_IP",
+        "command_port": "COMMAND_PORT"
+    },
+    "team_color_yellow" : "TEAM_COLOR_YELLOW",
+    "use_referee": "USE_REFEREE"
+}
