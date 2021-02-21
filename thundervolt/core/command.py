@@ -8,6 +8,11 @@ class RobotCommand(object):
         sum_of_right = self.right_speed + other.right_speed
         return RobotCommand(sum_of_left, sum_of_right)
 
+    def __sub__(self, other):
+        sum_of_left = self.left_speed - other.left_speed
+        sum_of_right = self.right_speed - other.right_speed
+        return RobotCommand(sum_of_left, sum_of_right)
+
     def __mul__(self, multiplier):
         return RobotCommand(self.left_speed * multiplier, self.right_speed * multiplier)
 
