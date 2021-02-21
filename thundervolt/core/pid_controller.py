@@ -42,7 +42,7 @@ class ButterworthSecondOrder:
         w = cutoff_frequency/sampling_frequency
 
         if w > 0.5:
-            logging.warn('Filter cutoff frequency larger than Nyquist frequency')
+            logging.warning('Filter cutoff frequency larger than Nyquist frequency')
 
         b0 = 1
         b1 = 2
@@ -147,6 +147,6 @@ class pidController:
         response = self.kp*(error + self.ki*self.error_acc + self.kd*dedt)
 
         if self.saturation is not None and abs(response) >= self.saturation:
-            logging.warn('Control response larger than saturation')
+            logging.warning('Control response larger than saturation')
 
         return response
