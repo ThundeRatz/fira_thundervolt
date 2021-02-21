@@ -43,4 +43,4 @@ class TeamCommand(object):
         return msg
 
     def __repr__(self):
-        return f'FieldData({self})'
+        return f'TeamCommand({self})'
