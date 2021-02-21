@@ -6,16 +6,38 @@ from thundervolt.core.utils import from_polar, assert_angle, gaussian
 from thundervolt.core.data import FieldData, ROBOT_SIZE
 from thundervolt.core.command import RobotCommand
 
+
 class FollowFieldAction(Action):
-    def __init__(self, kp_ang, ki_ang, kd_ang, kp_lin=0, ki_lin=0, kd_lin=0, tolerance_lin=0.15,
-                    base_speed=20.0, use_front=True, goal=None, **kwargs):
+    def __init__(self, kp_ang, ki_ang, kd_ang, kp_lin=0.0, ki_lin=0.0, kd_lin=0.0, tolerance_lin=0.15,
+                 base_speed=20.0, use_front=True, goal=None, saturation_ang=None, saturation_lin=None):
+        """
+        Create a follow field action object
+
+        Args:
+            kp_ang (float): Proportional constant for angular error
+            ki_ang (float): Integrative constant for angular error
+            kd_ang (float): Derivative constant for angular error
+            kp_lin (float, optional): Proportional constant for angular error. Defaults to 0.0.
+            ki_lin (float, optional): Integrative constant for angular error. Defaults to 0.0.
+            kd_lin (float, optional): Derivative constant for angular error. Defaults to 0.0.
+            tolerance_lin (float, optional): Settling interval around set point. Defaults to 0.15.
+            base_speed (float, optional): Base angular speed (rad/s). Defaults to 20.0.
+            use_front (bool, optional): Where to compute field vector.
+                If true, use robot front, otherwise use robot center. Defaults to True.
+            goal (ndarray, optional): Array with goal coordinates. Defaults to None.
+            saturation_ang (float, optional): Angular pid controller saturation
+            saturation_lin (float, optional): Linear pid controller saturation
+        """
         super().__init__()
         self.controller_ang = pidController(kp_ang, ki_ang, kd_ang)
-        self.controller_ang.saturation = kwargs.get('saturation_ang', np.pi * 2 * kp_ang)
+        if saturation_ang is not None:
+            self.controller_ang.saturation = saturation_ang
+        else:
+            self.controller_ang.saturation = np.pi * 2 * kp_ang
 
         self.tolerance_lin = tolerance_lin
         self.controller_lin = pidController(kp_lin, ki_lin, kd_lin)
-        self.controller_lin.saturation = kwargs.get('saturation_lin', None)
+        self.controller_lin.saturation = saturation_lin
 
         self.goal = goal
         self.base_speed = base_speed
