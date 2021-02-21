@@ -38,7 +38,7 @@ class FiraVision(Receiver):
         return vision_data
 
 
-    def receive_field_data(self):
+    def receive_field_data(self) -> FieldData:
         vision_data_dict = self.receive_dict()
 
         rcv_field_data = FieldData()
