@@ -2,6 +2,7 @@ import pytest
 
 from thundervolt.core.command import RobotCommand, TeamCommand
 
+
 def test_creation_robot_command():
     cmd = RobotCommand(3, 5)
     assert cmd.left_speed == pytest.approx(3)
@@ -16,6 +17,16 @@ def test_sum_robot_commands():
 
     assert sum_of_cmds.left_speed == pytest.approx(10)
     assert sum_of_cmds.right_speed == pytest.approx(9)
+
+
+def test_sub_robot_commands():
+    cmd_one = RobotCommand(7, 5)
+    cmd_two = RobotCommand(3, 4)
+
+    sum_of_cmds = cmd_one - cmd_two
+
+    assert sum_of_cmds.left_speed == pytest.approx(4)
+    assert sum_of_cmds.right_speed == pytest.approx(1)
 
 
 def test_mult_robot_command():
