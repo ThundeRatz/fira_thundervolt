@@ -43,21 +43,31 @@ class FiraControl(Transmitter):
 
         return packet
 
-
-    def transmit_team(self):
+    def transmit_team(self, team_cmd : TeamCommand):
         """
         Encode package and transmit.
 
         Parameters
         ----------
-        team_command : core.commands.TeamCommand
+        team_cmd : core.commands.TeamCommand
             Commands to all robots
+        """
+
+        packet = self._fill_team_command_packet(team_cmd)
+
+        self.transmit(packet)
+
+
+    def update(self):
+        """
+        Update the transmitted packet with the team_command
+        passed in the constructor
         """
 
         if self.team_command is None:
             logging.warn('TeamCommand not instantiated')
         else:
-            packet = self._fill_team_command_packet(self.team_command)
+            self.transmit_team(self.team_command)
 
 
     def stop_team(self):
@@ -85,7 +95,8 @@ class FiraControlThread(Job):
     def __init__(self, team_color_yellow: bool, team_command: TeamCommand = None, control_ip='127.0.0.1', control_port=20011):
         self.control = FiraControl(team_color_yellow, team_command, control_ip, control_port)
 
-        super(FiraControlThread, self).__init__(self.control.transmit_team)
+        super(FiraControlThread, self).__init__(self.control.update)
+
 
     def pause(self):
         super().pause()

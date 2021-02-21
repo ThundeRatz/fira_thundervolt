@@ -18,8 +18,8 @@ def main():
     team_command.commands[0].right_speed = 10
 
     while (time.time() - current_time < 5):
-        blue_control.transmit_team()
-        yellow_control.transmit_team()
+        blue_control.update()
+        yellow_control.update()
 
     current_time = time.time()
 
@@ -27,8 +27,8 @@ def main():
     team_command.commands[1].right_speed = 5
 
     while (time.time() - current_time < 5):
-        blue_control.transmit_team()
-        yellow_control.transmit_team()
+        blue_control.update()
+        yellow_control.update()
 
     current_time = time.time()
 
@@ -36,13 +36,13 @@ def main():
     team_command.commands[2].right_speed = -15
 
     while (time.time() - current_time < 5):
-        blue_control.transmit_team()
-        yellow_control.transmit_team()
+        blue_control.update()
+        yellow_control.update()
 
     team_command.reset()
 
-    blue_control.transmit_team()
-    yellow_control.transmit_team()
+    blue_control.update()
+    yellow_control.update()
 
 
 if __name__ == '__main__':

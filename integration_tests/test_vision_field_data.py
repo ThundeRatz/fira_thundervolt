@@ -11,7 +11,7 @@ def main():
     vision = FiraVision(team_color_yellow=False, field_data=test_field_data)
 
     print(test_field_data)
-    vision.receive_field_data()
+    vision.update()
     print(test_field_data)
 
 

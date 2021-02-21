@@ -39,6 +39,18 @@ class FiraVision(Receiver):
 
 
     def receive_field_data(self):
+        vision_data_dict = self.receive_dict()
+
+        rcv_field_data = FieldData()
+        self._field_data_from_dict(rcv_field_data, vision_data_dict)
+
+        return rcv_field_data
+
+
+    def update(self):
+        """
+        Update the field_data passed in the constructor
+        """
         if self.field_data is None:
             logging.warn('FieldData not instantiated')
         else:
@@ -88,5 +100,5 @@ class FiraVisionThread(Job):
     def __init__(self, team_color_yellow: bool, field_data: FieldData = None, vision_ip='224.0.0.1', vision_port=10002):
         self.vision = FiraVision(team_color_yellow, field_data, vision_ip, vision_port)
 
-        super(FiraVisionThread, self).__init__(self.vision.receive_field_data)
+        super(FiraVisionThread, self).__init__(self.vision.update)
 
