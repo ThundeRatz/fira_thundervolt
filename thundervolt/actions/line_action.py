@@ -2,7 +2,7 @@ import numpy as np
 
 from .action import Action
 from thundervolt.core.pid_controller import pidController
-from thundervolt.core.data import FieldData, Pose2D
+from thundervolt.core.data import FieldData
 from thundervolt.core.command import RobotCommand
 from thundervolt.core.utils import versor, assert_angle
 
@@ -25,8 +25,6 @@ class LineAction(Action):
 
         self.pointA = pointA
         self.pointB = pointB
-
-        self.controller_lin.set_point = 0
 
     def set_goal(self, point_goal):
         u = point_goal - self.pointA
@@ -56,8 +54,6 @@ class LineAction(Action):
 
         if np.linalg.norm(goal_vector) < self.tolerance_lin:
             goal_ang = np.arctan2(line[1], line[0])
-            if abs(assert_angle(goal_ang - actual_ang)) < self.tolerance_ang:
-                return (RobotCommand(), True)
             response_lin = 0
         else:
             goal_ang = np.arctan2(goal_vector[1], goal_vector[0])
@@ -72,4 +68,7 @@ class LineAction(Action):
         angle_to_goal = assert_angle(actual_ang - goal_ang)
         response_ang = self.controller_ang.update(angle_to_goal)
 
-        return (RobotCommand(response_lin - response_ang, response_lin + response_ang), False)
+        if response_lin == 0 and abs(assert_angle(goal_ang - actual_ang)) < self.tolerance_ang:
+            return (RobotCommand(), True)
+        else:
+            return (RobotCommand(response_lin - response_ang, response_lin + response_ang), False)
