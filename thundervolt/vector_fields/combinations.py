@@ -100,3 +100,43 @@ class WallField(VectorField):
             field.decay_dist = self.decay_dist
             field.multiplier = self.multiplier
 
+
+class ObstaclesField(VectorField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.max_radius = kwargs.get('max_radius', None)
+        self.decay_radius = kwargs.get('decay_radius', None)
+
+        self.multiplier = kwargs.get('multiplier', 1)
+        self.update_rule = kwargs.get('update_rule', None)
+
+        self.field_childrens = [RadialField(
+                                    target=np.zeros(2),
+                                    repelling=True,
+                                    max_radius=self.max_radius,
+                                    decay_radius=self.decay_radius,
+                                    multiplier=self.multiplier)
+                                for i in range(5)]
+
+    def update(self, field_data, robot_id):
+        if callable(self.update_rule):
+            self.update_rule(self, field_data, robot_id)
+
+        for field in self.field_childrens:
+            field.max_radius = self.max_radius
+            field.decay_radius = self.decay_radius
+            field.multiplier = self.multiplier
+
+        iterator = 0
+        for i in range(3):
+            if i == robot_id:
+                continue
+
+            self.field_childrens[iterator].target = (field_data.robots[i].position.x, field_data.robots[i].position.y)
+            iterator += 1
+
+        for i in range(3):
+            self.field_childrens[iterator].target = (field_data.foes[i].position.x, field_data.foes[i].position.y)
+            iterator += 1
+
