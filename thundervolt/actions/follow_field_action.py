@@ -1,3 +1,4 @@
+from typing import Tuple
 import numpy as np
 
 from .action import Action
@@ -52,7 +53,7 @@ class FollowFieldAction(Action):
     def set_goal(self, goal):
         self.goal = goal
 
-    def update(self, field_data: FieldData) -> (RobotCommand, bool):
+    def update(self, field_data: FieldData) -> Tuple[RobotCommand, bool]:
         actual_angle = field_data.robots[self.robot_id].position.theta
         looking_direction = from_polar(actual_angle)
 
@@ -63,7 +64,8 @@ class FollowFieldAction(Action):
         # Check if the action should use the linear controller or the base speed
         if self.goal is not None:
             goal_vector = self.goal - robot_center
-            response_lin = -self.controller_lin.update(np.linalg.norm(goal_vector))
+            response_lin = - \
+                self.controller_lin.update(np.linalg.norm(goal_vector))
 
             # Check if reached goal
             if np.linalg.norm(goal_vector) < self.tolerance_lin:
@@ -83,7 +85,8 @@ class FollowFieldAction(Action):
 
         # Calculate univector again in case you want to use robot front
         if self.use_front:
-            front_position = robot_center + (looking_direction * ROBOT_SIZE / 2)
+            front_position = robot_center + \
+                (looking_direction * ROBOT_SIZE / 2)
             univector = self.vector_field.compute(front_position)
             ang_univector = np.arctan2(univector[1], univector[0])
 
