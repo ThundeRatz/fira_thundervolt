@@ -4,8 +4,10 @@ from thundervolt.comm.control import FiraControlThread
 from thundervolt.core.command import TeamCommand
 
 import time
+import logging
 
 TEST_ROBOT = 0
+WAIT_TIME = 0.5
 
 def main():
     team_command = TeamCommand()
@@ -18,20 +20,25 @@ def main():
     print("--- Starting ---\r\n")
     blue_control.start()
 
-    time.sleep(5)
+    time.sleep(WAIT_TIME)
 
     print("--- Pause ---\r\n")
     blue_control.pause()
 
-    time.sleep(5)
+    time.sleep(WAIT_TIME)
 
     print("--- Resume ---\r\n")
     blue_control.resume()
 
-    time.sleep(5)
+    time.sleep(WAIT_TIME)
 
     print("--- Stoping ---\r\n")
     blue_control.stop()
+
+    try:
+        pass
+    except KeyboardInterrupt:
+            logging.warn("Ending")
 
 
 if __name__ == '__main__':

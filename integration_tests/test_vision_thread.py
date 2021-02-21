@@ -13,8 +13,11 @@ def main():
     vision.start()
 
     while True:
-        print(test_field_data)
-        time.sleep(1)
+        try:
+            print(test_field_data)
+            time.sleep(1)
+        except KeyboardInterrupt:
+            logging.warn("Ending")
 
 
 if __name__ == '__main__':
