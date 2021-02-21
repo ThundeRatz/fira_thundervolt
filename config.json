@@ -1,0 +1,12 @@
+{
+    "network" : {
+        "visiom_ip": "224.0.0.1",
+        "vision_port": 10002,
+        "referee_ip": "224.5.23.2",
+        "referee_port": 10003,
+        "command_ip": "127.0.0.1",
+        "command_port": 20011,
+    },
+    "match" : "blue",
+    "use_referee": false
+}
