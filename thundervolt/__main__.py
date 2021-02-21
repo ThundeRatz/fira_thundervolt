@@ -41,6 +41,7 @@ def main():
     try:
         my_game.run()
     except KeyboardInterrupt:
+        my_game.end()
         logging.warning("Ending")
 
 
