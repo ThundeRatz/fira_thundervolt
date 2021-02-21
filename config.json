@@ -5,8 +5,8 @@
         "referee_ip": "224.5.23.2",
         "referee_port": 10003,
         "command_ip": "127.0.0.1",
-        "command_port": 20011,
+        "command_port": 20011
     },
-    "match" : "blue",
+    "team_color_yellow" : false,
     "use_referee": false
 }
