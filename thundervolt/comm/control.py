@@ -59,7 +59,10 @@ class FiraControl(Transmitter):
         else:
             packet = self._fill_team_command_packet(self.team_command)
 
-            self.transmit(packet)
+
+    def stop_team(self):
+        stop_team_cmd = TeamCommand()
+        self.transmit_team(stop_team_cmd)
 
 
     def _fill_team_command_packet(self, team_command : TeamCommand):
@@ -77,6 +80,7 @@ class FiraControl(Transmitter):
 
         return packet
 
+
 class FiraControlThread(Job):
     def __init__(self, team_color_yellow: bool, team_command: TeamCommand = None, control_ip='127.0.0.1', control_port=20011):
         self.control = FiraControl(team_color_yellow, team_command, control_ip, control_port)
@@ -85,11 +89,13 @@ class FiraControlThread(Job):
 
     def pause(self):
         super().pause()
-        [self.control.transmit_robot(i, 0, 0) for i in range(3)]
+        self.control.stop_team()
+
 
     def resume(self):
         super().resume()
 
+
     def stop(self):
         super().pause()
-        [self.control.transmit_robot(i, 0, 0) for i in range(3)]
+        self.control.stop_team()
