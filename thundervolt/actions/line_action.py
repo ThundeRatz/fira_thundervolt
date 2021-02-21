@@ -10,9 +10,9 @@ class LineAction(Action):
     def __init__(self, kp_lin, ki_lin, kd_lin, tolerance_lin, kp_ang, ki_ang, kd_ang, tolerance_ang):
         super().__init__()
         self.tolerance_lin = tolerance_lin
-        self.controller_lin = pidController(kp_lin, ki_lin, kd_lin)
+        self.controller_lin = pidController(kp_lin, ki_lin, kd_lin, saturation = kp_ang * np.pi / 4)
         self.tolerance_ang = tolerance_ang
-        self.controller_ang = pidController(kp_ang, ki_ang, kd_ang)
+        self.controller_ang = pidController(kp_ang, ki_ang, kd_ang, saturation = kp_lin * 0.2)
 
 
     def initialize(self, robot_id, pointA, pointB):
@@ -56,7 +56,7 @@ class LineAction(Action):
 
         if np.linalg.norm(goal_vector) < self.tolerance_lin:
             goal_ang = np.arctan2(line[1], line[0])
-            if abs(goal_ang - actual_ang) < self.tolerance_ang:
+            if abs(assert_angle(goal_ang - actual_ang)) < self.tolerance_ang:
                 return (RobotCommand(), True)
             response_lin = 0
         else:
