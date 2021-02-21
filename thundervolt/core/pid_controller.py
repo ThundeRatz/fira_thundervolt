@@ -75,6 +75,7 @@ class ButterworthSecondOrder:
         self.y = np.append(self.y, y0)[1:]
         return y0
 
+
 class pidController:
     """
     Implementation of simple PID controller
@@ -82,7 +83,7 @@ class pidController:
         Response = Kp(error + Ki * integral(error) Kd * d/dt(error))
     """
 
-    def __init__(self, kp, ki, kd, set_point=0.0, freq=1.0, saturation=None, max_integral=10.0, integral_fade_rate=1.0):
+    def __init__(self, kp, ki, kd, set_point=0.0, freq=1.0, saturation=None, max_integral=None, integral_fade_rate=1.0):
         """
         Creation of PID controller
 
@@ -134,8 +135,8 @@ class pidController:
         else:
             self.error_acc *= self.integral_fade_rate**(1/self.freq)
 
-        if abs(self.ki*self.error_acc) > self.max_integral:
-            self.error_acc = self.max_integral * \
+        if self.max_integral is not None and abs(self.ki*self.error_acc) > self.max_integral:
+            self.error_acc = self.max_integral/self.ki * \
                 self.error_acc/abs(self.error_acc)
 
         response = self.kp*(error + self.ki*self.error_acc + self.kd*dedt)
