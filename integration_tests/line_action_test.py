@@ -12,7 +12,7 @@ def main():
     vision = FiraVision(team_color_yellow)
     blue_control = FiraControl(team_color_yellow)
 
-    action = LineAction(kp_lin=100.0, ki_lin=0.0, kd_lin=1.0, tolerance_lin=0.01, kp_ang=10.0, ki_ang=0.0, kd_ang=3.0, tolerance_ang=0.05)
+    action = LineAction(kp_lin=100.0, ki_lin=0.005, kd_lin=1.0, tolerance_lin=0.01, kp_ang=10.0, ki_ang=0.005, kd_ang=3.0, tolerance_ang=0.05)
 
     blue_control.transmit_robot(TEST_ROBOT, 0, 0)
 
