@@ -5,7 +5,7 @@ import json
 from google.protobuf.json_format import MessageToJson
 
 class RefereeComm(Receiver):
-    def __init__(self, referee_ip='224.0.0.1', referee_port=10003):
+    def __init__(self, referee_ip='224.5.23.2', referee_port=10003):
         super(RefereeComm, self).__init__(referee_ip, referee_port)
 
     def receive(self):

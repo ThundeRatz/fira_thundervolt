@@ -241,3 +241,92 @@ class TangentField(VectorField):
             decay = max(0, min(1, (self.max_radius - to_position_scalar)/(self.max_radius - self.decay_radius)))
 
         return output * decay * self.multiplier
+
+
+class OrientedAttractingField(VectorField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Field definition
+        self.target = kwargs.get('target')
+        self.direction = kwargs.get('direction')
+        self.nodes_radius = kwargs.get('nodes_radius')
+        self.damping = kwargs.get('damping', 1/25)
+        # self.nodes_dist = kwargs.get('nodes_dist')
+
+        self.positive_field = TangentField(
+            target = (0,0),
+            radius = self.nodes_radius,
+            clockwise = False,
+            damping = self.damping,
+        )
+
+        self.negative_field = TangentField(
+            target = (0,0),
+            radius = self.nodes_radius,
+            clockwise = True,
+            damping = self.damping,
+        )
+
+        # Geometric configuration
+        self.max_radius = kwargs.get('max_radius', None)
+        self.decay_radius = kwargs.get('decay_radius', None)
+        self.field_limits = kwargs.get('field_limits', None)
+
+        # General
+        self.multiplier = kwargs.get('multiplier', 1)
+        self.update_rule = kwargs.get('update_rule', None)
+
+
+    def update(self, field_data, robot_id):
+        if callable(self.update_rule):
+            self.update_rule(self, field_data, robot_id)
+
+    def compute(self, pose):
+        position = np.array(pose)
+
+        # Check geometric conditions
+        if self.field_limits and not(-self.field_limits[0] <= position[0] <= self.field_limits[0]):
+            return np.zeros(2)
+
+        if self.field_limits and not(-self.field_limits[1] <= position[1] <= self.field_limits[1]):
+            return np.zeros(2)
+
+        origin = np.array(self.target)
+        to_position = position - origin
+        to_position_scalar = np.linalg.norm(to_position)
+
+        if self.max_radius and to_position_scalar > self.max_radius:
+            return np.zeros(2)
+
+        # Construct new base
+        u_dir = math.versor(self.direction)
+        v_dir = math.rotate(u_dir, np.pi / 2)
+
+        # proj_u = np.dot(to_position, u_dir)
+        proj_v = np.dot(to_position, v_dir)
+
+        # Update children data
+        self.positive_field.target = origin + v_dir * self.nodes_radius
+        self.negative_field.target = origin - v_dir * self.nodes_radius
+        self.positive_field.radius = self.nodes_radius
+        self.negative_field.radius = self.nodes_radius
+        self.positive_field.damping = self.damping
+        self.negative_field.damping = self.damping
+
+        # Calculate output
+        if proj_v > self.nodes_radius:
+            output = self.positive_field.compute(pose)
+        elif proj_v < -self.nodes_radius:
+            output = self.negative_field.compute(pose)
+        else:
+            self.positive_field.multiplier = abs((-self.nodes_radius - proj_v)) / (2 * self.nodes_radius)
+            self.negative_field.multiplier = (self.nodes_radius - proj_v) / (2 * self.nodes_radius)
+            output = self.positive_field.compute(pose) + self.negative_field.compute(pose)
+        output = math.versor(output)
+
+        decay = 1
+        if self.max_radius and self.decay_radius:
+            decay = max(0, min(1, (self.max_radius - to_position_scalar)/(self.max_radius - self.decay_radius)))
+
+        return output * decay * self.multiplier

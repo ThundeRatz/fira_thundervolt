@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 
+
 class ButterworthSecondOrder:
     """
     Implementation of Butterworth second order low-pass filter
@@ -53,11 +54,11 @@ class ButterworthSecondOrder:
         a1 = 2 - 8/w**2
         a2 = 1 - 2*np.sqrt(2)/w + 4/w**2
 
-        self.x = np.array([0,0,0])
-        self.y = np.array([0,0])
+        self.x = np.array([0, 0, 0])
+        self.y = np.array([0, 0])
 
-        self.a = np.array([a2,a1])/a0
-        self.b = np.array([b2,b1,b0])/a0
+        self.a = np.array([a2, a1])/a0
+        self.b = np.array([b2, b1, b0])/a0
 
     def update(self, x0):
         """
@@ -76,6 +77,7 @@ class ButterworthSecondOrder:
         self.y = np.append(self.y, y0)[1:]
         return y0
 
+
 class pidController:
     """
     Implementation of simple PID controller
@@ -83,7 +85,7 @@ class pidController:
         Response = Kp(error + Ki * integral(error) Kd * d/dt(error))
     """
 
-    def __init__(self, kp, ki, kd, set_point=0.0, freq=1.0, saturation=None, max_integral=10.0, integral_fade_rate=1.0):
+    def __init__(self, kp, ki, kd, set_point=0.0, freq=1.0, saturation=None, max_integral=None, integral_fade_rate=1.0):
         """
         Creation of PID controller
 
@@ -106,7 +108,6 @@ class pidController:
         self.max_integral = max_integral
         self.integral_fade_rate = integral_fade_rate
 
-        self.set_point_changed = True
         self.error_acc = 0  # accumulated error for i term
         self.prev_error = 0  # previous error for d term
 
@@ -126,11 +127,6 @@ class pidController:
     def update(self, state):
         error = self.set_point - state
 
-        # Prevents spikes when set point is changed
-        if self.set_point_changed:
-            self.prev_error = error
-            self.set_point_changed = False
-
         dedt = self.dedt_filter.update((error - self.prev_error)*self.freq)
 
         self.prev_error = error
@@ -141,8 +137,8 @@ class pidController:
         else:
             self.error_acc *= self.integral_fade_rate**(1/self.freq)
 
-        if abs(self.ki*self.error_acc) > self.max_integral:
-            self.error_acc = self.max_integral * \
+        if self.max_integral is not None and abs(self.ki*self.error_acc) > self.max_integral:
+            self.error_acc = self.max_integral/self.ki * \
                 self.error_acc/abs(self.error_acc)
 
         response = self.kp*(error + self.ki*self.error_acc + self.kd*dedt)

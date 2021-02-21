@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='VSSRef',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x13vssref_common.proto\x12\x06VSSRef\"D\n\x05Robot\x12\x10\n\x08robot_id\x18\x01 \x01(\r\x12\t\n\x01x\x18\x02 \x01(\x01\x12\t\n\x01y\x18\x03 \x01(\x01\x12\x13\n\x0borientation\x18\x04 \x01(\x01\"H\n\x05\x46rame\x12 \n\tteamColor\x18\x01 \x01(\x0e\x32\r.VSSRef.Color\x12\x1d\n\x06robots\x18\x02 \x03(\x0b\x32\r.VSSRef.Robot*i\n\x04\x46oul\x12\r\n\tFREE_KICK\x10\x00\x12\x10\n\x0cPENALTY_KICK\x10\x01\x12\r\n\tGOAL_KICK\x10\x02\x12\r\n\tFREE_BALL\x10\x03\x12\x0b\n\x07KICKOFF\x10\x04\x12\x08\n\x04STOP\x10\x05\x12\x0b\n\x07GAME_ON\x10\x06*\'\n\x05\x43olor\x12\x08\n\x04\x42LUE\x10\x00\x12\n\n\x06YELLOW\x10\x01\x12\x08\n\x04NONE\x10\x02*[\n\x08Quadrant\x12\x0f\n\x0bNO_QUADRANT\x10\x00\x12\x0e\n\nQUADRANT_1\x10\x01\x12\x0e\n\nQUADRANT_2\x10\x02\x12\x0e\n\nQUADRANT_3\x10\x03\x12\x0e\n\nQUADRANT_4\x10\x04*4\n\x04Half\x12\x0b\n\x07NO_HALF\x10\x00\x12\x0e\n\nFIRST_HALF\x10\x01\x12\x0f\n\x0bSECOND_HALF\x10\x02\x62\x06proto3')
+  serialized_pb=_b('\n\x13vssref_common.proto\x12\x06VSSRef\"D\n\x05Robot\x12\x10\n\x08robot_id\x18\x01 \x01(\r\x12\t\n\x01x\x18\x02 \x01(\x01\x12\t\n\x01y\x18\x03 \x01(\x01\x12\x13\n\x0borientation\x18\x04 \x01(\x01\"H\n\x05\x46rame\x12 \n\tteamColor\x18\x01 \x01(\x0e\x32\r.VSSRef.Color\x12\x1d\n\x06robots\x18\x02 \x03(\x0b\x32\r.VSSRef.Robot*s\n\x04\x46oul\x12\r\n\tFREE_KICK\x10\x00\x12\x10\n\x0cPENALTY_KICK\x10\x01\x12\r\n\tGOAL_KICK\x10\x02\x12\r\n\tFREE_BALL\x10\x03\x12\x0b\n\x07KICKOFF\x10\x04\x12\x08\n\x04STOP\x10\x05\x12\x0b\n\x07GAME_ON\x10\x06\x12\x08\n\x04HALT\x10\x07*\'\n\x05\x43olor\x12\x08\n\x04\x42LUE\x10\x00\x12\n\n\x06YELLOW\x10\x01\x12\x08\n\x04NONE\x10\x02*[\n\x08Quadrant\x12\x0f\n\x0bNO_QUADRANT\x10\x00\x12\x0e\n\nQUADRANT_1\x10\x01\x12\x0e\n\nQUADRANT_2\x10\x02\x12\x0e\n\nQUADRANT_3\x10\x03\x12\x0e\n\nQUADRANT_4\x10\x04*~\n\x04Half\x12\x0b\n\x07NO_HALF\x10\x00\x12\x0e\n\nFIRST_HALF\x10\x01\x12\x0f\n\x0bSECOND_HALF\x10\x02\x12\x17\n\x13OVERTIME_FIRST_HALF\x10\x03\x12\x18\n\x14OVERTIME_SECOND_HALF\x10\x04\x12\x15\n\x11PENALTY_SHOOTOUTS\x10\x05\x62\x06proto3')
 )
 
 _FOUL = _descriptor.EnumDescriptor(
@@ -57,11 +57,15 @@ _FOUL = _descriptor.EnumDescriptor(
       name='GAME_ON', index=6, number=6,
       serialized_options=None,
       type=None),
+    _descriptor.EnumValueDescriptor(
+      name='HALT', index=7, number=7,
+      serialized_options=None,
+      type=None),
   ],
   containing_type=None,
   serialized_options=None,
   serialized_start=175,
-  serialized_end=280,
+  serialized_end=290,
 )
 _sym_db.RegisterEnumDescriptor(_FOUL)
 
@@ -87,8 +91,8 @@ _COLOR = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=282,
-  serialized_end=321,
+  serialized_start=292,
+  serialized_end=331,
 )
 _sym_db.RegisterEnumDescriptor(_COLOR)
 
@@ -122,8 +126,8 @@ _QUADRANT = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=323,
-  serialized_end=414,
+  serialized_start=333,
+  serialized_end=424,
 )
 _sym_db.RegisterEnumDescriptor(_QUADRANT)
 
@@ -146,11 +150,23 @@ _HALF = _descriptor.EnumDescriptor(
       name='SECOND_HALF', index=2, number=2,
       serialized_options=None,
       type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OVERTIME_FIRST_HALF', index=3, number=3,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OVERTIME_SECOND_HALF', index=4, number=4,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='PENALTY_SHOOTOUTS', index=5, number=5,
+      serialized_options=None,
+      type=None),
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=416,
-  serialized_end=468,
+  serialized_start=426,
+  serialized_end=552,
 )
 _sym_db.RegisterEnumDescriptor(_HALF)
 
@@ -162,6 +178,7 @@ FREE_BALL = 3
 KICKOFF = 4
 STOP = 5
 GAME_ON = 6
+HALT = 7
 BLUE = 0
 YELLOW = 1
 NONE = 2
@@ -173,6 +190,9 @@ QUADRANT_4 = 4
 NO_HALF = 0
 FIRST_HALF = 1
 SECOND_HALF = 2
+OVERTIME_FIRST_HALF = 3
+OVERTIME_SECOND_HALF = 4
+PENALTY_SHOOTOUTS = 5
 
 
 
