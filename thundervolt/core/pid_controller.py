@@ -105,7 +105,6 @@ class pidController:
         self.max_integral = max_integral
         self.integral_fade_rate = integral_fade_rate
 
-        self.set_point_changed = True
         self.error_acc = 0  # accumulated error for i term
         self.prev_error = 0  # previous error for d term
 
@@ -124,11 +123,6 @@ class pidController:
 
     def update(self, state):
         error = self.set_point - state
-
-        # Prevents spikes when set point is changed
-        if self.set_point_changed:
-            self.prev_error = error
-            self.set_point_changed = False
 
         dedt = self.dedt_filter.update((error - self.prev_error)*self.freq)
 

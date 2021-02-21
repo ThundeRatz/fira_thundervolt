@@ -176,3 +176,47 @@ Calcula o campo na posição fornecida.
 | pose | tuple / list / numpy.array | Posição em que será calculado o campo. |
 
 Return: field calculated (`numpy.ndarray`).
+
+# vector_fields.OrientedAttractingField
+
+Classe que implementa um campo vetorial de atração orientado.
+
+Base: `VectorField`
+
+```python
+class thundervolt.vector_fields.OrientedAttractingField(**kwargs)
+```
+
+| Parâmetro | Tipo | Descrição |
+| :--- |    :---   |   :--- |
+| name | str | Nome do campo, por default será gerado automaticamente.  |
+| target | tuple / list / numpy.array | Coordenadas xy do foco do campo. |
+| direction | tuple / list / numpy.array | Direções xy do vetor que dita a orientação do campo. |
+| node_radius | float | Corresponde ao raio que será usado para criar as espirais dos dois campos `positive_field` e `negative_field`. |
+| damping | float | Constante de amortecimento da espiral. Quanto maior mais suave. Defualt `1/25`. |
+| positive_field | TangentField | Um campo vetorial em espiral hiperbólico positivo (anti-horário). Default `target = (0,0)` `radius = self.nodes_radius` `clockwise = True` `damping = 1/25`|
+| negative_field | TangentField | Um campo vetorial em espiral hiperbólico negativo (horário). Default `target = (0,0)` `radius = self.nodes_radius` `clockwise = False` `damping = 1/25` |
+| max_radius | float | Raio até onde o campo tem efeito. Default `None`. |
+| decay_radius | float | Raio a partir do qual o campo começa a decair linearmente. Default `None`. |
+| field_limits | tuple / list | Define um retângulo onde o campo será válido. Default `None`. |
+| multiplier | float | Número entre 0 e 1 que indica o quão forte aquele campo será. Ou sejá, é o valor máximo do campo. Default `1.0`. |
+| update_rule | callable | Objeto chamado para atualizar os parâmetros do campo. |
+
+## update(field_data, robot_id)
+
+Chama a `update_rule` do campo.
+
+| Parâmetro | Tipo | Descrição |
+| :--- |  :---  |   :--- |
+| field_data | thundervolt.core.data.FieldData | Posição e velocidade de todas as entidade do jogo. |
+| robot_id | int | ID do robô a quem esse campo pertence. |
+
+## compute(pose)
+
+Calcula o campo na posição e na orientação fornecidas a partir da soma de dois `TangentField`.
+
+| Parâmetro | Tipo | Descrição |
+| :--- |    :---   |   :--- |
+| pose | tuple / list / numpy.array | Posição em que será calculado o campo. |
+
+Return: field calculated (`numpy.ndarray`).
