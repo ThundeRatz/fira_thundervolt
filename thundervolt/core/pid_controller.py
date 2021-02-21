@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 
+
 class ButterworthSecondOrder:
     """
     Implementation of Butterworth second order low-pass filter
@@ -42,7 +43,8 @@ class ButterworthSecondOrder:
         w = cutoff_frequency/sampling_frequency
 
         if w > 0.5:
-            logging.warn('Filter cutoff frequency larger than Nyquist frequency')
+            logging.warn(
+                'Filter cutoff frequency larger than Nyquist frequency')
 
         b0 = 1
         b1 = 2
@@ -52,11 +54,11 @@ class ButterworthSecondOrder:
         a1 = 2 - 8/w**2
         a2 = 1 - 2*np.sqrt(2)/w + 4/w**2
 
-        self.x = np.array([0,0,0])
-        self.y = np.array([0,0])
+        self.x = np.array([0, 0, 0])
+        self.y = np.array([0, 0])
 
-        self.a = np.array([a2,a1])/a0
-        self.b = np.array([b2,b1,b0])/a0
+        self.a = np.array([a2, a1])/a0
+        self.b = np.array([b2, b1, b0])/a0
 
     def update(self, x0):
         """
