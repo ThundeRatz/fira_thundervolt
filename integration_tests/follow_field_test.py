@@ -15,7 +15,8 @@ def main():
     vision = FiraVision(team_color_yellow)
     blue_control = FiraControl(team_color_yellow)
 
-    action = FollowFieldAction(kp_lin=100.0, ki_lin=0.0, kd_lin=1.0, tolerance_lin=0.01, kp_ang=10.0, ki_ang=0.0, kd_ang=3.0, tolerance_ang=0.05)# mudar
+    action = FollowFieldAction(kp_ang=10.0, ki_ang=0.0, kd_ang=3.0, kp_lin=60.0, ki_lin=0.0, kd_lin=3.0, tolerance_lin=0.01,
+                                base_speed=20, goal=None, use_front=True)
 
     blue_control.transmit_robot(TEST_ROBOT, 0, 0)
 
@@ -29,7 +30,7 @@ def main():
     attract_field = fields.RadialField(
         target = (0.3,0),
         max_radius = 3.0,
-        decay_radius = 0.6,
+        decay_radius = 0.3,
         repelling = False,
     )
 
@@ -38,29 +39,26 @@ def main():
     my_field.add(attract_field)
 
     vision_data = vision.receive_field_data()
-    ball_x = vision_data.ball.position.x
-    ball_y = vision_data.ball.position.y
 
     action.initialize(TEST_ROBOT, my_field)
-    action.set_goal(np.array([ball_x, ball_y]))
 
-    while True:
-        vision_data = vision.receive_field_data()
+    try:
+        while True:
+            vision_data = vision.receive_field_data()
 
-        attract_field.target = (vision_data.ball.position.x, vision_data.ball.position.y)
-        repell_field.target = (vision_data.foes[0].position.x, vision_data.foes[0].position.y)
+            attract_field.target = (vision_data.ball.position.x, vision_data.ball.position.y)
+            repell_field.target = (vision_data.foes[0].position.x, vision_data.foes[0].position.y)
+            action.set_goal(np.array([vision_data.ball.position.x, vision_data.ball.position.y]))
 
-        robot_cmd, action_state = action.update(vision_data)
+            robot_cmd, action_state = action.update(vision_data)
 
-        blue_control.transmit_robot(TEST_ROBOT, robot_cmd.left_speed, robot_cmd.right_speed)
+            blue_control.transmit_robot(TEST_ROBOT, robot_cmd.left_speed, robot_cmd.right_speed)
 
-        if action_state == True:
-            print("Next goal")
-            ball_x = vision_data.ball.position.x
-            ball_y = vision_data.ball.position.y
-            action.set_goal(np.array([ball_x, ball_y]))
+            if action_state == True:
+                print("Next goal")
+    except KeyboardInterrupt:
+        blue_control.transmit_robot(TEST_ROBOT, 0, 0)
 
-    blue_control.transmit_robot(TEST_ROBOT, 0, 0)
 
 if __name__ == '__main__':
     main()
