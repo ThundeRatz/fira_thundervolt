@@ -1,17 +1,22 @@
+import logging
+
 from .receiver import Receiver
 from .protocols import packet_pb2
 from ..core.data import FieldData, EntityData
+from .thread_job import Job
 from ..core.utils import assert_angle
 
 import json
 from google.protobuf.json_format import MessageToJson
 import numpy as np
 
+
 class FiraVision(Receiver):
-    def __init__(self, team_color_yellow: bool, vision_ip='224.0.0.1', vision_port=10002):
+    def __init__(self, team_color_yellow: bool, field_data: FieldData = None, vision_ip='224.0.0.1', vision_port=10002):
         super(FiraVision, self).__init__(vision_ip, vision_port)
 
         self.team_color_yellow = team_color_yellow
+        self.field_data = field_data
 
 
     def receive(self):
@@ -36,10 +41,22 @@ class FiraVision(Receiver):
     def receive_field_data(self) -> FieldData:
         vision_data_dict = self.receive_dict()
 
-        field_data = FieldData()
-        self._field_data_from_dict(field_data, vision_data_dict)
+        rcv_field_data = FieldData()
+        self._field_data_from_dict(rcv_field_data, vision_data_dict)
 
-        return field_data
+        return rcv_field_data
+
+
+    def update(self):
+        """
+        Update the field_data passed in the constructor
+        """
+        if self.field_data is None:
+            logging.warning('FieldData not instantiated')
+        else:
+            vision_data_dict = self.receive_dict()
+
+            self._field_data_from_dict(self.field_data, vision_data_dict)
 
 
     def _entity_from_dict(self, entity_data: EntityData, data_dict, rotate_field=False):
@@ -77,3 +94,11 @@ class FiraVision(Receiver):
 
         for i in range(len(foes_list_of_dicts)):
             self._entity_from_dict(field_data.foes[i], foes_list_of_dicts[i], rotate_field)
+
+
+class FiraVisionThread(Job):
+    def __init__(self, team_color_yellow: bool, field_data: FieldData = None, vision_ip='224.0.0.1', vision_port=10002):
+        self.vision = FiraVision(team_color_yellow, field_data, vision_ip, vision_port)
+
+        super(FiraVisionThread, self).__init__(self.vision.update)
+
