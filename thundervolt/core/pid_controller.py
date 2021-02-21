@@ -42,7 +42,8 @@ class ButterworthSecondOrder:
         w = cutoff_frequency/sampling_frequency
 
         if w > 0.5:
-            logging.warning('Filter cutoff frequency larger than Nyquist frequency')
+            logging.warning(
+                'Filter cutoff frequency larger than Nyquist frequency')
 
         b0 = 1
         b1 = 2

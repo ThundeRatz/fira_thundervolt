@@ -5,6 +5,7 @@ import json
 import os
 
 def main():
+    # Config logging
     logging.basicConfig(filename='logfile.log',
                         level=logging.DEBUG)
 
@@ -33,7 +34,6 @@ def main():
             continue
 
         game_config[key] = os.environ.get(env_config[key], config_from_file[key])
-
 
     # Create game and run
     my_game = thundervolt.game.Game(game_config)
