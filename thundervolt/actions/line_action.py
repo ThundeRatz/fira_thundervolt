@@ -4,15 +4,43 @@ from .action import Action
 from thundervolt.core.pid_controller import pidController
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import RobotCommand
-from thundervolt.core.utils import versor, assert_angle
+from thundervolt.core.utils import versor, assert_angle, gaussian
 
 class LineAction(Action):
-    def __init__(self, kp_lin, ki_lin, kd_lin, tolerance_lin, kp_ang, ki_ang, kd_ang, tolerance_ang):
+    def __init__(self, kp_ang, ki_ang, kd_ang, tolerance_ang, kp_lin, ki_lin, kd_lin, tolerance_lin,
+                saturation_ang=None, max_integral_ang=None, integral_fade_ang=None,
+                saturation_lin=None, max_integral_lin=None, integral_fade_lin=None,
+                linear_decay_std_dev=None):
+        """
+        Create a follow line action object
+
+        Args:
+            kp_ang (float): Proportional constant for angular error
+            ki_ang (float): Integrative constant for angular error
+            kd_ang (float): Derivative constant for angular error
+            tolerance_ang (float): Settling interval around set point.
+            kp_lin (float): Proportional constant for linear error.
+            ki_lin (float): Integrative constant for linear error.
+            kd_lin (float): Derivative constant for linear error.
+            tolerance_lin (float): Settling interval around set point.
+            saturation_ang (float, optional): Angular pid controller saturation.
+            max_integral_ang (float, optional): Angular pid controller max integral value.
+            integral_fade_ang (float, optional): Angular pid controller integral fade rate.
+            saturation_lin (float, optional): Linear pid controller saturation.
+            max_integral_lin (float, optional): Linear pid controller max integral value.
+            integral_fade_lin (float, optional): Linear pid controller integral fade rate.
+            linear_decay_std_dev (float, optional): Standard deviation for linear response gaussian decay function.
+        """
         super().__init__()
-        self.tolerance_lin = tolerance_lin
-        self.controller_lin = pidController(kp_lin, ki_lin, kd_lin, saturation = kp_ang * np.pi / 4)
         self.tolerance_ang = tolerance_ang
-        self.controller_ang = pidController(kp_ang, ki_ang, kd_ang, saturation = kp_lin * 0.2)
+        self.controller_ang = pidController(kp_ang, ki_ang, kd_ang,
+                                saturation=saturation_ang, max_integral=max_integral_ang, integral_fade_rate=integral_fade_ang)
+
+        self.tolerance_lin = tolerance_lin
+        self.controller_lin = pidController(kp_lin, ki_lin, kd_lin,
+                                saturation=saturation_lin, max_integral=max_integral_lin, integral_fade_rate=integral_fade_lin)
+
+        self.linear_decay_std_dev = linear_decay_std_dev
 
 
     def initialize(self, robot_id, pointA, pointB):
@@ -63,7 +91,8 @@ class LineAction(Action):
             goal_ang = assert_angle(goal_ang + np.pi)
             response_lin *= -1
 
-        response_lin *= np.cos(assert_angle(goal_ang - actual_ang))**2
+        if self.linear_decay_std_dev is not None:
+            response_lin *= gaussian(assert_angle(goal_ang - actual_ang), std_dev=self.linear_decay_std_dev)
 
         angle_to_goal = assert_angle(actual_ang - goal_ang)
         response_ang = self.controller_ang.update(angle_to_goal)

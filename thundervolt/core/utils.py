@@ -23,3 +23,6 @@ def assert_angle(angle):
         angle -= 2 * np.pi
 
     return angle
+
+def gaussian(x, std_dev = 1.0, mean = 0.0, height = 1.0):
+    return height * np.exp(-np.power(x - mean, 2.) / (2 * np.power(std_dev, 2.)))
