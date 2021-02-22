@@ -48,7 +48,7 @@ class BallDistToPlayerLTd(ExecutionNode):
         player_pos = np.zeros(2)
         player_pos[0] = self.field_data.robots[self.parameters.robot_id].position.x
         player_pos[1] = self.field_data.robots[self.parameters.robot_id].position.y
-        ball_pos = np.array(self.field_data.ball.position.x, self.field_data.ball.position.y)
+        ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
 
         if np.linalg.norm(ball_pos-player_pos) < self.distance:
             return py_trees.common.Status.SUCCESS
