@@ -16,9 +16,12 @@ class FollowBallVertical(ExecutionNode):
         self.limit_inf = np.clip(limit_inf, -data.FIELD_WIDTH/2, data.FIELD_WIDTH/2)
 
     def setup(self):
-        self.action = LineAction(kp_ang=10.0, ki_ang=0.005, kd_ang=3.0, tolerance_ang=0.05,
-                                    kp_lin=60.0, ki_lin=0.005, kd_lin=1.0, tolerance_lin=0.01,
-                                    saturation_ang=10 * np.pi/2, saturation_lin=60 * 0.15)
+        self.action = LineAction(
+                        kp_ang=8.0, ki_ang=0.005, kd_ang=2.0, tolerance_ang=0.03,
+                        kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.005,
+                        saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
+                        saturation_lin=(200*0.2), integral_fade_lin=0.75,
+                        linear_decay_std_dev=np.pi/30)
 
     def initialise(self):
         self.action.initialize(self.parameters.robot_id, (self.x_position, self.limit_inf), (self.x_position, self.limit_sup))

@@ -25,7 +25,7 @@ def main():
     bb_client.goalkeeper.robot_id = 0
 
     my_tree = FollowBallVertical("Test Node", "/goalkeeper", field_data, team_command,
-                                    x_position=-0.68, limit_sup=0.4, limit_inf=-0.4)
+                                    x_position=-0.68, limit_sup=0.22, limit_inf=-0.22)
 
     my_tree.setup()
 
