@@ -8,6 +8,17 @@ from thundervolt.actions.follow_field_action import FollowFieldAction
 
 class GoBack(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, distance):
+
+    """
+        Create a go back to x position action object 
+        Args:
+            name (string): name of the node
+            role (string): role of the player (/goalkeeper, /defender or /attacker)
+            field_data (FieldData): information received from the field (e.g.: position of each player and ball)
+            team_command (TeamCommand): velocity commands for a robot
+            distance (float): desired distance between player and (e.g.) ball (with player 'x' less than ball 'x')
+    """
+
         super().__init__(name, role, field_data)
         self.team_command = team_command
         self.distance = distance
