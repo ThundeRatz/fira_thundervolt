@@ -1,12 +1,13 @@
 import pytest
 import py_trees
 
+from thundervolt.core.data import FieldData
 from thundervolt.behavior_trees.nodes.execution_node import ExecutionNode
 
 def test_execution_node():
     class ExampleNode(ExecutionNode):
-        def __init__(self, name, role):
-            super().__init__(name, role)
+        def __init__(self, name, role, field_data):
+            super().__init__(name, role, field_data)
 
         def setup(self):
             pass
@@ -23,7 +24,8 @@ def test_execution_node():
         def terminate(self, new_status):
             pass
 
-    my_node = ExampleNode("First Node", "/defender")
+    field_data = FieldData()
+    my_node = ExampleNode("First Node", "/defender", field_data)
     bb_client = py_trees.blackboard.Client()
     bb_client.register_key(key="/defender/robot_id", access=py_trees.common.Access.WRITE)
 
