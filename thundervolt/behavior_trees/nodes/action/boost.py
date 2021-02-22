@@ -16,8 +16,7 @@ class BoostBall(ExecutionNode):
                                 base_speed=20, goal=None, use_front=True, saturation_ang=None, saturation_lin=10.0)
 
     def initialise(self):
-        ball_point = np.array([self.field_data.ball.position.x, self.field_data.ball.position.y])
-        self.vector_field = RadialField(target=ball_point)
+        self.vector_field = RadialField(target=(0, 0))
         self.action.initialize(self.parameters.robot_id, self.vector_field)
 
     def update(self):
