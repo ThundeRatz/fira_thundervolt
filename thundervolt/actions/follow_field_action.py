@@ -18,9 +18,9 @@ class FollowFieldAction(Action):
             kp_ang (float): Proportional constant for angular error
             ki_ang (float): Integrative constant for angular error
             kd_ang (float): Derivative constant for angular error
-            kp_lin (float, optional): Proportional constant for angular error. Defaults to 0.0.
-            ki_lin (float, optional): Integrative constant for angular error. Defaults to 0.0.
-            kd_lin (float, optional): Derivative constant for angular error. Defaults to 0.0.
+            kp_lin (float, optional): Proportional constant for linear error. Defaults to 0.0.
+            ki_lin (float, optional): Integrative constant for linear error. Defaults to 0.0.
+            kd_lin (float, optional): Derivative constant for linear error. Defaults to 0.0.
             tolerance_lin (float, optional): Settling interval around set point. Defaults to 0.15.
             base_speed (float, optional): Base angular speed (rad/s). Defaults to 20.0.
             use_front (bool, optional): Where to compute field vector.
