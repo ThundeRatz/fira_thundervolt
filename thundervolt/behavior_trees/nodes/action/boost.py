@@ -17,7 +17,6 @@ class BoostBall(ExecutionNode):
 
     def initialise(self):
         ball_point = np.array([self.field_data.ball.position.x, self.field_data.ball.position.y])
-        self.action.set_goal(ball_point)
         self.vector_field = RadialField(target=ball_point)
         self.action.initialize(self.parameters.robot_id, self.vector_field)
 
@@ -29,7 +28,7 @@ class BoostBall(ExecutionNode):
         robot_cmd, action_state = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
 
-        if action_state == True:
+        if action_state:
             return py_trees.common.Status.SUCCESS
         else:
             return py_trees.common.Status.RUNNING
