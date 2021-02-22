@@ -22,7 +22,7 @@ class FollowFieldAction(Action):
             ki_lin (float, optional): Integrative constant for linear error. Defaults to 0.0.
             kd_lin (float, optional): Derivative constant for linear error. Defaults to 0.0.
             tolerance_lin (float, optional): Settling interval around set point. Defaults to 0.15.
-            base_speed (float, optional): Base linear response when goal is None. Defaults to 20.0.
+            base_speed (float, optional): Base wheel angular speed (rad/s). Defaults to 20.0.
             use_front (bool, optional): Where to compute field vector.
                 If true, use robot front, otherwise use robot center. Defaults to True.
             goal (ndarray, optional): Array with goal coordinates. Defaults to None.
