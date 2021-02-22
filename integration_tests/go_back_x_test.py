@@ -23,7 +23,7 @@ def main():
     bb_client.register_key(key="/defender/robot_id", access=py_trees.common.Access.WRITE)
     bb_client.defender.robot_id = 1
 
-    my_tree = GoBack("Test Node", "/defender", field_data, team_command, goal_x = -0.4)
+    my_tree = GoBack("Test Node", "/defender", field_data, team_command, distance = 0.4)
 
     my_tree.setup()
 
