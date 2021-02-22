@@ -1,5 +1,4 @@
 import test_base  # pylint: disable=import-error
-import numpy as np
 import py_trees
 
 from thundervolt.comm.vision import FiraVision
