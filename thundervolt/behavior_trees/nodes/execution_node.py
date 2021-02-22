@@ -15,5 +15,6 @@ class ExecutionNode(Behaviour):
         """
         super(ExecutionNode, self).__init__(name)
 
+        self.field_data = field_data
         self.parameters = self.attach_blackboard_client(name="Role selector", namespace=role)
         self.parameters.register_key('robot_id', access=py_trees.common.Access.READ)
