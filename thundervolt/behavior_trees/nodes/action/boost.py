@@ -13,10 +13,12 @@ class BoostBall(ExecutionNode):
 
     def setup(self):
         self.action = FollowFieldAction(kp_ang=10.0, ki_ang=0.0, kd_ang=3.0, kp_lin=60.0, ki_lin=0.0, kd_lin=3.0, tolerance_lin=0.01,
-                                base_speed=20, goal=None, use_front=True)
+                                base_speed=20, goal=None, use_front=True, saturation_ang=None, saturation_lin=None)
 
     def initialise(self):
-        self.vector_field = RadialField(target=(self.field_data.ball.position.x, self.field_data.ball.position.y))
+        ball_point = np.array([self.field_data.ball.position.x, self.field_data.ball.position.y])
+        self.action.set_goal(ball_point)
+        self.vector_field = RadialField(target=ball_point)
         self.action.initialize(self.parameters.robot_id, self.vector_field)
 
     def update(self):
