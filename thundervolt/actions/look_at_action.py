@@ -21,12 +21,13 @@ class LookAtAction(Action):
         self.final_angle = assert_angle(angle)
 
     def update(self, field_data: FieldData) -> (RobotCommand, bool):
+        action_status = False
         last_received_angle = field_data.robots[self.robot_id].position.theta
 
         # Check if it is inside the tolerance
         if abs(assert_angle(self.final_angle - last_received_angle)) < self.tolerance:
-            return (RobotCommand(), True)
+            action_status = True
 
         # Calculate controller response
         response = self.controller.update(assert_angle(last_received_angle - self.final_angle))
-        return (RobotCommand(-response, response), False)
+        return (RobotCommand(-response, response), action_status)

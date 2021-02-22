@@ -54,6 +54,7 @@ class FollowFieldAction(Action):
         self.goal = goal
 
     def update(self, field_data: FieldData) -> Tuple[RobotCommand, bool]:
+        action_status = False
         actual_angle = field_data.robots[self.robot_id].position.theta
         looking_direction = from_polar(actual_angle)
 
@@ -69,7 +70,7 @@ class FollowFieldAction(Action):
 
             # Check if reached goal
             if np.linalg.norm(goal_vector) < self.tolerance_lin:
-                return (RobotCommand(), True)
+                action_status = True
         else:
             response_lin = self.base_speed
 
@@ -98,4 +99,4 @@ class FollowFieldAction(Action):
 
         response_ang = self.controller_ang.update(to_univector_angle)
 
-        return (RobotCommand(response_lin - response_ang, response_lin + response_ang), False)
+        return (RobotCommand(response_lin - response_ang, response_lin + response_ang), action_status)
