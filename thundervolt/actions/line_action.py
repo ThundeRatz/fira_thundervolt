@@ -17,9 +17,9 @@ class LineAction(Action):
             ki_ang (float): Integrative constant for angular error
             kd_ang (float): Derivative constant for angular error
             tolerance_ang (float): Settling interval around set point.
-            kp_lin (float): Proportional constant for angular error.
-            ki_lin (float): Integrative constant for angular error.
-            kd_lin (float): Derivative constant for angular error.
+            kp_lin (float): Proportional constant for linear error.
+            ki_lin (float): Integrative constant for linear error.
+            kd_lin (float): Derivative constant for linear error.
             tolerance_lin (float): Settling interval around set point.
             saturation_ang (float, optional): Angular pid controller saturation
             saturation_lin (float, optional): Linear pid controller saturation
