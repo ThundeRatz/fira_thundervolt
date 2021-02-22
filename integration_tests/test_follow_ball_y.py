@@ -18,7 +18,7 @@ def main():
     vision = FiraVision(team_color_yellow, field_data)
     blue_control = FiraControl(team_color_yellow, team_command)
 
-    blue_control.update()
+    blue_control.stop_team()
 
     bb_client = py_trees.blackboard.Client()
     bb_client.register_key(key="/goalkeeper/robot_id", access=py_trees.common.Access.WRITE)
@@ -39,7 +39,7 @@ def main():
     except KeyboardInterrupt:
         team_command.reset()
 
-    blue_control.update()
+    blue_control.stop_team()
 
 if __name__ == '__main__':
     main()
