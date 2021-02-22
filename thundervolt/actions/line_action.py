@@ -7,12 +7,28 @@ from thundervolt.core.command import RobotCommand
 from thundervolt.core.utils import versor, assert_angle
 
 class LineAction(Action):
-    def __init__(self, kp_lin, ki_lin, kd_lin, tolerance_lin, kp_ang, ki_ang, kd_ang, tolerance_ang):
+    def __init__(self, kp_ang, ki_ang, kd_ang, tolerance_ang, kp_lin, ki_lin, kd_lin, tolerance_lin,
+                saturation_ang=None, saturation_lin=None):
+        """
+        Create a follow field action object
+
+        Args:
+            kp_ang (float): Proportional constant for angular error
+            ki_ang (float): Integrative constant for angular error
+            kd_ang (float): Derivative constant for angular error
+            tolerance_ang (float): Settling interval around set point.
+            kp_lin (float): Proportional constant for linear error.
+            ki_lin (float): Integrative constant for linear error.
+            kd_lin (float): Derivative constant for linear error.
+            tolerance_lin (float): Settling interval around set point.
+            saturation_ang (float, optional): Angular pid controller saturation
+            saturation_lin (float, optional): Linear pid controller saturation
+        """
         super().__init__()
         self.tolerance_lin = tolerance_lin
-        self.controller_lin = pidController(kp_lin, ki_lin, kd_lin, saturation = kp_ang * np.pi / 4)
+        self.controller_lin = pidController(kp_lin, ki_lin, kd_lin, saturation=saturation_lin)
         self.tolerance_ang = tolerance_ang
-        self.controller_ang = pidController(kp_ang, ki_ang, kd_ang, saturation = kp_lin * 0.2)
+        self.controller_ang = pidController(kp_ang, ki_ang, kd_ang, saturation=saturation_ang)
 
 
     def initialize(self, robot_id, pointA, pointB):
