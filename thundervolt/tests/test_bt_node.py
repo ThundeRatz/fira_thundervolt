@@ -4,6 +4,14 @@ import py_trees
 from thundervolt.core.data import FieldData
 from thundervolt.behavior_trees.nodes.execution_node import ExecutionNode
 from thundervolt.behavior_trees.nodes.conditions import xPlayerLTd
+from thundervolt.behavior_trees.nodes.conditions import GoodStrikerOrientation
+from thundervolt.behavior_trees.nodes.conditions import xPlayerLTxBall
+from thundervolt.behavior_trees.nodes.conditions import xBallLTd
+from thundervolt.behavior_trees.nodes.conditions import BallDistToGoalLTd
+from thundervolt.behavior_trees.nodes.conditions import FoeCloseToBall
+from thundervolt.behavior_trees.nodes.conditions import GoalKeeperOutsideGoal
+from thundervolt.behavior_trees.nodes.conditions import BallDistToPlayerLTd
+from thundervolt.behavior_trees.nodes.conditions import TimeBallReachGoalLTt
 
 def test_execution_node():
     class ExampleNode(ExecutionNode):
@@ -66,4 +74,36 @@ def test_x_player_lt_d():
         cond_node.tick_once()
 
         assert cond_node.status is desired_status[i]
+
+
+def test_good_striker_orientation():
+    pass
+
+
+def test_x_player_lt_x_ball():
+    pass
+
+
+def test_x_ball_lt_d():
+    pass
+
+
+def test_ball_dist_to_goal_lt_d():
+    pass
+
+
+def test_foe_close_to_ball():
+    pass
+
+
+def test_goal_keeper_outside_goal():
+    pass
+
+
+def test_ball_dist_to_player_lt_d():
+    pass
+
+
+def test_time_ball_reach_goal_lt_t():
+    pass
 

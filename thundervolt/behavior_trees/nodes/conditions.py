@@ -14,3 +14,34 @@ class xPlayerLTd(ExecutionNode):
         else:
             return py_trees.common.Status.FAILURE
 
+
+class GoodStrikerOrientation(ExecutionNode):
+    pass
+
+
+class xPlayerLTxBall(ExecutionNode):
+    pass
+
+
+class xBallLTd(ExecutionNode):
+    pass
+
+
+class BallDistToGoalLTd(ExecutionNode):
+    pass
+
+
+class FoeCloseToBall(ExecutionNode):
+    pass
+
+
+class GoalKeeperOutsideGoal(ExecutionNode):
+    pass
+
+
+class BallDistToPlayerLTd(ExecutionNode):
+    pass
+
+
+class TimeBallReachGoalLTt(ExecutionNode):
+    pass
