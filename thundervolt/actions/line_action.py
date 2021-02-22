@@ -39,11 +39,11 @@ class LineAction(Action):
         if pointB[0] < pointA[0]:
             pointA, pointB = pointB, pointA
 
-        self.pointA = pointA
-        self.pointB = pointB
+        self.pointA = np.array(pointA)
+        self.pointB = np.array(pointB)
 
     def set_goal(self, point_goal):
-        u = point_goal - self.pointA
+        u = np.array(point_goal) - self.pointA
         v = self.pointB - self.pointA
         v_versor = versor(v)
         u_dot_v = np.dot(u, v_versor)
