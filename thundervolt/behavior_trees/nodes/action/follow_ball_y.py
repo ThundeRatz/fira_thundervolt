@@ -8,6 +8,18 @@ from thundervolt.actions.line_action import LineAction
 class FollowBallVertical(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, x_position=0.0,
                     limit_sup=data.FIELD_WIDTH/2 , limit_inf=-data.FIELD_WIDTH/2):
+        """
+        Create an action node to follow the ball's y position on a vertical line.
+
+        Args:
+            name (str): Behaviour name.
+            role (str): Robot role namespace for black board client.
+            field_data (FieldData): Field information to be stored in the node.
+            team_command (TeamCommand): Angular speed commands for the robots.
+            x_position (float): The horizontal position the will be maintined by the robot at every time.
+            limit_sup (float, optional): Max vertical value the robot can reach. Defualts to FIELD_WIDTH/2.
+            limit_inf (float, optional): Min vertical value the robot can reach. Defualts to -FIELD_WIDTH/2.
+        """
 
         super().__init__(name, role, field_data)
         self.team_command = team_command
