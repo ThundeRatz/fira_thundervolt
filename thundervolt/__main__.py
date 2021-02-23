@@ -1,5 +1,5 @@
 import thundervolt
-import logging
+import logging.config
 import coloredlogs
 import argparse
 import json
@@ -7,19 +7,9 @@ import os
 
 def main():
     # Config logging
-    rootLogger = logging.getLogger()
-    rootLogger.setLevel(logging.DEBUG)
-
+    logging.config.fileConfig('logging.conf')
     log_format_msg = "\r%(asctime)s %(hostname)s %(name)s | %(levelname)s %(message)s"
-
-    consoleHandler = logging.StreamHandler()
-    rootLogger.addHandler(consoleHandler)
     coloredlogs.install(fmt=log_format_msg)
-
-    file_log_formatter = logging.Formatter(log_format_msg)
-    fileHandler = logging.FileHandler("logfile.log")
-    fileHandler.setFormatter(file_log_formatter)
-    rootLogger.addHandler(fileHandler)
 
     # Loads config from file
     parser = argparse.ArgumentParser(description='ThunderVolt')
