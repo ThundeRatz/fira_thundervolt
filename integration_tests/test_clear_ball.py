@@ -24,7 +24,7 @@ def main():
     bb_client.register_key(key="/goalkeeper/robot_id", access=py_trees.common.Access.WRITE)
     bb_client.goalkeeper.robot_id = 0
 
-    my_tree = ClearBall("Test Node", "/goalkeeper", field_data, team_command, 1)
+    my_tree = ClearBall("Test Node", "/goalkeeper", field_data, team_command)
 
     my_tree.setup()
 
