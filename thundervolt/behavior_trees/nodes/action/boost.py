@@ -13,7 +13,7 @@ class BoostBall(ExecutionNode):
 
     def setup(self):
         self.action = FollowFieldAction(kp_ang=10.0, ki_ang=0.005, kd_ang=3.0, kp_lin=100.0, ki_lin=0.005, kd_lin=3.0, tolerance_lin=0.07,
-                                base_speed=20, goal=None, use_front=True, saturation_ang=None, saturation_lin=10.0)
+                                base_speed=20, goal=None, use_front=False, saturation_ang=None, saturation_lin=10.0)
 
     def initialise(self):
         self.vector_field = RadialField(target=(0, 0))
