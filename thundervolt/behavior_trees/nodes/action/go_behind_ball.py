@@ -23,9 +23,10 @@ class GoBehindBall(ExecutionNode):
         self.distance = distance
 
     def setup(self):
-        self.action = FollowFieldAction(kp_ang=10.0, ki_ang=0.0, kd_ang=3.0, kp_lin=50.0, ki_lin=0.0,
-                                        kd_lin=3.0, tolerance_lin=0.15, base_speed=20,
+        self.action = FollowFieldAction(kp_ang=6.0, ki_ang=0.0, kd_ang=3.0, kp_lin=200.0, ki_lin=0.0,
+                                        kd_lin=3.0, tolerance_lin=0.15, base_speed=200,
                                         goal=None, use_front=True)
+
 
     def initialise(self):
         goal_x = self.field_data.ball.position.x - self.distance
