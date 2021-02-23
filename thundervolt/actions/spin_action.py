@@ -8,7 +8,7 @@ from thundervolt.core.command import RobotCommand
 
 class SpinAction(Action):
     def __init__(self, kp, ki, kd, tolerance,
-                saturation=None, max_integral=None, integral_fade=None):
+                saturation=None, max_integral=None, integral_fade=1.0):
         """
         Create a spin action object
 
