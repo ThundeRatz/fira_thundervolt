@@ -10,7 +10,7 @@ class GoBehindBall(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, distance):
 
         """
-        Create a go back to x position action object
+        Create an action node to make the robot go behind ball's x position
         Args:
             name (string): name of the node
             role (string): role of the player (/goalkeeper, /defender or /attacker)
