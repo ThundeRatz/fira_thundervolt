@@ -1,6 +1,7 @@
 import test_base  # pylint: disable=import-error
 import numpy as np
 import time
+import logging
 
 from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
@@ -29,13 +30,13 @@ def main():
             blue_control.transmit_robot(TEST_ROBOT, robot_cmd.left_speed, robot_cmd.right_speed)
 
             if action_state == True:
-                print(f"Reached {angle * 180 / np.pi}º")
+                logging.debug(f"Reached {angle * 180 / np.pi}º")
                 break
 
         time.sleep(1)
 
     blue_control.transmit_robot(TEST_ROBOT, 0, 0)
-    print("Yay finished!\r\n")
+    logging.debug("Yay finished!\r\n")
 
 if __name__ == '__main__':
     main()

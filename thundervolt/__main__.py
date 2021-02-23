@@ -42,7 +42,7 @@ def main():
         my_game.run()
     except KeyboardInterrupt:
         my_game.end()
-        logging.warning("Ending")
+        logging.info("Ending the game!")
 
 
 if __name__ == '__main__':

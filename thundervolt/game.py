@@ -1,3 +1,5 @@
+import logging
+
 from .comm.vision import FiraVision
 from .comm.control import FiraControl
 from .comm.referee import RefereeComm
@@ -28,7 +30,7 @@ class Game():
 
 
     def run(self):
-        print("Starting...")
+        logging.info("Starting the game!")
 
         while True:
             if self.use_referee:
