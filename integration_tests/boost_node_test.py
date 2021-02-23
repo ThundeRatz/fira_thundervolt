@@ -33,7 +33,9 @@ def main():
             if my_tree.status == py_trees.common.Status.SUCCESS:
                 break
     except KeyboardInterrupt:
-        blue_control.stop_team()
+        pass
+
+    blue_control.stop_team()
 
 if __name__ == '__main__':
     main()
