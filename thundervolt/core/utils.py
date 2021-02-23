@@ -26,3 +26,10 @@ def assert_angle(angle):
 
 def gaussian(x, std_dev = 1.0, mean = 0.0, height = 1.0):
     return height * np.exp(-np.power(x - mean, 2.) / (2 * np.power(std_dev, 2.)))
+
+def vectors_angle(vector1, vector2=np.array((1,0))):
+    """Use numpy to calculate the angle between 2 vectors"""
+    dot_product = np.dot(versor(vector1), versor(vector2))
+    angle = np.arccos(dot_product)
+
+    return angle
