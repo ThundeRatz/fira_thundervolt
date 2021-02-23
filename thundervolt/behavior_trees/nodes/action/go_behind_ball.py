@@ -61,9 +61,7 @@ class GoBehindBall(ExecutionNode):
         self.my_field.update(self.field_data, self.parameters.robot_id)
         self.ball_repell_field.target = (self.field_data.ball.position.x, self.field_data.ball.position.y)
 
-        goal_x = self.field_data.ball.position.x - self.distance
-        if goal_x < -0.5: # Near our goal area
-            goal_x = -0.5
+        goal_x = max(self.field_data.ball.position.x - self.distance, -0.5) # Near our goal area
 
         self.action.set_goal(np.array([goal_x, self.field_data.ball.position.y]))
         self.attract_field.target = (goal_x, self.field_data.ball.position.y)
