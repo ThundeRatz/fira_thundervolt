@@ -72,15 +72,18 @@ class BallDistanceToDefenseAreaLTd(ExecutionNode):
 
     def update(self):
         ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
-        dist_to_area = 0.0
+        dist_to_area = None
 
-        if ball_pos[0] < (-data.FIELD_LENGTH + data.GOAL_AREA_DEPTH):
+        if ball_pos[0] < (-data.FIELD_LENGTH / 2 + data.GOAL_AREA_DEPTH):
             if abs(ball_pos[1]) > data.GOAL_AREA_WIDTH / 2:
                 dist_to_area = abs(ball_pos[1]) - data.GOAL_AREA_WIDTH / 2
         else:
             vertical_coordinate = np.clip (ball_pos[1], -data.GOAL_AREA_WIDTH / 2, data.GOAL_AREA_WIDTH / 2)
             closest_point = np.array([data.FIELD_LENGTH / 2 - data.GOAL_AREA_DEPTH, vertical_coordinate])
             dist_to_area = np.linalg.norm(closest_point - ball_pos)
+
+        if dist_to_area is None:
+            return py_trees.common.Status.SUCCESS
 
         if dist_to_area < self.distance:
             return py_trees.common.Status.SUCCESS
@@ -97,15 +100,18 @@ class PlayerDistanceToDefenseAreaLTd(ExecutionNode):
         player_pos = np.zeros(2)
         player_pos[0] = self.field_data.robots[self.parameters.robot_id].position.x
         player_pos[1] = self.field_data.robots[self.parameters.robot_id].position.y
-        dist_to_area = 0.0
+        dist_to_area = None
 
-        if player_pos[0] < (-data.FIELD_LENGTH + data.GOAL_AREA_DEPTH):
+        if player_pos[0] < (-data.FIELD_LENGTH / 2 + data.GOAL_AREA_DEPTH):
             if abs(player_pos[1]) > data.GOAL_AREA_WIDTH / 2:
                 dist_to_area = abs(player_pos[1]) - data.GOAL_AREA_WIDTH / 2
         else:
             vertical_coordinate = np.clip (player_pos[1], -data.GOAL_AREA_WIDTH / 2, data.GOAL_AREA_WIDTH / 2)
             closest_point = np.array([data.FIELD_LENGTH / 2 - data.GOAL_AREA_DEPTH, vertical_coordinate])
             dist_to_area = np.linalg.norm(closest_point - player_pos)
+
+        if dist_to_area is None:
+            return py_trees.common.Status.SUCCESS
 
         if dist_to_area < self.distance:
             return py_trees.common.Status.SUCCESS
