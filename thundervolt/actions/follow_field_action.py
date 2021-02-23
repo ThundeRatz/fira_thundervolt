@@ -38,7 +38,6 @@ class FollowFieldAction(Action):
             linear_decay_std_dev (float, optional): Standard deviation for linear response gaussian decay function.
         """
         super().__init__()
-        self.tolerance_ang = tolerance_ang
         self.controller_ang = pidController(kp_ang, ki_ang, kd_ang,
                                 saturation=saturation_ang, max_integral=max_integral_ang, integral_fade_rate=integral_fade_ang)
 
