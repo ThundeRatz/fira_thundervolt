@@ -6,7 +6,7 @@ from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import TeamCommand
-from thundervolt.behavior_trees.nodes.action.go_back_x import GoBehindBall
+from thundervolt.behavior_trees.nodes.action.go_behind_ball import GoBehindBall
 
 def main():
     team_color_yellow = False
