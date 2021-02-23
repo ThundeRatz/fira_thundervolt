@@ -3,7 +3,6 @@ import numpy as np
 
 from ..execution_node import ExecutionNode
 from thundervolt.actions.spin_action import SpinAction
-from thundervolt.core.utils import assert_half_angle
 from thundervolt.core.data import ROBOT_SIZE
 
 
