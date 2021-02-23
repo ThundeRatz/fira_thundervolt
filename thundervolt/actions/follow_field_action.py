@@ -10,8 +10,8 @@ from thundervolt.core.command import RobotCommand
 
 class FollowFieldAction(Action):
     def __init__(self, kp_ang, ki_ang, kd_ang, kp_lin=0.0, ki_lin=0.0, kd_lin=0.0, tolerance_lin=0.15,
-                 saturation_ang=None, max_integral_ang=None, integral_fade_ang=None,
-                 saturation_lin=None, max_integral_lin=None, integral_fade_lin=None,
+                 saturation_ang=None, max_integral_ang=None, integral_fade_ang=1.0,
+                 saturation_lin=None, max_integral_lin=None, integral_fade_lin=1.0,
                  base_speed=20.0, use_front=True, goal=None,
                  linear_decay_std_dev=None):
         """
