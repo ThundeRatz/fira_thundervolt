@@ -3,6 +3,8 @@ import numpy as np
 
 from .execution_node import ExecutionNode
 
+OUR_GOAL_X = -0.75
+
 class xPlayerLTd(ExecutionNode):
     def __init__(self, name, role, field_data, d_position):
         super().__init__(name, role, field_data)
@@ -28,7 +30,15 @@ class xBallLTd(ExecutionNode):
 
 
 class BallDistToGoalLTd(ExecutionNode):
-    pass
+    def __init__(self, name, role, field_data, max_distance):
+        super().__init__(name, role, field_data)
+        self.max_distance = max_distance
+
+    def update(self):
+        if self.field_data.ball.position.x - OUR_GOAL_X < self.max_distance:
+            return py_trees.common.Status.SUCCESS
+        else:
+            return py_trees.common.Status.FAILURE
 
 
 class FoeCloseToBall(ExecutionNode):
