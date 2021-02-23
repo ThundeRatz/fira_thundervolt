@@ -10,7 +10,10 @@ from thundervolt.core.command import RobotCommand
 
 class FollowFieldAction(Action):
     def __init__(self, kp_ang, ki_ang, kd_ang, kp_lin=0.0, ki_lin=0.0, kd_lin=0.0, tolerance_lin=0.15,
-                 base_speed=20.0, use_front=True, goal=None, saturation_ang=None, saturation_lin=None):
+                 saturation_ang=None, max_integral_ang=None, integral_fade_ang=1.0,
+                 saturation_lin=None, max_integral_lin=None, integral_fade_lin=1.0,
+                 base_speed=20.0, use_front=True, goal=None,
+                 linear_decay_std_dev=None):
         """
         Create a follow field action object
 
@@ -22,27 +25,31 @@ class FollowFieldAction(Action):
             ki_lin (float, optional): Integrative constant for linear error. Defaults to 0.0.
             kd_lin (float, optional): Derivative constant for linear error. Defaults to 0.0.
             tolerance_lin (float, optional): Settling interval around set point. Defaults to 0.15.
+            saturation_ang (float, optional): Angular pid controller saturation.
+            max_integral_ang (float, optional): Angular pid controller max integral value.
+            integral_fade_ang (float, optional): Angular pid controller integral fade rate.
+            saturation_lin (float, optional): Linear pid controller saturation.
+            max_integral_lin (float, optional): Linear pid controller max integral value.
+            integral_fade_lin (float, optional): Linear pid controller integral fade rate.
             base_speed (float, optional): Base angular speed (rad/s). Defaults to 20.0.
             use_front (bool, optional): Where to compute field vector.
                 If true, use robot front, otherwise use robot center. Defaults to True.
             goal (ndarray, optional): Array with goal coordinates. Defaults to None.
-            saturation_ang (float, optional): Angular pid controller saturation
-            saturation_lin (float, optional): Linear pid controller saturation
+            linear_decay_std_dev (float, optional): Standard deviation for linear response gaussian decay function.
         """
         super().__init__()
-        self.controller_ang = pidController(kp_ang, ki_ang, kd_ang)
-        if saturation_ang is not None:
-            self.controller_ang.saturation = saturation_ang
-        else:
-            self.controller_ang.saturation = np.pi * 2 * kp_ang
+        self.controller_ang = pidController(kp_ang, ki_ang, kd_ang,
+                                saturation=saturation_ang, max_integral=max_integral_ang, integral_fade_rate=integral_fade_ang)
 
         self.tolerance_lin = tolerance_lin
-        self.controller_lin = pidController(kp_lin, ki_lin, kd_lin)
-        self.controller_lin.saturation = saturation_lin
+        self.controller_lin = pidController(kp_lin, ki_lin, kd_lin,
+                                saturation=saturation_lin, max_integral=max_integral_lin, integral_fade_rate=integral_fade_lin)
 
         self.goal = goal
         self.base_speed = base_speed
         self.use_front = use_front
+
+        self.linear_decay_std_dev = linear_decay_std_dev
 
     def initialize(self, robot_id, vector_field):
         super().initialize(robot_id)
@@ -54,6 +61,7 @@ class FollowFieldAction(Action):
         self.goal = goal
 
     def update(self, field_data: FieldData) -> Tuple[RobotCommand, bool]:
+        action_status = False
         actual_angle = field_data.robots[self.robot_id].position.theta
         looking_direction = from_polar(actual_angle)
 
@@ -69,7 +77,7 @@ class FollowFieldAction(Action):
 
             # Check if reached goal
             if np.linalg.norm(goal_vector) < self.tolerance_lin:
-                return (RobotCommand(), True)
+                action_status = True
         else:
             response_lin = self.base_speed
 
@@ -94,8 +102,9 @@ class FollowFieldAction(Action):
         to_univector_angle = assert_angle(actual_angle - ang_univector)
 
         # Apply de decay on the linear command based on the error
-        response_lin *= gaussian(to_univector_angle, std_dev=np.pi/6)
+        if self.linear_decay_std_dev is not None:
+            response_lin *= gaussian(to_univector_angle, std_dev=self.linear_decay_std_dev)
 
         response_ang = self.controller_ang.update(to_univector_angle)
 
-        return (RobotCommand(response_lin - response_ang, response_lin + response_ang), False)
+        return (RobotCommand(response_lin - response_ang, response_lin + response_ang), action_status)
