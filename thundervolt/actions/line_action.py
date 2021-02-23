@@ -99,7 +99,7 @@ class LineAction(Action):
 
         goal_ang = np.arctan2(goal_vector[1], goal_vector[0])
 
-        weight = gaussian(goal_proj_line, std_dev=self.line_dist_std_dev)
+        weight = gaussian(goal_proj_axis, std_dev=self.line_dist_std_dev)
         desired_angle = line_ang * weight + goal_ang * (1-weight)
 
         # Calculate the linear response based on the robot to goal projection on the line direction

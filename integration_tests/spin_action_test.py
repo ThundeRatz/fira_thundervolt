@@ -4,7 +4,7 @@ from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
 from thundervolt.actions.spin_action import SpinAction
 
-TEST_ROBOT = 2
+TEST_ROBOT = 0
 
 
 def main():

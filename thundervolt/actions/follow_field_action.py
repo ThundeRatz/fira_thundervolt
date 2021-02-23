@@ -31,7 +31,7 @@ class FollowFieldAction(Action):
             saturation_lin (float, optional): Linear pid controller saturation.
             max_integral_lin (float, optional): Linear pid controller max integral value.
             integral_fade_lin (float, optional): Linear pid controller integral fade rate.
-            base_speed (float, optional): Base angular speed (rad/s). Defaults to 20.0.
+            base_speed (float, optional): Base wheel angular speed (rad/s). Defaults to 20.0.
             use_front (bool, optional): Where to compute field vector.
                 If true, use robot front, otherwise use robot center. Defaults to True.
             goal (ndarray, optional): Array with goal coordinates. Defaults to None.

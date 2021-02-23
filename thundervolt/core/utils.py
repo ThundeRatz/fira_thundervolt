@@ -24,5 +24,20 @@ def assert_angle(angle):
 
     return angle
 
+def assert_half_angle(theta):
+    """
+    Represent angles in range [-np.pi/2; np.pi/2], using the inverse of the supplementary angle when needed.
+    """
+
+    theta = assert_angle(theta)
+
+    if (theta > np.pi / 2):
+        theta -= np.pi
+
+    if (theta < -np.pi / 2):
+        theta += np.pi
+
+    return theta
+
 def gaussian(x, std_dev = 1.0, mean = 0.0, height = 1.0):
     return height * np.exp(-np.power(x - mean, 2.) / (2 * np.power(std_dev, 2.)))
