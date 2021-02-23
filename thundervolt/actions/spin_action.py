@@ -22,6 +22,7 @@ class SpinAction(Action):
         self.controller.set_point = self.total_angular_dist
 
     def update(self, field_data: FieldData) -> (RobotCommand, bool):
+        action_status = False
         if self.last_angle is not None:
             self.actual_angular_dist += \
                 assert_angle(field_data.robots[self.robot_id].position.theta - self.last_angle)
@@ -30,12 +31,12 @@ class SpinAction(Action):
 
         # Check if it has passsed the set point
         if abs(self.actual_angular_dist) > abs(self.total_angular_dist):
-            return (RobotCommand(), True)
+            action_status = True
 
         # Check if it is inside the tolerance
         if abs(self.total_angular_dist - self.actual_angular_dist) < self.tolerance:
-            return (RobotCommand(), True)
+            action_status = True
 
         # Calculate controller response
         response = self.controller.update(self.actual_angular_dist)
-        return (RobotCommand(-response, response), False)
+        return (RobotCommand(-response, response), action_status)
