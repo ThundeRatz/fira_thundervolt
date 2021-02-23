@@ -8,8 +8,8 @@ from thundervolt.core.utils import versor, assert_angle, rotate, gaussian
 
 class LineAction(Action):
     def __init__(self, kp_ang, ki_ang, kd_ang, tolerance_ang, kp_lin, ki_lin, kd_lin, tolerance_lin,
-                saturation_ang=None, max_integral_ang=None, integral_fade_ang=None,
-                saturation_lin=None, max_integral_lin=None, integral_fade_lin=None,
+                saturation_ang=None, max_integral_ang=None, integral_fade_ang=1.0,
+                saturation_lin=None, max_integral_lin=None, integral_fade_lin=1.0,
                 line_dist_std_dev=0.05, linear_decay_std_dev=None):
         """
         Create a line action object
