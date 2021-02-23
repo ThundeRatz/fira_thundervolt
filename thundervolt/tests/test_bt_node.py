@@ -88,7 +88,32 @@ def test_x_ball_lt_d():
 
 
 def test_ball_dist_to_goal_lt_d():
-    pass
+    max_distances = [0.2, 0.2, -0.1, 0.25, 0.3]
+    ball_positions = [-0.5, 0.1, -0.6, -0.53, -0.45]
+    desired_status = [
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE
+    ]
+
+    ROBOT_ID = 1
+
+    field_data = FieldData()
+    bb_client = py_trees.blackboard.Client()
+    bb_client.register_key(key="/defender/robot_id", access=py_trees.common.Access.WRITE)
+    bb_client.defender.robot_id = ROBOT_ID
+
+    for i in range(len(max_distances)):
+        print(f"TEST NUMBER: {i}")
+
+        field_data.ball.position.x = ball_positions[i]
+
+        cond_node = BallDistToGoalLTd(f"Ball distance to goal less than {max_distances[i]}", "/defender", field_data, max_distances[i])
+        cond_node.tick_once()
+
+        assert cond_node.status is desired_status[i]
 
 
 def test_foe_close_to_ball():
