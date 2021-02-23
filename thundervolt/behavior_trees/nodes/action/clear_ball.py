@@ -8,6 +8,15 @@ from thundervolt.core.data import ROBOT_SIZE
 
 class ClearBall(ExecutionNode):
     def __init__(self, name, role, field_data, team_command):
+        """
+        Clear the ball, kick it away
+
+        Args:
+            name (str): Behaviour name.
+            role (str): Robot role namespace for black board client.
+            field_data (FieldData): Field information to be stored in the node.
+            team_command (TeamCommand): Angular speed commands for the robots.
+        """
         super().__init__(name, role, field_data)
         self.team_command = team_command
 
