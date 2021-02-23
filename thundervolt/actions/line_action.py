@@ -12,7 +12,7 @@ class LineAction(Action):
                 saturation_lin=None, max_integral_lin=None, integral_fade_lin=None,
                 linear_decay_std_dev=None):
         """
-        Create a follow line action object
+        Create a line action object
 
         Args:
             kp_ang (float): Proportional constant for angular error

@@ -7,11 +7,25 @@ from thundervolt.core.command import RobotCommand
 from thundervolt.core.pid_controller import pidController
 
 class LookAtAction(Action):
-    def __init__(self, kp, ki, kd, tolerance):
+    def __init__(self, kp, ki, kd, tolerance,
+                saturation=None, max_integral=None, integral_fade=None):
+        """
+        Create a look at action object
+
+        Args:
+            kp (float): Proportional constant for pid controller.
+            ki (float): Integrative constant for pid controller.
+            kd (float): Derivative constant for pid controller.
+            tolerance (float): Settling interval around set point.
+            saturation (float, optional): pid controller saturation.
+            max_integral (float, optional): pid controller max integral value.
+            integral_fade (float, optional): pid controller integral fade rate.
+        """
         super().__init__()
         self.tolerance = tolerance
-        self.controller = pidController(kp, ki, kd)
-        self.controller.saturation = kp * np.pi
+        self.controller = pidController(kp, ki, kd, saturation=saturation,
+                            max_integral=max_integral, integral_fade_rate=integral_fade)
+
 
     def initialize(self, robot_id):
         super().initialize(robot_id)
