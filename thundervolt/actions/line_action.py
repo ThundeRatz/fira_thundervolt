@@ -12,7 +12,7 @@ class LineAction(Action):
                 saturation_lin=None, max_integral_lin=None, integral_fade_lin=None,
                 linear_decay_std_dev=None):
         """
-        Create a follow line action object
+        Create a line action object
 
         Args:
             kp_ang (float): Proportional constant for angular error
@@ -70,6 +70,7 @@ class LineAction(Action):
         self.goal = goal
 
     def update(self, field_data: FieldData) -> (RobotCommand, bool):
+        action_status = False
         actual_point = np.zeros(2)
 
         actual_point[0] = field_data.robots[self.robot_id].position.x
@@ -98,6 +99,6 @@ class LineAction(Action):
         response_ang = self.controller_ang.update(angle_to_goal)
 
         if response_lin == 0 and abs(assert_angle(goal_ang - actual_ang)) < self.tolerance_ang:
-            return (RobotCommand(), True)
-        else:
-            return (RobotCommand(response_lin - response_ang, response_lin + response_ang), False)
+            action_status = True
+
+        return (RobotCommand(response_lin - response_ang, response_lin + response_ang), action_status)
