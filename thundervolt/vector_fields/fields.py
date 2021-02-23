@@ -300,8 +300,8 @@ class OrientedAttractingField(VectorField):
             return np.zeros(2)
 
         # Construct new base
-        u_dir = math.versor(self.direction)
-        v_dir = math.rotate(u_dir, np.pi / 2)
+        u_dir = utils.versor(self.direction)
+        v_dir = utils.rotate(u_dir, np.pi / 2)
 
         # proj_u = np.dot(to_position, u_dir)
         proj_v = np.dot(to_position, v_dir)
@@ -323,7 +323,7 @@ class OrientedAttractingField(VectorField):
             self.positive_field.multiplier = abs((-self.nodes_radius - proj_v)) / (2 * self.nodes_radius)
             self.negative_field.multiplier = (self.nodes_radius - proj_v) / (2 * self.nodes_radius)
             output = self.positive_field.compute(pose) + self.negative_field.compute(pose)
-        output = math.versor(output)
+        output = utils.versor(output)
 
         decay = 1
         if self.max_radius and self.decay_radius:
