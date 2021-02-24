@@ -102,6 +102,9 @@ class LineAction(Action):
         weight = gaussian(goal_proj_axis, std_dev=self.line_dist_std_dev)
         desired_angle = line_ang * weight + goal_ang * (1-weight)
 
+        if np.linalg.norm(abs(goal_proj_line)) < self.tolerance_lin:
+            desired_angle = line_ang
+
         # Calculate the linear response based on the robot to goal projection on the line direction
         response_lin = -self.controller_lin.update(abs(goal_proj_line))
 
