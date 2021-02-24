@@ -55,10 +55,11 @@ class BackToGoal(ExecutionNode):
 
         self.action = FollowFieldAction(
                         kp_ang=8.0, ki_ang=0.005, kd_ang=2.0,
-                        # kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.005,
+                        kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.05,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
-                        # saturation_lin=(200*0.2), integral_fade_lin=0.75,
-                        base_speed=100, linear_decay_std_dev=np.pi/4)
+                        saturation_lin=(200*0.2), integral_fade_lin=0.75,
+                        base_speed=100, linear_decay_std_dev=np.pi/4, goal=(self.goal_x_position, 0)
+        )
 
     def initialise(self):
         self.action.initialize(self.parameters.robot_id, self.vector_field)
