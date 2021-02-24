@@ -117,7 +117,41 @@ def test_ball_dist_to_goal_lt_d():
 
 
 def test_foe_close_to_ball():
-    pass
+    allies_positions = [(-0.75, 0.0), (-0.5, -0.4), (0.0, 0.0)]
+    foes_positions = [(0.75, 0.0), (0.5, 0.4), (0.0, -0.4)]
+    ball_positions = [(-0.65, 0.0), (-0.25, -0.4), (0.25, 0.3), (0.0, -0.19), (0.0, 0.35)]
+    desired_status = [
+        py_trees.common.Status.FAILURE, # Ball closer to ally 0
+        py_trees.common.Status.SUCCESS, # Ball closer to foe 2 and ally 1
+        py_trees.common.Status.SUCCESS, # Ball closer to foe 1
+        py_trees.common.Status.FAILURE, # Ball closer to ally 2
+        py_trees.common.Status.FAILURE  # Ball closer to ally 2
+    ]
+
+    ROBOT_ID = 1
+
+    field_data = FieldData()
+    bb_client = py_trees.blackboard.Client()
+    bb_client.register_key(key="/defender/robot_id", access=py_trees.common.Access.WRITE)
+    bb_client.defender.robot_id = ROBOT_ID
+
+    for i in range(len(ball_positions)):
+        print(f"TEST NUMBER: {i}")
+
+        field_data.robots[0].position = allies_positions[0]
+        field_data.robots[1].position = allies_positions[1]
+        field_data.robots[2].position = allies_positions[2]
+
+        field_data.foes[0].position = foes_positions[0]
+        field_data.foes[1].position = foes_positions[1]
+        field_data.foes[2].position = foes_positions[2]
+
+        field_data.ball.position = ball_positions[i]
+
+        cond_node = FoeCloseToBall(f"Opponent closest to ball when ball is in {ball_positions[i]}", "/defender", field_data)
+        cond_node.tick_once()
+
+        assert cond_node.status is desired_status[i]
 
 
 def test_goal_keeper_outside_goal():
