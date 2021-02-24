@@ -29,12 +29,13 @@ class WaitToGetBall(ExecutionNode):
             size = data.FIELD_WIDTH / 2,
             side = 'positive',
             repelling = True,
+            max_dist = data.ROBOT_SIZE/2
         )
 
         repell_field = combinations.ObstaclesField(
             max_radius = 0.3,
             decay_radius = 0.05,
-            multiplier = 1,
+            multiplier = 1
         )
 
         self.target_field = fields.OrientedAttractingField(
@@ -46,14 +47,19 @@ class WaitToGetBall(ExecutionNode):
         self.vector_field = fields.VectorField()
         self.vector_field.add(division_field)
         self.vector_field.add(repell_field)
-        self.vector_field.add(self.target_field)
         self.action.initialize(self.parameters.robot_id, self.vector_field)
 
 
     def update(self):
-        goal = (self.field_data.ball.position.x + data.ROBOT_SIZE, self.field_data.ball.position.y)
-        
-        self.target_field.target(goal)
+        ball_x = self.field_data.ball.position.x
+
+        if ball_x < self.x_partition:
+            goal = (ball_x + data.ROBOT_SIZE, self.field_data.robots[self.parameters.robot_id].position.y)
+        else:
+            goal = (ball_x - data.ROBOT_SIZE, self.field_data.ball.position.y)
+            self.vector_field.add(self.target_field)
+            self.target_field.target(goal)
+
         self.vector_field.update(self.field_data, self.parameters.robot_id)
         self.action.set_goal(np.array(goal))
 
