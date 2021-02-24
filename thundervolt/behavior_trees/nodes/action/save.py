@@ -5,8 +5,8 @@ from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.line_action import LineAction
 
-GOAL_LINE_X = data.FIELD_LENGTH/2 - data.ROBOT_SIZE*0.75
-GOAL_LINE_Y = data.GOAL_WIDTH/2 - data.ROBOT_SIZE/4
+GOAL_LINE_X = data.FIELD_LENGTH/2 - data.ROBOT_SIZE
+GOAL_LINE_Y = data.GOAL_AREA_WIDTH/2 - data.ROBOT_SIZE
 
 class SaveGoal(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, save_time):
@@ -28,11 +28,13 @@ class SaveGoal(ExecutionNode):
     def update(self):
         ball_position = (self.field_data.ball.position.x, self.field_data.ball.position.y)
         ball_velocity = (self.field_data.ball.velocity.x, self.field_data.ball.velocity.y)
-        ball_distance = -(ball_position[0] + GOAL_LINE_X - data.ROBOT_SIZE/2)
+        ball_distance = -(ball_position[0] + data.FIELD_LENGTH)
 
         if ball_velocity[0] < 0:
             ball_time = ball_distance / ball_velocity[0]
             if ball_time < self.save_time:
+                ball_distance = min(-(ball_position[0] + GOAL_LINE_X - data.ROBOT_SIZE/2), 0)
+                ball_time = ball_distance / ball_velocity[0]
                 goal_point = np.zeros(2)
                 goal_point[1] = ball_position[1] + ball_time * ball_velocity[1]
                 self.action.set_goal(goal_point)
