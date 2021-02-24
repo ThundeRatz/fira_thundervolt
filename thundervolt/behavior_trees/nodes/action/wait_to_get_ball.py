@@ -43,18 +43,18 @@ class WaitToGetBall(ExecutionNode):
             node_radius = data.ROBOT_SIZE
         )
 
-        self.my_field = fields.VectorField()
-        self.my_field.add(division_field)
-        self.my_field.add(repell_field)
-        self.my_field.add(self.target_field)
-        self.action.initialize(self.parameters.robot_id, self.my_field)
+        self.vector_field = fields.VectorField()
+        self.vector_field.add(division_field)
+        self.vector_field.add(repell_field)
+        self.vector_field.add(self.target_field)
+        self.action.initialize(self.parameters.robot_id, self.vector_field)
 
 
     def update(self):
         goal = (self.field_data.ball.position.x + data.ROBOT_SIZE, self.field_data.ball.position.y)
         
         self.target_field.target(goal)
-        self.my_field.update(self.field_data, self.parameters.robot_id)
+        self.vector_field.update(self.field_data, self.parameters.robot_id)
         self.action.set_goal(np.array(goal))
 
         robot_cmd, action_status = self.action.update(self.field_data)
