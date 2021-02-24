@@ -5,7 +5,7 @@ from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.follow_field_action import FollowFieldAction
 from thundervolt.vector_fields.fields import VectorField, RadialField
-from thundervolt.vector_fields.combinations import WallField, ObstaclesField
+from thundervolt.vector_fields.combinations import WallField, ObstaclesField, TangentObstaclesField
 
 from thundervolt.vector_fields.plotter import FieldPlotter
 
@@ -33,8 +33,14 @@ class BackToGoal(ExecutionNode):
         repelling_field = ObstaclesField(
             max_radius = 0.17,
             decay_radius = 0.08,
-            multiplier = 0.9,
+            multiplier = 0.9
         )
+
+        avoid_obstacles = TangentObstaclesField(
+                            radius = 0.7,
+                            max_radius = 0.3,
+                            decay_radius = 0.08,
+                            multiplier = 1.2
         )
 
         self.attracting_field = RadialField(
@@ -48,24 +54,25 @@ class BackToGoal(ExecutionNode):
         self.ball_repelling_field = RadialField(
             target = (self.field_data.ball.position.x, self.field_data.ball.position.y),
             max_radius = 0.25,
-            decay_radius = 0.05,
+            decay_radius = 0.03,
             repelling = True,
             multiplier = 0.8
         )
 
         avoid_walls = WallField(
-                        max_dist=0.2,
+                        max_dist=0.1,
                         decay_dist=0.05,
-                        multiplier=0.9
+                        multiplier=0.7
         )
 
         self.vector_field.add(self.attracting_field)
         self.vector_field.add(repelling_field)
+        self.vector_field.add(avoid_obstacles)
         self.vector_field.add(avoid_walls)
         self.vector_field.add(self.ball_repelling_field)
 
         self.action = FollowFieldAction(
-                        kp_ang=9.0, ki_ang=0.009, kd_ang=2.0,
+                        kp_ang=9.0, ki_ang=0.009, kd_ang=2.5,
                         kp_lin=200.0, ki_lin=0.01, kd_lin=3.0, tolerance_lin=0.10,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
                         saturation_lin=(200*0.2), max_integral_lin=0.5, integral_fade_lin=0.75,
