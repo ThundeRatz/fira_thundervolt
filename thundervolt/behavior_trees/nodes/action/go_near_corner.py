@@ -7,7 +7,8 @@ from thundervolt.vector_fields import fields, combinations
 from thundervolt.actions.follow_field_action import FollowFieldAction
 
 class GoNearCorner(ExecutionNode):
-    def __init__(self, name, role, field_data, team_command, upper):
+    def __init__(self, name, role, field_data, team_command, y_position=0.0,
+                    min_sup_limit=data.FIELD_WIDTH/2 , max_inf_limit=-data.GOAL_AREA_WIDTH/2):
 
         """
         Create an action node to make the robot go near the corner kick area
@@ -16,13 +17,16 @@ class GoNearCorner(ExecutionNode):
             role (string): role of the player (/goalkeeper, /defender or /attacker)
             field_data (FieldData): information received from the field (e.g.: position of each player and ball)
             team_command (TeamCommand): velocity commands for a robot
-            upper (bool, optional): decides if the point is in the upper or lower corner area when the goal
-                                    isn´t defined. Defaults to false
+            y_position (float, optional): y goal. Defaults to -0.45
+            max_inf_limit (float, optional): max y value in bottom corner area. Defaults to -0.35
+            min_sup_limit (float, optional): min y value in top corner area. Defaults to 0.35
         """
 
         super().__init__(name, role, field_data)
         self.team_command = team_command
-        self.upper = upper
+        self.y_position = y_position
+        self.min_sup_limit = min_sup_limit
+        self.max_inf_limit = max_inf_limit
 
     def setup(self):
         self.action = FollowFieldAction(
@@ -33,11 +37,19 @@ class GoNearCorner(ExecutionNode):
                         base_speed=40, linear_decay_std_dev=np.pi/4)
 
     def initialise(self):
-        self.goal_y = -0.45 # Default value
-        self.goal_x = -0.6  # Initial value
+        if self.y_position > 0 and self.y_position <= self.min_sup_limit:
+            self.goal_y = self.min_sup_limit + 0.05
 
-        if self.upper is True:
-            self.goal_y = abs(self.goal_y)
+        elif self.y_position < 0 and self.y_position >= self.max_inf_limit:
+            self.goal_y = self.max_inf_limit + 0.05
+
+        elif self.y_position is None:
+            self.goal_y = -0.45 # Default value
+
+        else:
+            self.goal_y = self.y_position
+
+        self.goal_x = -0.6  # Initial value
 
         # Field declarations
         self.attract_field = fields.RadialField(
