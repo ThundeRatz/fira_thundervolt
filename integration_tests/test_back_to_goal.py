@@ -33,13 +33,13 @@ def main():
             vision.update()
             my_tree.tick_once()
             blue_control.update()
-            
+
             if my_tree.status == py_trees.common.Status.SUCCESS:
                 print("Reach goal!")
                 break
 
     except KeyboardInterrupt:
-        pass
+        my_tree.plot_field()
 
     blue_control.stop_team()
 
