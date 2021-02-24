@@ -252,7 +252,6 @@ class OrientedAttractingField(VectorField):
         self.direction = kwargs.get('direction')
         self.nodes_radius = kwargs.get('nodes_radius')
         self.damping = kwargs.get('damping', 1/25)
-        # self.nodes_dist = kwargs.get('nodes_dist')
 
         self.positive_field = TangentField(
             target = (0,0),
@@ -267,6 +266,9 @@ class OrientedAttractingField(VectorField):
             clockwise = True,
             damping = self.damping,
         )
+
+        self.disable_positive = kwargs.get('disable_positive', False)
+        self.disable_negative = kwargs.get('disable_negative', False)
 
         # Geometric configuration
         self.max_radius = kwargs.get('max_radius', None)
@@ -315,14 +317,24 @@ class OrientedAttractingField(VectorField):
         self.negative_field.damping = self.damping
 
         # Calculate output
-        if proj_v > self.nodes_radius:
-            output = self.positive_field.compute(pose)
-        elif proj_v < -self.nodes_radius:
-            output = self.negative_field.compute(pose)
+        if self.disable_positive:
+            if self.disable_negative:
+                output = np.zeros(2)
+            else:
+                output = self.negative_field.compute(pose)
         else:
-            self.positive_field.multiplier = abs((-self.nodes_radius - proj_v)) / (2 * self.nodes_radius)
-            self.negative_field.multiplier = (self.nodes_radius - proj_v) / (2 * self.nodes_radius)
-            output = self.positive_field.compute(pose) + self.negative_field.compute(pose)
+            if self.disable_negative:
+                output = self.positive_field.compute(pose)
+            else:
+                if proj_v > self.nodes_radius:
+                    output = self.positive_field.compute(pose)
+                elif proj_v < -self.nodes_radius:
+                    output = self.negative_field.compute(pose)
+                else:
+                    self.positive_field.multiplier = abs((-self.nodes_radius - proj_v)) / (2 * self.nodes_radius)
+                    self.negative_field.multiplier = (self.nodes_radius - proj_v) / (2 * self.nodes_radius)
+                    output = self.positive_field.compute(pose) + self.negative_field.compute(pose)
+
         output = utils.versor(output)
 
         decay = 1
