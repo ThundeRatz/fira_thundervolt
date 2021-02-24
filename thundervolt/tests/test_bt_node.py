@@ -8,7 +8,7 @@ from thundervolt.behavior_trees.nodes.conditions import GoodStrikerOrientation
 from thundervolt.behavior_trees.nodes.conditions import xPlayerLTxBall
 from thundervolt.behavior_trees.nodes.conditions import xBallLTd
 from thundervolt.behavior_trees.nodes.conditions import BallDistToGoalLTd
-from thundervolt.behavior_trees.nodes.conditions import FoeCloseToBall
+from thundervolt.behavior_trees.nodes.conditions import FoeCloserToBall
 from thundervolt.behavior_trees.nodes.conditions import BallDistToPlayerLTd
 from thundervolt.behavior_trees.nodes.conditions import BallDistanceToDefenseAreaLTd
 from thundervolt.behavior_trees.nodes.conditions import PlayerDistanceToDefenseAreaLTd
@@ -146,8 +146,49 @@ def test_ball_dist_to_goal_lt_d():
         assert cond_node.status is desired_status[i]
 
 
-def test_foe_close_to_ball():
-    pass
+def test_foe_closer_to_ball():
+    allies_positions = [(-0.75, 0.0), (-0.5, -0.4), (0.0, 0.0)]
+    foes_positions = [(0.75, 0.0), (0.5, 0.4), (0.0, -0.4)]
+    ball_positions = [(-0.65, 0.0), (-0.25, -0.4), (0.25, 0.3), (0.0, -0.19), (0.0, 0.35)]
+    desired_status = [
+        py_trees.common.Status.FAILURE, # Ball closer to ally 0
+        py_trees.common.Status.SUCCESS, # Ball closer to foe 2 and ally 1
+        py_trees.common.Status.SUCCESS, # Ball closer to foe 1
+        py_trees.common.Status.FAILURE, # Ball closer to ally 2
+        py_trees.common.Status.FAILURE  # Ball closer to ally 2
+    ]
+
+    ROBOT_ID = 1
+
+    field_data = FieldData()
+    bb_client = py_trees.blackboard.Client()
+    bb_client.register_key(key="/defender/robot_id", access=py_trees.common.Access.WRITE)
+    bb_client.defender.robot_id = ROBOT_ID
+
+    field_data.robots[0].position.x = allies_positions[0][0]
+    field_data.robots[0].position.y = allies_positions[0][1]
+    field_data.robots[1].position.x = allies_positions[1][0]
+    field_data.robots[1].position.y = allies_positions[1][1]
+    field_data.robots[2].position.x = allies_positions[2][0]
+    field_data.robots[2].position.y = allies_positions[2][1]
+
+    field_data.foes[0].position.x = foes_positions[0][0]
+    field_data.foes[0].position.y = foes_positions[0][1]
+    field_data.foes[1].position.x = foes_positions[1][0]
+    field_data.foes[1].position.y = foes_positions[1][1]
+    field_data.foes[2].position.x = foes_positions[2][0]
+    field_data.foes[2].position.y = foes_positions[2][1]
+
+    for i in range(len(ball_positions)):
+        print(f"TEST NUMBER: {i}")
+
+        field_data.ball.position.x = ball_positions[i][0]
+        field_data.ball.position.y = ball_positions[i][1]
+
+        cond_node = FoeCloserToBall(f"Opponent closest to ball when ball is in {ball_positions[i]}", "/defender", field_data)
+        cond_node.tick_once()
+
+        assert cond_node.status is desired_status[i]
 
 
 def test_ball_dist_to_player_lt_d():
