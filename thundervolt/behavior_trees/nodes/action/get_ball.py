@@ -8,10 +8,7 @@ from thundervolt.actions.follow_field_action import FollowFieldAction
 from thundervolt.vector_fields.fields import VectorField, OrientedAttractingField
 from thundervolt.vector_fields.combinations import ObstaclesField, TangentObstaclesField, WallField
 
-
-
 from thundervolt.vector_fields.plotter import FieldPlotter
-
 
 
 class GetBall(ExecutionNode):
@@ -60,6 +57,9 @@ class GetBall(ExecutionNode):
             robot_pos = np.array((field_data.robots[robot_id].position.x, field_data.robots[robot_id].position.y))
             approx_robot_speed = base_speed * data.WHEEL_RADIUS * 0.8
             ball_next_pos = ball_pos + ball_vel * (np.linalg.norm(robot_pos - ball_pos)) / approx_robot_speed
+
+            ball_next_pos[0] = np.clip(ball_next_pos[0], -data.FIELD_LENGTH/2, data.FIELD_LENGTH/2)
+            ball_next_pos[1] = np.clip(ball_next_pos[1], -data.FIELD_WIDTH/2, data.FIELD_WIDTH/2)
 
             ball_to_goal = np.array((data.FIELD_LENGTH/2, 0)) - ball_next_pos
 
