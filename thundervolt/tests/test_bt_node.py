@@ -88,8 +88,8 @@ def test_x_ball_lt_d():
 
 
 def test_ball_dist_to_goal_lt_d():
-    max_distances = [0.2, 1.2, 0.5, 0.5, 0.3]
-    ball_positions = [(-0.5, 0.0), (0.3, 0.0), (-0.4, 0.2), (-0.45, 0.4), (-0.45, 0.0)]
+    max_distances = [0.2, 0.5, 0.5, 0.5, 0.3]
+    ball_positions = [(-0.5, 0.0), (-0.5, 0.4), (-0.4, 0.2), (-0.4, 0.6), (-0.45, 0.0)]
     desired_status = [
         py_trees.common.Status.FAILURE,
         py_trees.common.Status.SUCCESS,

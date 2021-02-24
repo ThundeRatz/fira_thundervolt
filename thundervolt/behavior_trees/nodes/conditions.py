@@ -34,12 +34,16 @@ class BallDistToGoalLTd(ExecutionNode):
         self.max_distance = max_distance
 
     def update(self):
-        if abs(self.field_data.ball.position.x) < 0.2:
-            distance = self.field_data.ball.position.x - (-data.FIELD_LENGTH/2)
+        ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
+
+        if self.field_data.ball.position.y > data.GOAL_WIDTH/2:
+            upper_goalpost = np.array((-data.FIELD_LENGTH/2, data.GOAL_WIDTH/2))
+            distance = np.linalg.norm(ball_pos - upper_goalpost)
+        elif self.field_data.ball.position.y < -data.GOAL_WIDTH/2:
+            lower_goalpost = np.array((-data.FIELD_LENGTH/2, -data.GOAL_WIDTH/2))
+            distance = np.linalg.norm(ball_pos - lower_goalpost)
         else:
-            goal_center = np.array((-data.FIELD_LENGTH/2, 0.0))
-            ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
-            distance = np.linalg.norm(ball_pos - goal_center)
+            distance = self.field_data.ball.position.x - (-data.FIELD_LENGTH/2)
 
         if distance < self.max_distance:
             return py_trees.common.Status.SUCCESS
