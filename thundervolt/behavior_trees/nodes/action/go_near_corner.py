@@ -7,7 +7,7 @@ from thundervolt.vector_fields import fields, combinations
 from thundervolt.actions.follow_field_action import FollowFieldAction
 
 class GoNearCorner(ExecutionNode):
-    def __init__(self, name, role, field_data, team_command, upper, goal_x, goal_y):
+    def __init__(self, name, role, field_data, team_command, upper):
 
         """
         Create an action node to make the robot go near the corner kick area
@@ -18,15 +18,11 @@ class GoNearCorner(ExecutionNode):
             team_command (TeamCommand): velocity commands for a robot
             upper (bool, optional): decides if the point is in the upper or lower corner area when the goal
                                     isn´t defined. Defaults to false
-            goal_x (float, optional): Defines a x goal. Defaults to -0.65
-            goal_y (float, optional): Defines a y goal. Defaults to -0.5
         """
 
         super().__init__(name, role, field_data)
         self.team_command = team_command
         self.upper = upper
-        self.goal_x = goal_x
-        self.goal_y = goal_y
 
     def setup(self):
         self.action = FollowFieldAction(
@@ -37,10 +33,8 @@ class GoNearCorner(ExecutionNode):
                         base_speed=40, linear_decay_std_dev=np.pi/4)
 
     def initialise(self):
-        if self.goal_x is None:
-            self.goal_x = -0.65 # Default value
-        if self.goal_y is None:
-            self.goal_y = -0.5 # Default value
+        self.goal_y = -0.45 # Default value
+        self.goal_x = -0.6  # Initial value
 
         if self.upper is True:
             self.goal_y = abs(self.goal_y)
@@ -74,7 +68,10 @@ class GoNearCorner(ExecutionNode):
 
     def update(self):
         self.vector_field.update(self.field_data, self.parameters.robot_id)
+        if self.field_data.ball.position.x < -data.FIELD_LENGTH/3:
+            self.goal_x = self.field_data.ball.position.x
         self.action.set_goal(np.array([self.goal_x, self.goal_y]))
+        self.attract_field.target = (self.goal_x, self.goal_y)
 
         robot_cmd, action_status = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
