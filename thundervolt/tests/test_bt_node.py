@@ -106,7 +106,7 @@ def test_x_player_lt_x_ball():
 
         field_data.robots[ROBOT_ID].position.x = player_x_postions[i]
 
-        cond_node = xPlayerLTxBall(f"X player less than {player_x_postions[i]}", "/striker", field_data, player_x_postions[i])
+        cond_node = xPlayerLTxBall(f"X player less than {player_x_postions[i]}", "/striker", field_data)
         cond_node.tick_once()
 
         assert cond_node.status is desired_status[i]
