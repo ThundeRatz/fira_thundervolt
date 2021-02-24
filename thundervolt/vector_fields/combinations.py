@@ -111,9 +111,9 @@ class AreaField(VectorField):
         self.update_rule = kwargs.get('update_rule', None)
 
         top_line = LineField(
-            target = (-data.FIELD_LENGTH / 2, 0.1),
+            target = (-data.FIELD_LENGTH / 2, 0.05),
             theta = 0.0,
-            size = data.AREA_LENGTH + 0.1,
+            size = data.AREA_LENGTH,
             side = 'negative',
             repelling = True,
             max_dist = self.max_dist,
@@ -122,9 +122,9 @@ class AreaField(VectorField):
         )
 
         botton_line = LineField(
-            target = (-data.FIELD_LENGTH / 2, -0.1),
+            target = (-data.FIELD_LENGTH / 2, -0.05),
             theta = 0.0,
-            size = data.AREA_LENGTH + 0.1,
+            size = data.AREA_LENGTH,
             side = 'positive',
             repelling = True,
             max_dist = self.max_dist,
@@ -133,9 +133,9 @@ class AreaField(VectorField):
         )
 
         front_line = LineField(
-            target = (-data.FIELD_LENGTH / 2, 0.45),
+            target = (-data.FIELD_LENGTH / 2, data.AREA_WIDTH/2),
             theta = -np.pi / 2,
-            size = data.AREA_WIDTH + 0.2,
+            size = data.AREA_WIDTH,
             only_forward = True,
             side = 'negative',
             repelling = True,

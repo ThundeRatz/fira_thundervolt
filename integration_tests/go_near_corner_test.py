@@ -24,9 +24,9 @@ def main():
     bb_client.defender.robot_id = 1
 
     # Tests:
-    # my_tree = GoNearCorner("Test Node", "/defender", field_data, team_command, side = 1, goal_x = -0.6, goal_y = None)
-    # my_tree = GoNearCorner("Test Node", "/defender", field_data, team_command, side = None, goal_x = None, goal_y = -0.5)
-    my_tree = GoNearCorner("Test Node", "/defender", field_data, team_command, side = None, goal_x = -0.6, goal_y = 0.5)
+    # my_tree = GoNearCorner("Test Node", "/defender", field_data, team_command, upper = True, goal_x = -0.6, goal_y = None)
+    # my_tree = GoNearCorner("Test Node", "/defender", field_data, team_command, upper = None, goal_x = None, goal_y = -0.5)
+    my_tree = GoNearCorner("Test Node", "/defender", field_data, team_command, upper = None, goal_x = -0.7, goal_y = 0.45)
 
     my_tree.setup()
 
@@ -40,7 +40,9 @@ def main():
                 break
 
     except KeyboardInterrupt:
-        blue_control.stop_team()
+        team_command.reset()
+
+    blue_control.stop_team()
 
 if __name__ == '__main__':
     main()
