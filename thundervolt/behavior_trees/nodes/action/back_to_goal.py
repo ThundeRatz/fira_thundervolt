@@ -24,7 +24,7 @@ class BackToGoal(ExecutionNode):
 
         super().__init__(name, role, field_data)
         self.team_command = team_command
-        self.goal_x_position = -(data.FIELD_LENGTH/2 - data.ROBOT_SIZE * 0.75)
+        self.goal_position = (-(data.FIELD_LENGTH/2 - data.ROBOT_SIZE * 0.75), 0)
 
     def setup(self):
         self.vector_field = VectorField(name="Back to Goal!")
@@ -36,7 +36,7 @@ class BackToGoal(ExecutionNode):
         )
 
         attracting_field = RadialField(
-            target = (self.goal_x_position, 0),
+            target = self.goal_position,
             max_radius = 3.0,
             decay_radius = 0.3,
             repelling = False,
@@ -54,11 +54,11 @@ class BackToGoal(ExecutionNode):
         self.vector_field.add(self.ball_repelling_field)
 
         self.action = FollowFieldAction(
-                        kp_ang=8.0, ki_ang=0.005, kd_ang=2.0,
+                        kp_ang=20.0, ki_ang=0.009, kd_ang=2.0,
                         kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.05,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
                         saturation_lin=(200*0.2), integral_fade_lin=0.75,
-                        base_speed=100, linear_decay_std_dev=np.pi/4, goal=(self.goal_x_position, 0)
+                        base_speed=300, linear_decay_std_dev=np.pi/4, goal=self.goal_position
         )
 
     def initialise(self):
