@@ -21,7 +21,17 @@ class GoodStrikerOrientation(ExecutionNode):
 
 
 class xPlayerLTxBall(ExecutionNode):
-    pass
+    def __init__(self, name, role, field_data):
+        super().__init__(name, role, field_data)
+
+    def update(self):
+        player_x = self.field_data.robots[self.parameters.robot_id].position.x
+        ball_x = self.field_data.ball.position.x
+
+        if player_x < ball_x:
+            return py_trees.common.Status.SUCCESS
+        else:
+            return py_trees.common.Status.FAILURE
 
 
 class xBallLTd(ExecutionNode):
