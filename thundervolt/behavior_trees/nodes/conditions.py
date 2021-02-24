@@ -2,6 +2,7 @@ import py_trees
 import numpy as np
 
 from .execution_node import ExecutionNode
+from thundervolt.core import data
 
 class xPlayerLTd(ExecutionNode):
     def __init__(self, name, role, field_data, d_position):
@@ -28,7 +29,15 @@ class xBallLTd(ExecutionNode):
 
 
 class BallDistToGoalLTd(ExecutionNode):
-    pass
+    def __init__(self, name, role, field_data, max_distance):
+        super().__init__(name, role, field_data)
+        self.max_distance = max_distance
+
+    def update(self):
+        if self.field_data.ball.position.x - (-data.FIELD_LENGTH/2) < self.max_distance:
+            return py_trees.common.Status.SUCCESS
+        else:
+            return py_trees.common.Status.FAILURE
 
 
 class FoeCloseToBall(ExecutionNode):
