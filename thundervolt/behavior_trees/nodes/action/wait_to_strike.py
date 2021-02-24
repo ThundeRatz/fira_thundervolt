@@ -28,12 +28,13 @@ class WaitToStrike(ExecutionNode):
             size = data.FIELD_WIDTH / 2,
             side = 'positive',
             repelling = True,
+            max_dist = data.ROBOT_SIZE
         )
 
         repell_field = combinations.ObstaclesField(
             max_radius = 0.3,
             decay_radius = 0.05,
-            multiplier = 1,
+            multiplier = 1
         )
 
         self.vector_field = fields.VectorField()
