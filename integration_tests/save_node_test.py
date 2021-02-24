@@ -1,5 +1,6 @@
 import test_base  # pylint: disable=import-error
 import py_trees
+import logging
 
 from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
@@ -30,7 +31,7 @@ def main():
             vision.update()
             my_tree.tick_once()
             if my_tree.status == py_trees.common.Status.SUCCESS:
-                print('Success!!')
+                logging.debug('Success!!')
             elif my_tree.status == py_trees.common.Status.FAILURE:
                 blue_control.stop_team()
             else:
