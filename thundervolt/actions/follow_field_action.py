@@ -10,8 +10,8 @@ from thundervolt.core.command import RobotCommand
 
 class FollowFieldAction(Action):
     def __init__(self, kp_ang, ki_ang, kd_ang, kp_lin=0.0, ki_lin=0.0, kd_lin=0.0, tolerance_lin=0.15,
-                 saturation_ang=None, max_integral_ang=None, integral_fade_ang=None,
-                 saturation_lin=None, max_integral_lin=None, integral_fade_lin=None,
+                 saturation_ang=None, max_integral_ang=None, integral_fade_ang=1.0,
+                 saturation_lin=None, max_integral_lin=None, integral_fade_lin=1.0,
                  base_speed=20.0, use_front=True, goal=None,
                  linear_decay_std_dev=None):
         """
@@ -31,7 +31,7 @@ class FollowFieldAction(Action):
             saturation_lin (float, optional): Linear pid controller saturation.
             max_integral_lin (float, optional): Linear pid controller max integral value.
             integral_fade_lin (float, optional): Linear pid controller integral fade rate.
-            base_speed (float, optional): Base angular speed (rad/s). Defaults to 20.0.
+            base_speed (float, optional): Base wheel angular speed (rad/s). Defaults to 20.0.
             use_front (bool, optional): Where to compute field vector.
                 If true, use robot front, otherwise use robot center. Defaults to True.
             goal (ndarray, optional): Array with goal coordinates. Defaults to None.
