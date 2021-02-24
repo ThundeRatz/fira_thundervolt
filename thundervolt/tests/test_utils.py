@@ -82,3 +82,10 @@ def test_assert_angle():
     assert utils.assert_angle(5 * np.pi + np.pi / 4) == pytest.approx(- 3 * np.pi / 4)
     assert utils.assert_angle(- 7 * np.pi / 2) == pytest.approx(np.pi / 2)
 
+def test_assert_half_angle():
+    assert utils.assert_half_angle(2 * np.pi) == pytest.approx(0)
+    assert utils.assert_half_angle(np.pi) == pytest.approx(0)
+    assert utils.assert_half_angle(3 * np.pi) == pytest.approx(0)
+    assert utils.assert_half_angle(-5 * np.pi / 4) == pytest.approx(-np.pi / 4)
+    assert utils.assert_half_angle(5 * np.pi + np.pi / 4) == pytest.approx(np.pi / 4)
+    assert utils.assert_half_angle(- 7 * np.pi / 2) == pytest.approx(np.pi / 2)
