@@ -33,18 +33,19 @@ class GetBall(ExecutionNode):
         self.vector_field = VectorField(name='Get Ball Field')
 
         avoid_obstacles = ObstaclesField(
-                            max_radius=0.2,
-                            decay_radius=0.1,
-                            multiplier=0.9)
+                            max_radius=0.25,
+                            decay_radius=0.05,
+                            multiplier=1.0)
 
         avoid_walls = WallField(
-                        max_dist=0.3,
-                        decay_dist=0.1,
+                        max_dist=0.2,
+                        decay_dist=0.05,
                         multiplier=0.9)
 
-
-        nodes_radius = 0.15
+        nodes_radius = 0.1
         base_speed = 40
+        disable_threshold = 0.4
+        enable_threshold = 0.35
 
         def update_get_ball_field(field, field_data, robot_id):
             ball_pos = np.array((field_data.ball.position.x, field_data.ball.position.y))
@@ -54,11 +55,7 @@ class GetBall(ExecutionNode):
             approx_robot_speed = base_speed * data.WHEEL_RADIUS * 0.8
             ball_next_pos = ball_pos + ball_vel * (np.linalg.norm(robot_pos - ball_pos)) / approx_robot_speed
 
-
-
             ball_to_goal = np.array((data.FIELD_LENGTH/2, 0)) - ball_next_pos
-
-            print(np.arctan2(ball_to_goal[1], ball_to_goal[0]))
 
             # Check if ball to goal direction leaves enough space for robot positioning
             allowed_direction = utils.versor(ball_to_goal) * (data.BALL_RADIUS + 2 * data.ROBOT_SIZE)
@@ -70,7 +67,15 @@ class GetBall(ExecutionNode):
             else:
                 allowed_direction[1] = max(allowed_direction[1], -dist_to_wall)
 
-            print(np.arctan2(allowed_direction[1], allowed_direction[0]))
+
+            if ball_pos[1] > disable_threshold:
+                field.disable_positive = True
+            if ball_pos[1] < enable_threshold:
+                field.disable_positive = False
+            if ball_pos[1] < -disable_threshold:
+                field.disable_negative = True
+            if ball_pos[1] > -enable_threshold:
+                field.disable_negative = False
 
             field.target = ball_next_pos
             field.direction = allowed_direction
@@ -81,7 +86,7 @@ class GetBall(ExecutionNode):
                     nodes_radius = nodes_radius,
                     damping = 1/250,
                     max_radius = 2.0,
-                    decay_radius = 0.1,
+                    decay_radius = 0.01,
                     multiplier = 1.0,
                     update_rule = update_get_ball_field)
 

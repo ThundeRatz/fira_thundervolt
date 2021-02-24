@@ -31,17 +31,13 @@ def main():
     try:
         while True:
             vision.update()
-            for node in my_tree.tick():
-                pass
+            my_tree.tick_once()
             blue_control.update()
 
-        # vision.update()
-        # my_tree.tick_once()
-
     except KeyboardInterrupt:
-        pass
+        blue_control.stop_team()
+        my_tree.plot_field()
 
-    blue_control.stop_team()
 
 if __name__ == '__main__':
     main()
