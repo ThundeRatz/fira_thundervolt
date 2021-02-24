@@ -6,7 +6,7 @@ from thundervolt.core import data
 from thundervolt.core import utils
 from thundervolt.actions.follow_field_action import FollowFieldAction
 from thundervolt.vector_fields.fields import VectorField, OrientedAttractingField
-from thundervolt.vector_fields.combinations import ObstaclesField, WallField
+from thundervolt.vector_fields.combinations import ObstaclesField, TangentObstaclesField, WallField
 
 
 
@@ -32,18 +32,24 @@ class GetBall(ExecutionNode):
     def setup(self):
         self.vector_field = VectorField(name='Get Ball Field')
 
-        avoid_obstacles = ObstaclesField(
-                            max_radius=0.25,
+        avoid_obstacles = TangentObstaclesField(
+                            radius = 1.5,
+                            max_radius = 0.25,
+                            decay_radius = 0.1,
+                            multiplier = 1.0)
+
+        avoid_obstacles_2 = ObstaclesField(
+                            max_radius=0.15,
                             decay_radius=0.05,
-                            multiplier=1.0)
+                            multiplier=0.9)
 
         avoid_walls = WallField(
                         max_dist=0.2,
                         decay_dist=0.05,
                         multiplier=0.9)
 
-        nodes_radius = 0.1
-        base_speed = 40
+        nodes_radius = 0.08
+        base_speed = 45
         disable_threshold = 0.4
         enable_threshold = 0.35
 
@@ -87,15 +93,16 @@ class GetBall(ExecutionNode):
                     damping = 1/250,
                     max_radius = 2.0,
                     decay_radius = 0.01,
-                    multiplier = 1.0,
+                    multiplier = 1.5,
                     update_rule = update_get_ball_field)
 
         self.vector_field.add(avoid_obstacles)
+        self.vector_field.add(avoid_obstacles_2)
         self.vector_field.add(avoid_walls)
         self.vector_field.add(get_ball)
 
         self.action = FollowFieldAction(
-                        kp_ang=8.0, ki_ang=0.005, kd_ang=2.0,
+                        kp_ang=7.0, ki_ang=0.005, kd_ang=2.0,
                         # kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.005,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
                         # saturation_lin=(200*0.2), integral_fade_lin=0.75,
