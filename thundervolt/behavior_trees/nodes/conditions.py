@@ -40,22 +40,22 @@ class BallDistToGoalLTd(ExecutionNode):
             return py_trees.common.Status.FAILURE
 
 
-class FoeCloseToBall(ExecutionNode):
+class FoeCloserToBall(ExecutionNode):
     def __init__(self, name, role, field_data):
         super().__init__(name, role, field_data)
 
     def update(self):
-        ball_pos = np.array((self.field_data.ball.position))
+        ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
         num_team_robots = 3
         distance = np.zeros(3)
 
         for i in range(num_team_robots):
-            robot_pos = np.array((self.field_data.robots[i].position))
+            robot_pos = np.array((self.field_data.robots[i].position.x, self.field_data.robots[i].position.y))
             distance[i] = np.linalg.norm(ball_pos-robot_pos)
         min_ally_dist = min(distance)
 
         for i in range(num_team_robots):
-            robot_pos = np.array((self.field_data.foes[i].position))
+            robot_pos = np.array((self.field_data.foes[i].position.x, self.field_data.foes[i].position.y))
             distance[i] = np.linalg.norm(ball_pos-robot_pos)
         min_foe_dist = min(distance)
 
