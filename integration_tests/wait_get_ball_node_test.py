@@ -24,7 +24,8 @@ def main():
     bb_client.register_key(key="/striker/robot_id", access=py_trees.common.Access.WRITE)
     bb_client.striker.robot_id = 1
 
-    my_tree = WaitToGetBall("Test Node", "/striker", field_data, team_command, 0)
+    x_partition = -0.3
+    my_tree = WaitToGetBall("Test Node", "/striker", field_data, team_command, x_partition)
 
     my_tree.setup()
 
