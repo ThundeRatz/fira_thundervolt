@@ -4,7 +4,7 @@ import py_trees
 from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.follow_field_action import FollowFieldAction
-from thundervolt.vector_fields import fields, combinations
+from thundervolt.vector_fields import fields, combinations, plotter
 
 class WaitToStrike(ExecutionNode):
     def __init__(self, name, role, field_data, team_command):
@@ -14,11 +14,11 @@ class WaitToStrike(ExecutionNode):
 
     def setup(self):
         self.action = FollowFieldAction(
-                        kp_ang=8.0, ki_ang=0.001, kd_ang=3.0, tolerance_ang=0.03,
+                        kp_ang=8.0, ki_ang=0.001, kd_ang=3.0,
                         kp_lin=350.0, ki_lin=0.001, kd_lin=2.0, tolerance_lin=0.005,
                         saturation_ang=(6*np.pi/6), max_integral_ang=np.pi/20, integral_fade_ang=0.75,
-                        saturation_lin=(350 * (self.limit_sup - self.limit_inf)/2), max_integral_lin=1.0, integral_fade_lin=0.75,
-                        line_dist_std_dev=0.03, linear_decay_std_dev=np.pi/30)
+                        max_integral_lin=1.0, integral_fade_lin=0.75,
+                        linear_decay_std_dev=np.pi/30)
 
 
     def initialise(self):
@@ -58,7 +58,7 @@ class WaitToStrike(ExecutionNode):
         goal = (self.field_data.ball.position.x + data.ROBOT_SIZE, goal_y)
 
         self.vector_field.update(self.field_data, self.parameters.robot_id)
-        self.division_field.target(self.field_data.ball.position.x, 0)
+        self.division_field.target = (self.field_data.ball.position.x, 0)
         self.action.set_goal(np.array(goal))
 
         robot_cmd, action_status = self.action.update(self.field_data)
@@ -72,3 +72,10 @@ class WaitToStrike(ExecutionNode):
 
     def terminate(self, new_status):
         pass
+
+
+    def plot_field(self):
+        self.vector_field.update(self.field_data, self.parameters.robot_id)
+        my_plotter = plotter.FieldPlotter('Wait to Get Ball Plot')
+        my_plotter.plot(self.division_field)
+        my_plotter.plot(self.vector_field)
