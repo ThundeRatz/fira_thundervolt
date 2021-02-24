@@ -9,7 +9,6 @@ from thundervolt.behavior_trees.nodes.conditions import xPlayerLTxBall
 from thundervolt.behavior_trees.nodes.conditions import xBallLTd
 from thundervolt.behavior_trees.nodes.conditions import BallDistToGoalLTd
 from thundervolt.behavior_trees.nodes.conditions import FoeCloseToBall
-from thundervolt.behavior_trees.nodes.conditions import GoalKeeperOutsideGoal
 from thundervolt.behavior_trees.nodes.conditions import BallDistToPlayerLTd
 from thundervolt.behavior_trees.nodes.conditions import BallDistanceToDefenseAreaLTd
 from thundervolt.behavior_trees.nodes.conditions import PlayerDistanceToDefenseAreaLTd
@@ -119,10 +118,6 @@ def test_ball_dist_to_goal_lt_d():
 
 
 def test_foe_close_to_ball():
-    pass
-
-
-def test_goal_keeper_outside_goal():
     pass
 
 

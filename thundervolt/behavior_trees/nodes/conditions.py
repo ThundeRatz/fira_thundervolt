@@ -44,9 +44,6 @@ class FoeCloseToBall(ExecutionNode):
     pass
 
 
-class GoalKeeperOutsideGoal(ExecutionNode):
-    pass
-
 
 class BallDistToPlayerLTd(ExecutionNode):
     def __init__(self, name, role, field_data, distance):
@@ -78,7 +75,7 @@ class BallDistanceToDefenseAreaLTd(ExecutionNode):
             if abs(ball_pos[1]) > data.GOAL_AREA_WIDTH / 2:
                 dist_to_area = abs(ball_pos[1]) - data.GOAL_AREA_WIDTH / 2
         else:
-            vertical_coordinate = np.clip (ball_pos[1], -data.GOAL_AREA_WIDTH / 2, data.GOAL_AREA_WIDTH / 2)
+            vertical_coordinate = np.clip(ball_pos[1], -data.GOAL_AREA_WIDTH / 2, data.GOAL_AREA_WIDTH / 2)
             closest_point = np.array([data.FIELD_LENGTH / 2 - data.GOAL_AREA_DEPTH, vertical_coordinate])
             dist_to_area = np.linalg.norm(closest_point - ball_pos)
 
@@ -106,7 +103,7 @@ class PlayerDistanceToDefenseAreaLTd(ExecutionNode):
             if abs(player_pos[1]) > data.GOAL_AREA_WIDTH / 2:
                 dist_to_area = abs(player_pos[1]) - data.GOAL_AREA_WIDTH / 2
         else:
-            vertical_coordinate = np.clip (player_pos[1], -data.GOAL_AREA_WIDTH / 2, data.GOAL_AREA_WIDTH / 2)
+            vertical_coordinate = np.clip(player_pos[1], -data.GOAL_AREA_WIDTH / 2, data.GOAL_AREA_WIDTH / 2)
             closest_point = np.array([data.FIELD_LENGTH / 2 - data.GOAL_AREA_DEPTH, vertical_coordinate])
             dist_to_area = np.linalg.norm(closest_point - player_pos)
 
