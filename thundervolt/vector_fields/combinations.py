@@ -114,7 +114,7 @@ class AreaField(VectorField):
         top_line = LineField(
             target = (-data.FIELD_LENGTH / 2, 0.05),
             theta = 0.0,
-            size = data.AREA_LENGTH,
+            size = data.GOAL_AREA_DEPTH,
             side = 'negative',
             repelling = True,
             max_dist = self.max_dist,
@@ -125,7 +125,7 @@ class AreaField(VectorField):
         botton_line = LineField(
             target = (-data.FIELD_LENGTH / 2, -0.05),
             theta = 0.0,
-            size = data.AREA_LENGTH,
+            size = data.GOAL_AREA_DEPTH,
             side = 'positive',
             repelling = True,
             max_dist = self.max_dist,
@@ -134,9 +134,9 @@ class AreaField(VectorField):
         )
 
         front_line = LineField(
-            target = (-data.FIELD_LENGTH / 2, data.AREA_WIDTH/2),
+            target = (-data.FIELD_LENGTH / 2, data.GOAL_AREA_WIDTH/2),
             theta = -np.pi / 2,
-            size = data.AREA_WIDTH,
+            size = data.GOAL_AREA_WIDTH,
             only_forward = True,
             side = 'negative',
             repelling = True,
