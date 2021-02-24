@@ -12,3 +12,7 @@ class Coach(object):
         self.team_command.commands[0].right_speed += 0.1
 
         print(self.team_command)
+
+    def reset(self):
+        # Reseta as posições dos jogadores
+        pass

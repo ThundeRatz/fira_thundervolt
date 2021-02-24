@@ -47,11 +47,11 @@ class Game():
             elif game_state == 'HALT':
                 self.control.stop_team()
             else:
+                self.control.reset()
                 self.control.stop_team()
                 self.team_command.reset()
 
 
     def end(self):
-        self.team_command.reset()
-        self.team_command.reset()
+        self.control.stop_team()
 
