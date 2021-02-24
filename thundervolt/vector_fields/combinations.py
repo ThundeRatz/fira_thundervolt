@@ -1,7 +1,8 @@
 import numpy as np
 
 from thundervolt.core import data
-from thundervolt.vector_fields.fields import VectorField, RadialField, LineField
+from thundervolt.vector_fields.fields import VectorField, RadialField, LineField, TangentField
+from thundervolt.core.utils import from_polar
 
 class WallField(VectorField):
     def __init__(self, **kwargs):
@@ -197,3 +198,81 @@ class ObstaclesField(VectorField):
             self.field_childrens[iterator].target = (field_data.foes[i].position.x, field_data.foes[i].position.y)
             iterator += 1
 
+
+VERTICAL_THRESHOLD = 0.475
+
+class TangentObstaclesField(VectorField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.radius = kwargs.get('radius')
+        self.damping = kwargs.get('damping', 1/2500)
+
+        self.max_radius = kwargs.get('max_radius', None)
+        self.decay_radius = kwargs.get('decay_radius', None)
+
+        self.multiplier = kwargs.get('multiplier', 1)
+        self.update_rule = kwargs.get('update_rule', None)
+
+        self.field_childrens = [TangentField(
+                                    target=np.zeros(2),
+                                    radius=self.radius,
+                                    damping=self.damping,
+                                    max_radius=self.max_radius,
+                                    decay_radius=self.decay_radius,
+                                    multiplier=self.multiplier)
+                                for i in range(5)]
+
+    def update(self, field_data, robot_id):
+        if callable(self.update_rule):
+            self.update_rule(self, field_data, robot_id)
+
+        for field in self.field_childrens:
+            field.radius = self.radius
+            field.damping = self.damping
+            field.max_radius = self.max_radius
+            field.decay_radius = self.decay_radius
+            field.multiplier = self.multiplier
+
+        robot_pos = np.array((field_data.robots[robot_id].position.x, field_data.robots[robot_id].position.y))
+        robot_vel = np.array((field_data.robots[robot_id].velocity.x, field_data.robots[robot_id].velocity.y))
+        robot_theta = field_data.robots[robot_id].position.theta
+        u_dir = from_polar(robot_theta)
+        v_dir = from_polar(robot_theta + np.pi/2)
+
+        if np.dot(u_dir, robot_vel) < 0:
+            u_dir += -1
+            v_dir += -1
+
+        obstacles_positions = []
+
+        for i in range(3):
+            if i == robot_id:
+                continue
+            obstacles_positions.append(np.array((field_data.robots[i].position.x, field_data.robots[i].position.y)))
+
+        for i in range(3):
+            obstacles_positions.append((field_data.foes[i].position.x, field_data.foes[i].position.y))
+
+        for i in range(len(obstacles_positions)):
+            obs_pos = obstacles_positions[i]
+            to_obs = obs_pos - robot_pos
+            obs_proj_u = np.dot(to_obs, u_dir)
+            obs_proj_v = np.dot(to_obs, v_dir)
+
+            if obs_proj_v > 0:
+                # Obstácue in 1st adn 2nd quadrant
+                if obs_pos[1] < -VERTICAL_THRESHOLD:
+                    clockwise = True
+                else:
+                    clockwise = False
+
+            else:
+                # Obstácue in 3rd and 4th quadrant
+                if obs_pos[1] > VERTICAL_THRESHOLD:
+                    clockwise = False
+                else:
+                    clockwise = True
+
+            self.field_childrens[i].clockwise = clockwise
+            self.field_childrens[i].target = obs_pos
