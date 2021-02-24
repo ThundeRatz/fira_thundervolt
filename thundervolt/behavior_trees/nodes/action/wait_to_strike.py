@@ -14,11 +14,11 @@ class WaitToStrike(ExecutionNode):
 
     def setup(self):
         self.action = FollowFieldAction(
-                        kp_ang=8.0, ki_ang=0.001, kd_ang=3.0,
-                        kp_lin=350.0, ki_lin=0.001, kd_lin=2.0, tolerance_lin=0.005,
-                        saturation_ang=(6*np.pi/6), max_integral_ang=np.pi/20, integral_fade_ang=0.75,
-                        max_integral_lin=1.0, integral_fade_lin=0.75,
-                        linear_decay_std_dev=np.pi/30)
+                        kp_ang=7.0, ki_ang=0.005, kd_ang=2.0,
+                        kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.005,
+                        saturation_ang=(15*np.pi), integral_fade_ang=0.75,
+                        saturation_lin=(200), integral_fade_lin=0.75,
+                        base_speed=40, linear_decay_std_dev=np.pi/4)
 
 
     def initialise(self):
@@ -28,13 +28,14 @@ class WaitToStrike(ExecutionNode):
             size = data.FIELD_WIDTH / 2,
             side = 'positive',
             repelling = True,
-            max_dist = data.ROBOT_SIZE
+            max_dist = data.ROBOT_SIZE,
+            multiplier = 1.5
         )
 
         repell_field = combinations.ObstaclesField(
             max_radius = 0.3,
             decay_radius = 0.05,
-            multiplier = 1
+            multiplier = 0.8
         )
 
         self.vector_field = fields.VectorField()
@@ -76,6 +77,6 @@ class WaitToStrike(ExecutionNode):
 
     def plot_field(self):
         self.vector_field.update(self.field_data, self.parameters.robot_id)
-        my_plotter = plotter.FieldPlotter('Wait to Get Ball Plot')
+        my_plotter = plotter.FieldPlotter('Wait to Strike')
         my_plotter.plot(self.division_field)
         my_plotter.plot(self.vector_field)
