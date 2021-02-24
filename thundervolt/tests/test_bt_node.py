@@ -81,7 +81,35 @@ def test_good_striker_orientation():
 
 
 def test_x_player_lt_x_ball():
-    pass
+    ball_x_positions = [-0.5, -0.3, -0.1, 0, 0, 0.1, 0.3, 0.5]
+    player_x_postions = [0, -0.5, -0.4, 0.4, -0.2, 0.5, 0.5, -0.3]
+    desired_status = [
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS
+    ]
+
+    ROBOT_ID = 0
+
+    field_data = FieldData()
+    bb_client = py_trees.blackboard.Client()
+    bb_client.register_key(key="/striker/robot_id", access=py_trees.common.Access.WRITE)
+    bb_client.striker.robot_id = ROBOT_ID
+
+    for i in range(len(ball_x_positions)):
+        print(f"TEST NUMBER: {i}")
+
+        field_data.robots[ROBOT_ID].position.x = player_x_postions[i]
+
+        cond_node = xPlayerLTxBall(f"X player less than {player_x_postions[i]}", "/striker", field_data, player_x_postions[i])
+        cond_node.tick_once()
+
+        assert cond_node.status is desired_status[i]
 
 
 def test_x_ball_lt_d():
