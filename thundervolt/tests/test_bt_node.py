@@ -9,8 +9,9 @@ from thundervolt.behavior_trees.nodes.conditions import xPlayerLTxBall
 from thundervolt.behavior_trees.nodes.conditions import xBallLTd
 from thundervolt.behavior_trees.nodes.conditions import BallDistToGoalLTd
 from thundervolt.behavior_trees.nodes.conditions import FoeCloserToBall
-from thundervolt.behavior_trees.nodes.conditions import GoalKeeperOutsideGoal
 from thundervolt.behavior_trees.nodes.conditions import BallDistToPlayerLTd
+from thundervolt.behavior_trees.nodes.conditions import BallDistanceToDefenseAreaLTd
+from thundervolt.behavior_trees.nodes.conditions import PlayerDistanceToDefenseAreaLTd
 
 def test_execution_node():
     class ExampleNode(ExecutionNode):
@@ -80,7 +81,35 @@ def test_good_striker_orientation():
 
 
 def test_x_player_lt_x_ball():
-    pass
+    ball_x_positions = [-0.5, -0.3, -0.1, 0, 0, 0.1, 0.3, 0.5]
+    player_x_postions = [0, -0.5, -0.4, 0.4, -0.2, 0.5, 0.5, -0.3]
+    desired_status = [
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS
+    ]
+
+    ROBOT_ID = 0
+
+    field_data = FieldData()
+    bb_client = py_trees.blackboard.Client()
+    bb_client.register_key(key="/striker/robot_id", access=py_trees.common.Access.WRITE)
+    bb_client.striker.robot_id = ROBOT_ID
+
+    for i in range(len(ball_x_positions)):
+        print(f"TEST NUMBER: {i}")
+
+        field_data.robots[ROBOT_ID].position.x = player_x_postions[i]
+
+        cond_node = xPlayerLTxBall(f"X player less than {player_x_postions[i]}", "/striker", field_data)
+        cond_node.tick_once()
+
+        assert cond_node.status is desired_status[i]
 
 
 def test_x_ball_lt_d():
@@ -161,10 +190,6 @@ def test_foe_closer_to_ball():
         assert cond_node.status is desired_status[i]
 
 
-def test_goal_keeper_outside_goal():
-    pass
-
-
 def test_ball_dist_to_player_lt_d():
     distances = [0.5, 1.8, 5.0, 0.1, 10.134]
     player_positions = [(1.0, 2.0), (-10.6, 5.4), (3, 4), (-0.3, -0.1), (-3, 22.6)]
@@ -194,6 +219,70 @@ def test_ball_dist_to_player_lt_d():
         field_data.ball.position.y = ball_positions[i][1]
 
         cond_node = BallDistToPlayerLTd(f"Ball dist to player less than {distances[i]}", "/striker", field_data, distances[i])
+        cond_node.tick_once()
+
+        assert cond_node.status is desired_status[i]
+
+
+def test_ball_dist_def_area_lt_d():
+    distances = [0.0, 0.0, 0.6, 0.61, 0.1, 0.2, 0.2]
+    ball_positions = [(-0.7, 0), (-0.6, 0.2), (0, 0.1), (0, 0), (-0.25, -0.15), (-0.7, 0.5), (-0.7, -0.6)]
+    desired_status = [
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE
+    ]
+
+    ROBOT_ID = 0
+
+    field_data = FieldData()
+    bb_client = py_trees.blackboard.Client()
+    bb_client.register_key(key="/goalkeeper/robot_id", access=py_trees.common.Access.WRITE)
+    bb_client.goalkeeper.robot_id = ROBOT_ID
+
+    for i in range(len(distances)):
+        print(f"TEST NUMBER: {i}")
+
+        field_data.ball.position.x = ball_positions[i][0]
+        field_data.ball.position.y = ball_positions[i][1]
+
+        cond_node = BallDistanceToDefenseAreaLTd(f"Ball dist to area less than {distances[i]}", "/goalkeeper", field_data, distances[i])
+        cond_node.tick_once()
+
+        assert cond_node.status is desired_status[i]
+
+
+def test_player_dist_def_area_lt_d():
+    distances = [0.0, 0.0, 0.6, 0.61, 0.1, 0.2, 0.2]
+    player_positions = [(-0.7, 0), (-0.6, 0.2), (0, 0.1), (0, 0), (-0.25, -0.15), (-0.7, 0.5), (-0.7, -0.6)]
+    desired_status = [
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE
+    ]
+
+    ROBOT_ID = 0
+
+    field_data = FieldData()
+    bb_client = py_trees.blackboard.Client()
+    bb_client.register_key(key="/goalkeeper/robot_id", access=py_trees.common.Access.WRITE)
+    bb_client.goalkeeper.robot_id = ROBOT_ID
+
+    for i in range(len(distances)):
+        print(f"TEST NUMBER: {i}")
+
+        field_data.robots[ROBOT_ID].position.x = player_positions[i][0]
+        field_data.robots[ROBOT_ID].position.y = player_positions[i][1]
+
+        cond_node = PlayerDistanceToDefenseAreaLTd(f"Player dist to area less than {distances[i]}", "/goalkeeper", field_data, distances[i])
         cond_node.tick_once()
 
         assert cond_node.status is desired_status[i]
