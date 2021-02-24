@@ -9,7 +9,7 @@ def main():
     # Config logging
     logging.config.fileConfig('logging.conf')
     log_format_msg = "\r%(asctime)s %(hostname)s %(name)s | %(levelname)s %(message)s"
-    coloredlogs.install(fmt=log_format_msg)
+    coloredlogs.install(level=logging.DEBUG, fmt=log_format_msg)
 
     # Loads config from file
     parser = argparse.ArgumentParser(description='ThunderVolt')
