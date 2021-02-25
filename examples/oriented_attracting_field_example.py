@@ -2,7 +2,7 @@ import base_example
 
 import numpy as np
 
-from thundervolt.core import math
+from thundervolt.core import utils
 from thundervolt.vector_fields import fields, plotter
 
 my_plotter = plotter.FieldPlotter('Oriented Attracting Field')
