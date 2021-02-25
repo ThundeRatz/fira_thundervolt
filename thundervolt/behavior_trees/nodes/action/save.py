@@ -5,9 +5,9 @@ from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.line_action import LineAction
 
-GOAL_LINE_X = data.FIELD_LENGTH/2 - 0.75 * data.ROBOT_SIZE
-GOAL_LINE_Y = data.GOAL_AREA_WIDTH/2 - data.ROBOT_SIZE/2
-LIMIT_VELOCITY = 1.0
+GOAL_LINE_X = data.FIELD_LENGTH/2 - 0.8 * data.ROBOT_SIZE
+GOAL_LINE_Y = data.GOAL_AREA_WIDTH/2
+LIMIT_VELOCITY = 0.6
 
 class SaveGoal(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, save_time):
