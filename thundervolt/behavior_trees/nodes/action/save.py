@@ -7,6 +7,7 @@ from thundervolt.actions.line_action import LineAction
 
 GOAL_LINE_X = data.FIELD_LENGTH/2 - 0.75 * data.ROBOT_SIZE
 GOAL_LINE_Y = data.GOAL_AREA_WIDTH/2 - data.ROBOT_SIZE
+LIMIT_VELOCITY = 10.0   #Random value that needs calibration
 
 class SaveGoal(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, save_time):
@@ -37,6 +38,11 @@ class SaveGoal(ExecutionNode):
                 ball_time = ball_distance / ball_velocity[0]
                 goal_point = np.zeros(2)
                 goal_point[1] = ball_position[1] + ball_time * ball_velocity[1]
+
+                player_to_ball = goal_point[1] - self.field_data.robots[self.parameters.robot_id].position.y
+                if ball_time == 0 or abs(player_to_ball/ball_time) > LIMIT_VELOCITY:
+                    goal_point[1] += player_to_ball
+
                 self.action.set_goal(goal_point)
 
                 robot_cmd, action_status = self.action.update(self.field_data)
