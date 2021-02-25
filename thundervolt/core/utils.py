@@ -32,4 +32,7 @@ def vectors_angle(vector1, vector2=np.array((1,0))):
     dot_product = np.dot(versor(vector1), versor(vector2))
     angle = np.arccos(dot_product)
 
+    if (vector2 == (1,0)).all() and vector1[1] < 0:
+        angle = -angle
+
     return angle
