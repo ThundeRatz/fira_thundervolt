@@ -16,7 +16,7 @@ PLAYER_DIST_TO_GOAL = 1.5 * data.ROBOT_SIZE
 BALL_DIST_TO_PLAYER = 0.75 * data.ROBOT_SIZE + data.BALL_RADIUS
 BALL_DIST_TO_GOAL = 1.5 * data.ROBOT_SIZE + data.BALL_RADIUS
 AREA_LINE_X = data.FIELD_LENGTH/2 - data.GOAL_AREA_DEPTH
-CLOSE_LINE_Y = data.GOAL_WIDTH/2 + data.ROBOT_SIZE
+CLOSE_LINE_Y = data.GOAL_AREA_WIDTH/2 - data.ROBOT_SIZE/2
 LINE_X = data.FIELD_LENGTH/2 - 0.75 * data.ROBOT_SIZE
 
 def create_goalkeeper_tree(field_data, team_command):
