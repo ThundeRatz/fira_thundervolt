@@ -1,4 +1,5 @@
 import py_trees
+import numpy as np
 
 from .execution_node import ExecutionNode
 from thundervolt.core import utils, data
@@ -29,7 +30,7 @@ class GoodStrikerOrientation(ExecutionNode):
         player_pos = np.zeros(2)
         player_pos[0] = self.field_data.robots[self.parameters.robot_id].position.x
         player_pos[1] = self.field_data.robots[self.parameters.robot_id].position.y
-        player_theta = assert_half_angle(self.field_data.robots[self.parameters.robot_id].theta)
+        player_theta = utils.assert_half_angle(self.field_data.robots[self.parameters.robot_id].theta)
         ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
 
         player_ball = np.array((ball_pos[0] - player_pos[0], ball_pos[1] - player_pos[1]))
