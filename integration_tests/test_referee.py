@@ -19,7 +19,7 @@ def main():
             print(f"\r\nTempo do jogo: {referee_data['gameHalf']}\r\n")
             print(f"\r\nTime: {referee_data['teamcolor']}\r\n")
     except KeyboardInterrupt:
-        logging.warn("Ending")
+        logging.debug("Ending")
 
 
 if __name__ == '__main__':

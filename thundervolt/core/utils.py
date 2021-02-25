@@ -41,3 +41,10 @@ def assert_half_angle(theta):
 
 def gaussian(x, std_dev = 1.0, mean = 0.0, height = 1.0):
     return height * np.exp(-np.power(x - mean, 2.) / (2 * np.power(std_dev, 2.)))
+
+def vectors_angle(vector1, vector2=np.array((1,0))):
+    """Use numpy to calculate the angle of vector1 using vector2 as reference"""
+    v1 = np.array((vector1))
+    v2 = np.array((vector2))
+
+    return np.arctan2(np.linalg.det([v2,v1]),np.dot(v1,v2))
