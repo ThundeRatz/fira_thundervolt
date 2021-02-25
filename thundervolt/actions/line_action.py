@@ -4,7 +4,7 @@ from .action import Action
 from thundervolt.core.pid_controller import pidController
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import RobotCommand
-from thundervolt.core.utils import versor, assert_angle, rotate, gaussian
+from thundervolt.core.utils import versor, assert_angle, rotate, from_polar, gaussian, vectors_angle
 
 class LineAction(Action):
     def __init__(self, kp_ang, ki_ang, kd_ang, tolerance_ang, kp_lin, ki_lin, kd_lin, tolerance_lin,
@@ -50,9 +50,6 @@ class LineAction(Action):
         self.controller_lin.reset()
         self.controller_ang.reset()
 
-        if pointB[0] < pointA[0]:
-            pointA, pointB = pointB, pointA
-
         # Save start and end point
         self.pointA = np.array(pointA)
         self.pointB = np.array(pointB)
@@ -66,7 +63,7 @@ class LineAction(Action):
         u = np.array(point_goal) - self.pointA
         u_proj_line = np.dot(u, self.line_dir)
 
-        if u_proj_line < 0:
+        if u_proj_line < 0.0:
             goal = self.pointA
         elif u_proj_line > np.linalg.norm(self.pointB - self.pointA):
             goal = self.pointB
@@ -83,6 +80,7 @@ class LineAction(Action):
         actual_point[0] = field_data.robots[self.robot_id].position.x
         actual_point[1] = field_data.robots[self.robot_id].position.y
         actual_ang = field_data.robots[self.robot_id].position.theta
+        actual_dir = from_polar(actual_ang)
 
         # Calculate the robot to goal vector and coordinates ont the line basis
         goal_vector = self.goal - actual_point
@@ -92,37 +90,37 @@ class LineAction(Action):
         # Calculate the desired angle for the controller based on the robot to goal angle
         # and the line angle with weights based on the gaussian distribution of the robots distance
         # to the line
+        actual_line_dir = np.copy(self.line_dir)
         if goal_proj_line < 0:
-            line_ang = np.arctan2(-self.line_dir[1], -self.line_dir[0])
-        else:
-            line_ang = np.arctan2(self.line_dir[1], self.line_dir[0])
+            actual_line_dir *= -1
 
-        goal_ang = np.arctan2(goal_vector[1], goal_vector[0])
+        actual_goal_dir = versor(goal_vector)
 
         weight = gaussian(goal_proj_axis, std_dev=self.line_dist_std_dev)
-        desired_angle = line_ang * weight + goal_ang * (1-weight)
+        desired_dir = actual_line_dir * weight + actual_goal_dir * (1-weight)
 
-        if np.linalg.norm(abs(goal_proj_line)) < self.tolerance_lin:
-            desired_angle = line_ang
+        if abs(goal_proj_line) < self.tolerance_lin:
+            desired_dir = actual_line_dir
 
         # Calculate the linear response based on the robot to goal projection on the line direction
         response_lin = -self.controller_lin.update(abs(goal_proj_line))
 
         # Decide the robot side to use
-        if abs(assert_angle(desired_angle - actual_ang)) > np.pi/2:
-            desired_angle = assert_angle(desired_angle + np.pi)
+        if abs(vectors_angle(actual_dir, desired_dir)) > np.pi/2:
+            desired_dir *= -1
             response_lin *= -1
+
+        angular_error = vectors_angle(actual_dir, desired_dir)
 
         # Calculte the linear response decay based on the angular error gaussian distribution
         if self.linear_decay_std_dev is not None:
-            response_lin *= gaussian(assert_angle(desired_angle - actual_ang), std_dev=self.linear_decay_std_dev)
+            response_lin *= gaussian(angular_error, std_dev=self.linear_decay_std_dev)
 
         # Calculate the angular response
-        angle_to_goal = assert_angle(actual_ang - desired_angle)
-        response_ang = self.controller_ang.update(angle_to_goal)
+        response_ang = self.controller_ang.update(angular_error)
 
         # Check tolerances
-        if np.linalg.norm(abs(goal_proj_line)) < self.tolerance_lin and abs(assert_angle(desired_angle - actual_ang)) < self.tolerance_ang:
+        if abs(goal_proj_line) < self.tolerance_lin and abs(angular_error) < self.tolerance_ang:
             action_status = True
 
         return (RobotCommand(response_lin - response_ang, response_lin + response_ang), action_status)
