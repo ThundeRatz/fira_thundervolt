@@ -32,7 +32,7 @@ class GoodStrikerOrientation(ExecutionNode):
         player_theta = utils.assert_half_angle(self.field_data.robots[self.parameters.robot_id].theta)
         ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
 
-        player_ball = np.array((ball_pos[0] - player_pos[0], ball_pos[1] - player_pos[1]))
+        player_ball = ball_pos - player_pos
         player_lpost = np.array((self.lpost[0] - player_pos[0], self.lpost[1] - player_pos[1]))
         player_rpost = np.array((self.rpost[0] - player_pos[0], self.rpost[1] - player_pos[1]))
         
@@ -183,5 +183,4 @@ class PlayerDistanceToDefenseAreaLTd(ExecutionNode):
             return py_trees.common.Status.SUCCESS
         else:
             return py_trees.common.Status.FAILURE
-
 
