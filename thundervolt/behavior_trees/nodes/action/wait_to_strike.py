@@ -72,18 +72,29 @@ class WaitToStrike(ExecutionNode):
 
     def initialise(self):
         self.action.initialize(self.parameters.robot_id, self.vector_field)
+        self.goal_y = None
 
 
     def update(self):
-        player_y = self.field_data.robots[self.parameters.robot_id].position.y
         ball_y = self.field_data.ball.position.y
 
-        if 0 <= ball_y:
-            goal_y = ball_y - 3 * data.ROBOT_SIZE
-        else:
-            goal_y = ball_y + 3 * data.ROBOT_SIZE
+        if self.goal_y is None:
+            if ball_y <= 0:
+                self.goal_y = ball_y + 3 * data.ROBOT_SIZE
+            else:
+                self.goal_y = ball_y - 3 * data.ROBOT_SIZE
+        elif self.goal_y > 0:
+            if ball_y <= -data.ROBOT_SIZE:
+                self.goal_y = ball_y + 3 * data.ROBOT_SIZE
+            else:
+                self.goal_y = ball_y - 3 * data.ROBOT_SIZE
+        elif self.goal_y <= 0:
+            if ball_y > data.ROBOT_SIZE:
+                self.goal_y = ball_y - 3 * data.ROBOT_SIZE
+            else:
+                self.goal_y = ball_y + 3 * data.ROBOT_SIZE
 
-        goal = (self.x_partition + data.ROBOT_SIZE, goal_y)
+        goal = (self.x_partition + data.ROBOT_SIZE, self.goal_y)
         self.attracting_field.target = goal
         self.action.set_goal(np.array(goal))
         self.vector_field.update(self.field_data, self.parameters.robot_id)
