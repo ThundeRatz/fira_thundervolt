@@ -5,6 +5,7 @@ from thundervolt.core.data import FieldData
 
 import json
 import time
+import logging
 
 def main():
     test_field_data = FieldData()
@@ -17,7 +18,7 @@ def main():
             print(test_field_data)
             time.sleep(1)
     except KeyboardInterrupt:
-        logging.warn("Ending")
+        logging.debug("Ending")
 
 
 if __name__ == '__main__':

@@ -16,6 +16,16 @@ class RobotCommand(object):
     def __mul__(self, multiplier):
         return RobotCommand(self.left_speed * multiplier, self.right_speed * multiplier)
 
+    def __str__(self):
+        msg = (
+            f'LEFT SPEED: {self.left_speed}\n'
+            f'RIGHT SPEED: {self.right_speed}\n'
+        )
+        return msg
+
+    def __repr__(self):
+        return f'RobotCommand({self})'
+
 
 class TeamCommand(object):
     def __init__(self):
@@ -25,3 +35,12 @@ class TeamCommand(object):
         for cmd in self.commands:
             cmd.left_speed = 0
             cmd.right_speed = 0
+
+    def __str__(self):
+        msg = f'\nTEAM COMMAND:\n'
+        for i in range(3):
+            msg += f'ROBOT_{i}\n{self.commands[i]}'
+        return msg
+
+    def __repr__(self):
+        return f'TeamCommand({self})'

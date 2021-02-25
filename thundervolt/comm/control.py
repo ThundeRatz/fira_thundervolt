@@ -65,7 +65,7 @@ class FiraControl(Transmitter):
         """
 
         if self.team_command is None:
-            logging.warning('TeamCommand not instantiated')
+            logging.error('TeamCommand not instantiated', exc_info=True)
         else:
             self.transmit_team(self.team_command)
 
