@@ -77,7 +77,42 @@ def test_x_player_lt_d():
 
 
 def test_good_striker_orientation():
-    pass
+    player_positions = [(0.3, 0), (0.2, -0.4), (0, -0.5), (0.3, -0.4), (-0.2, -0.1), (0.3, 0.4), (0.5, 0.1), (0, 0.2), (-0.2, 0.3), (0.1, 0.3)]
+    player_orientations = [0.7, 1.4, 0.9, 0.8, 0.5, -0.8, 0.2, 0.7, -0.3, 0.6]
+    ball_positions = [(0.5, -0.2), (0.4, -0.5), (0.1, -0.4), (-0.2, -0.3), (0, 0), (0.4, 0.3), (0.3, 0.1), (-0.1, 0), (0.1, 0.2), (0.3, 0.5)]
+    desired_status = [
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.FAILURE,
+        py_trees.common.Status.SUCCESS,
+        py_trees.common.Status.FAILURE
+    ]
+
+    ROBOT_ID = 0
+
+    field_data = FieldData()
+    bb_client = py_trees.blackboard.Client()
+    bb_client.register_key(key="/striker/robot_id", access=py_trees.common.Access.WRITE)
+    bb_client.striker.robot_id = ROBOT_ID
+
+    for i in range(len(player_orientations)):
+        print(f"TEST NUMBER: {i}")
+
+        field_data.robots[ROBOT_ID].position.x = player_positions[i][0]
+        field_data.robots[ROBOT_ID].position.y = player_positions[i][1]
+        field_data.robots[ROBOT_ID].theta = player_orientations[i]
+        field_data.ball.position.x = ball_positions[i][0]
+        field_data.ball.position.y = ball_positions[i][1]
+
+        cond_node = GoodStrikerOrientation(f"Teste number: {i}", "/striker", field_data, 0.3, 0.3)
+        cond_node.tick_once()
+
+        assert cond_node.status is desired_status[i]
 
 
 def test_x_player_lt_x_ball():
