@@ -15,15 +15,6 @@ class WaitToStrike(ExecutionNode):
 
 
     def setup(self):
-        self.action = FollowFieldAction(
-                        kp_ang=7.0, ki_ang=0.005, kd_ang=2.0,
-                        kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.005,
-                        saturation_ang=(8*np.pi), integral_fade_ang=0.75,
-                        saturation_lin=(200 * 0.8), integral_fade_lin=0.75,
-                        base_speed=40, linear_decay_std_dev=np.pi/4)
-
-
-    def initialise(self):
         division_field = fields.LineField(
             target = (self.x_partition, 0),
             theta = np.pi / 2,
@@ -35,18 +26,22 @@ class WaitToStrike(ExecutionNode):
         )
 
         repell_field = combinations.ObstaclesField(
-            max_radius = 0.3,
-            decay_radius = 0.05,
-            multiplier = 0.8
+            max_radius = 0.17,
+            decay_radius = 0.08,
+            multiplier = 0.9
         )
 
         wall_field = combinations.WallField(
-            max_dist = data.ROBOT_SIZE * 2/3,
-            multiplier = 0.7
+                        max_dist=0.1,
+                        decay_dist=0.05,
+                        multiplier=0.7
         )
 
         self.attracting_field = fields.RadialField(
             target = (self.x_partition, self.field_data.ball.position.y + 2 * data.ROBOT_SIZE),
+            max_radius = 2.0,
+            decay_radius = 0.3,
+            repelling = False,
             multiplier = 0.8
         )
 
@@ -55,6 +50,16 @@ class WaitToStrike(ExecutionNode):
         self.vector_field.add(repell_field)
         self.vector_field.add(wall_field)
         self.vector_field.add(self.attracting_field)
+
+        self.action = FollowFieldAction(
+                        kp_ang=7.0, ki_ang=0.01, kd_ang=2.0,
+                        kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.1,
+                        saturation_ang=(100*np.pi), integral_fade_ang=0.75,
+                        saturation_lin=(2000), integral_fade_lin=0.75,
+                        base_speed=40, linear_decay_std_dev=np.pi/4, use_front=False)
+
+
+    def initialise(self):
         self.action.initialize(self.parameters.robot_id, self.vector_field)
 
 
@@ -62,13 +67,14 @@ class WaitToStrike(ExecutionNode):
         player_y = self.field_data.robots[self.parameters.robot_id].position.y
         ball_y = self.field_data.ball.position.y
 
-        if (data.FIELD_WIDTH/2 + ball_y - 2 * data.ROBOT_SIZE) <= (data.FIELD_WIDTH/2 - ball_y + 2 * data.ROBOT_SIZE):
-            goal_y = ball_y + 2 * data.ROBOT_SIZE
+        if 0 <= ball_y:
+            goal_y = ball_y - 3 * data.ROBOT_SIZE
         else:
-            goal_y = ball_y - 2 * data.ROBOT_SIZE
+            goal_y = ball_y + 3 * data.ROBOT_SIZE
 
         goal = (self.x_partition + data.ROBOT_SIZE, goal_y)
         self.attracting_field.target = goal
+        self.action.set_goal(np.array(goal))
         self.vector_field.update(self.field_data, self.parameters.robot_id)
 
         robot_cmd, action_status = self.action.update(self.field_data)

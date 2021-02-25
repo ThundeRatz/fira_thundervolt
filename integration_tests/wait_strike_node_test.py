@@ -35,9 +35,13 @@ def main():
             my_tree.tick_once()
             blue_control.update()
 
+            if my_tree.status == py_trees.common.Status.SUCCESS:
+                print('Success!!')
+
     except KeyboardInterrupt:
-        blue_control.stop_team()
         my_tree.plot_field()
+    
+    blue_control.stop_team()
 
 
 if __name__ == '__main__':
