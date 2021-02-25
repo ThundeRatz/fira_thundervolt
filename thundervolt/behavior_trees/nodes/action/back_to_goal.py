@@ -9,8 +9,8 @@ from thundervolt.vector_fields.combinations import WallField, ObstaclesField, Ta
 
 from thundervolt.vector_fields.plotter import FieldPlotter
 
-GOAL_LINE_X = data.FIELD_LENGTH/2 - data.ROBOT_SIZE*0.75
-GOAL_LINE_Y = data.GOAL_WIDTH/2 - data.ROBOT_SIZE/4
+GOAL_LINE_X = data.FIELD_LENGTH/2 - data.ROBOT_SIZE*0.8
+GOAL_LINE_Y = data.GOAL_WIDTH/2
 
 class BackToGoal(ExecutionNode):
     def __init__(self, name, role, field_data, team_command):
