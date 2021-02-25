@@ -15,14 +15,17 @@ class WaitToStrike(ExecutionNode):
 
 
     def setup(self):
+        line_field_dist = abs(-data.FIELD_LENGTH / 2 - self.x_partition)
+
         division_field = fields.LineField(
-            target = (self.x_partition, 0),
+            target = (-data.FIELD_LENGTH / 2, 0),
             theta = np.pi / 2,
             size = data.FIELD_WIDTH / 2,
             side = 'positive',
             repelling = True,
-            max_dist = data.ROBOT_SIZE/2,
-            multiplier = 1
+            max_dist = line_field_dist,
+            decay_dist = line_field_dist * 0.8,
+            multiplier = 0.7
         )
 
         repell_field = combinations.ObstaclesField(
@@ -42,7 +45,7 @@ class WaitToStrike(ExecutionNode):
             max_radius = 2.0,
             decay_radius = 0.3,
             repelling = False,
-            multiplier = 0.8
+            multiplier = 0.9
         )
 
         self.vector_field = fields.VectorField()
@@ -52,10 +55,10 @@ class WaitToStrike(ExecutionNode):
         self.vector_field.add(self.attracting_field)
 
         self.action = FollowFieldAction(
-                        kp_ang=7.0, ki_ang=0.01, kd_ang=2.0,
+                        kp_ang=9.0, ki_ang=0.01, kd_ang=2.0,
                         kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.1,
                         saturation_ang=(100*np.pi), integral_fade_ang=0.75,
-                        saturation_lin=(2000), integral_fade_lin=0.75,
+                        saturation_lin=(200), max_integral_lin=0.5, integral_fade_lin=0.75,
                         base_speed=40, linear_decay_std_dev=np.pi/4, use_front=False)
 
 
@@ -93,5 +96,5 @@ class WaitToStrike(ExecutionNode):
     def plot_field(self):
         self.vector_field.update(self.field_data, self.parameters.robot_id)
         my_plotter = plotter.FieldPlotter('Wait to Strike')
-        my_plotter.plot(self.attracting_field)
+        # my_plotter.plot(self.attracting_field)
         my_plotter.plot(self.vector_field)
