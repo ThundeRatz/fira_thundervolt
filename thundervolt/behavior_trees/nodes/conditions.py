@@ -2,7 +2,8 @@ import py_trees
 import numpy as np
 
 from .execution_node import ExecutionNode
-from thundervolt.core import utils, data
+from thundervolt.core import data
+from thundervolt.core import utils
 
 class xPlayerLTd(ExecutionNode):
     def __init__(self, name, role, field_data, d_position):
