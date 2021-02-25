@@ -23,8 +23,7 @@ def main():
     bb_client.register_key(key="/defender/robot_id", access=py_trees.common.Access.WRITE)
     bb_client.defender.robot_id = 1
 
-    my_tree = GoNearCorner("Test Node", "/defender", field_data, team_command,
-                            y_position = 0.5, min_sup_limit = 0.35, max_inf_limit = -0.35)
+    my_tree = GoNearCorner("Test Node", "/defender", field_data, team_command, y_position = 0.5)
 
     my_tree.setup()
 
