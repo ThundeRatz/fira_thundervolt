@@ -199,8 +199,6 @@ class ObstaclesField(VectorField):
             iterator += 1
 
 
-VERTICAL_THRESHOLD = 0.475
-
 class TangentObstaclesField(VectorField):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -241,8 +239,8 @@ class TangentObstaclesField(VectorField):
         v_dir = from_polar(robot_theta + np.pi/2)
 
         if np.dot(u_dir, robot_vel) < 0:
-            u_dir += -1
-            v_dir += -1
+            u_dir *= -1
+            v_dir *= -1
 
         obstacles_positions = []
 
@@ -260,19 +258,14 @@ class TangentObstaclesField(VectorField):
             obs_proj_u = np.dot(to_obs, u_dir)
             obs_proj_v = np.dot(to_obs, v_dir)
 
+            if obs_proj_u < 0:
+                self.field_childrens[i].multiplier = self.multiplier / 2
+
             if obs_proj_v > 0:
-                # Obstácue in 1st adn 2nd quadrant
-                if obs_pos[1] < -VERTICAL_THRESHOLD:
-                    clockwise = True
-                else:
-                    clockwise = False
+                clockwise = False
 
             else:
-                # Obstácue in 3rd and 4th quadrant
-                if obs_pos[1] > VERTICAL_THRESHOLD:
-                    clockwise = False
-                else:
-                    clockwise = True
+                clockwise = True
 
             self.field_childrens[i].clockwise = clockwise
             self.field_childrens[i].target = obs_pos
