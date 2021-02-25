@@ -34,6 +34,13 @@ class WaitToStrike(ExecutionNode):
             multiplier = 0.9
         )
 
+        avoid_obstacles = combinations.TangentObstaclesField(
+                            radius = 0.7,
+                            max_radius = 0.3,
+                            decay_radius = 0.08,
+                            multiplier = 1.2
+        )
+
         wall_field = combinations.WallField(
                         max_dist=0.1,
                         decay_dist=0.05,
@@ -50,16 +57,17 @@ class WaitToStrike(ExecutionNode):
 
         self.vector_field = fields.VectorField()
         self.vector_field.add(division_field)
+        self.vector_field.add(avoid_obstacles)
         self.vector_field.add(repell_field)
         self.vector_field.add(wall_field)
         self.vector_field.add(self.attracting_field)
 
         self.action = FollowFieldAction(
-                        kp_ang=9.0, ki_ang=0.01, kd_ang=2.0,
-                        kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.1,
+                        kp_ang=7.0, ki_ang=0.01, kd_ang=2.0,
+                        kp_lin=150.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.1,
                         saturation_ang=(100*np.pi), integral_fade_ang=0.75,
-                        saturation_lin=(200), max_integral_lin=0.5, integral_fade_lin=0.75,
-                        base_speed=40, linear_decay_std_dev=np.pi/4, use_front=False)
+                        saturation_lin=(100), max_integral_lin=0.5, integral_fade_lin=0.75,
+                        base_speed=40, linear_decay_std_dev=np.pi/4, use_front=True)
 
 
     def initialise(self):
