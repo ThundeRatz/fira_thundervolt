@@ -1,5 +1,6 @@
 import py_trees
 import numpy as np
+import logging
 
 from .core import data
 from .core.data import FieldData
@@ -11,9 +12,6 @@ class Coach(object):
         self.field_data = field_data
         self.team_command = team_command
         self.goalkeeper_bt = trees.create_goalkeeper_tree(field_data, team_command)
-        self.defender_bt = trees.create_goalkeeper_tree(field_data, team_command)
-        self.striker_bt = trees.create_goalkeeper_tree(field_data, team_command)
-
         # Need to create the right trees
         # self.defender_bt = trees.create_defender_tree(field_data, team_command)
         # self.striker_bt = trees.create_striker_tree(field_data, team_command)
@@ -30,8 +28,8 @@ class Coach(object):
         self.bb_client.striker.robot_id = 2
 
         self.goalkeeper_bt.setup_with_descendants()
-        self.defender_bt.setup_with_descendants()
-        self.striker_bt.setup_with_descendants()
+        # self.defender_bt.setup_with_descendants()
+        # self.striker_bt.setup_with_descendants()
 
 
     def initialise(self):
@@ -60,11 +58,15 @@ class Coach(object):
         self.bb_client.defender.robot_id = defender_id
         self.bb_client.striker.robot_id = striker_id
 
+        logging.info(f"Goalkeeper: {goalkeeper_id}")
+        logging.info(f"Defender: {defender_id}")
+        logging.info(f"Striker: {striker_id}")
+
 
     def update(self):
         self.goalkeeper_bt.tick_once()
-        self.defender_bt.tick_once()
-        self.striker_bt.tick_once()
+        # self.defender_bt.tick_once()
+        # self.striker_bt.tick_once()
 
 
     def _ordered_closest_robots_to_point(self, point: np.ndarray(2)) -> tuple:
