@@ -29,7 +29,7 @@ def create_goalkeeper_tree(field_data, team_command):
     back_node = py_trees.composites.Parallel(name="Back Node", children=[back_inverter, back_action])
     root.add_child(back_node)
 
-    save_node = SaveGoal("Save Node", "/goalkeeper", field_data, team_command, 3.0)
+    save_node = SaveGoal("Save Node", "/goalkeeper", field_data, team_command, 3.0, LINE_X, CLOSE_LINE_Y)
     root.add_child(save_node)
 
     spin_condition1 = BallDistToPlayerLTd("Spin Condition 1", "/goalkeeper", field_data, BALL_DIST_TO_PLAYER)
