@@ -50,9 +50,6 @@ class LineAction(Action):
         self.controller_lin.reset()
         self.controller_ang.reset()
 
-        # if pointB[0] < pointA[0]:
-        #     pointA, pointB = pointB, pointA
-
         # Save start and end point
         self.pointA = np.array(pointA)
         self.pointB = np.array(pointB)
