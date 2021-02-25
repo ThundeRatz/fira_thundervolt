@@ -52,7 +52,7 @@ class FiraVision(Receiver):
         Update the field_data passed in the constructor
         """
         if self.field_data is None:
-            logging.warning('FieldData not instantiated')
+            logging.error('FieldData not instantiated', exc_info=True)
         else:
             vision_data_dict = self.receive_dict()
 
