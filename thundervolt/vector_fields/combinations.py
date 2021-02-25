@@ -101,6 +101,63 @@ class WallField(VectorField):
             field.decay_dist = self.decay_dist
             field.multiplier = self.multiplier
 
+class AreaField(VectorField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.max_dist = kwargs.get('max_dist', None)
+        self.decay_dist = kwargs.get('decay_dist', None)
+
+        self.multiplier = kwargs.get('multiplier', 1)
+        self.update_rule = kwargs.get('update_rule', None)
+
+        top_line = LineField(
+            target = (-data.FIELD_LENGTH / 2, 0.05),
+            theta = 0.0,
+            size = data.GOAL_AREA_DEPTH,
+            side = 'negative',
+            repelling = True,
+            max_dist = self.max_dist,
+            decay_dist = self.decay_dist,
+            multiplier = self.multiplier,
+        )
+
+        botton_line = LineField(
+            target = (-data.FIELD_LENGTH / 2, -0.05),
+            theta = 0.0,
+            size = data.GOAL_AREA_DEPTH,
+            side = 'positive',
+            repelling = True,
+            max_dist = self.max_dist,
+            decay_dist = self.decay_dist,
+            multiplier = self.multiplier,
+        )
+
+        front_line = LineField(
+            target = (-data.FIELD_LENGTH / 2, data.GOAL_AREA_WIDTH/2),
+            theta = -np.pi / 2,
+            size = data.GOAL_AREA_WIDTH,
+            only_forward = True,
+            side = 'negative',
+            repelling = True,
+            max_dist = self.max_dist,
+            decay_dist = self.decay_dist,
+            multiplier = self.multiplier,
+        )
+
+        self.add(top_line)
+        self.add(botton_line)
+        self.add(front_line)
+
+    def update(self, field_data, robot_id):
+        if callable(self.update_rule):
+            self.update_rule(self, field_data, robot_id)
+
+        for field in self.field_childrens:
+            field.max_dist = self.max_dist
+            field.decay_dist = self.decay_dist
+            field.multiplier = self.multiplier
+
 
 class ObstaclesField(VectorField):
     def __init__(self, **kwargs):
