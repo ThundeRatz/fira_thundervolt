@@ -5,7 +5,7 @@ from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.line_action import LineAction
 
-class FollowBallVertical(ExecutionNode):
+class FollowBallHorizontal(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, y_position=0.0,
                     limit_dir=data.FIELD_LENGTH/2 , limit_esq=-data.FIELD_LENGTH/2):
         """
