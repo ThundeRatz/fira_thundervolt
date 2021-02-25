@@ -89,3 +89,17 @@ def test_assert_half_angle():
     assert utils.assert_half_angle(-5 * np.pi / 4) == pytest.approx(-np.pi / 4)
     assert utils.assert_half_angle(5 * np.pi + np.pi / 4) == pytest.approx(np.pi / 4)
     assert utils.assert_half_angle(- 7 * np.pi / 2) == pytest.approx(np.pi / 2)
+
+def test_angle_between_vector():
+    test_vectors = [((0, 1), (1, 0), np.pi/2),
+                    ((1, 0), (0, 1), -np.pi/2),
+                    ((1, 0), (1, 0), 0),
+                    ((1, 1), (1, 0), np.pi/4),
+                    ((-1, 0), (-1, -1), -np.pi/4),
+                    ((1, -1), (-1, 0), 3*np.pi/4)]
+
+    i = 0
+    for vector1, vector2, angle in test_vectors:
+        print(f"TEST NUMBER: {i}")
+        assert utils.vectors_angle(vector1, vector2) == pytest.approx(angle)
+        i += 1
