@@ -33,9 +33,9 @@ class GoodStrikerOrientation(ExecutionNode):
         ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
 
         player_ball = ball_pos - player_pos
-        player_lpost = np.array((self.lpost[0] - player_pos[0], self.lpost[1] - player_pos[1]))
-        player_rpost = np.array((self.rpost[0] - player_pos[0], self.rpost[1] - player_pos[1]))
-        
+        player_lpost = self.lpost - player_pos
+        player_rpost = self.rpost - player_pos
+
         angle_ball = utils.vectors_angle(player_ball)
         angle_lpost = utils.vectors_angle(player_lpost)
         angle_rpost = utils.vectors_angle(player_rpost)
