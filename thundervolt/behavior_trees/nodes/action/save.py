@@ -18,9 +18,9 @@ class SaveGoal(ExecutionNode):
     def setup(self):
         self.action = LineAction(
                         kp_ang=8.0, ki_ang=0.001, kd_ang=3.0, tolerance_ang=0.03,
-                        kp_lin=350.0, ki_lin=0.001, kd_lin=2.0, tolerance_lin=0.01,
+                        kp_lin=400.0, ki_lin=0.001, kd_lin=2.0, tolerance_lin=0.01,
                         saturation_ang=(6*np.pi/6), max_integral_ang=np.pi/20, integral_fade_ang=0.75,
-                        saturation_lin=(350 * GOAL_LINE_Y), max_integral_lin=1.0, integral_fade_lin=0.75,
+                        saturation_lin=(400.0 * 2 * GOAL_LINE_Y), max_integral_lin=1.0, integral_fade_lin=0.75,
                         line_dist_std_dev=0.03, linear_decay_std_dev=np.pi/30)
 
     def initialise(self):
