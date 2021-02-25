@@ -5,11 +5,11 @@ from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import TeamCommand
-from thundervolt.behavior_trees.trees import create_goalkeeper_tree
+from thundervolt.behavior_trees.trees import create_striker_tree
 
 
 def main():
-    team_color_yellow = True
+    team_color_yellow = False
 
     field_data = FieldData()
     team_command = TeamCommand()
@@ -19,18 +19,19 @@ def main():
     blue_control.stop_team()
 
     bb_client = py_trees.blackboard.Client()
-    bb_client.register_key(key="/goalkeeper/robot_id", access=py_trees.common.Access.WRITE)
-    bb_client.goalkeeper.robot_id = 0
+    bb_client.register_key(key="/striker/robot_id", access=py_trees.common.Access.WRITE)
+    bb_client.striker.robot_id = 0
 
-    my_tree = create_goalkeeper_tree(field_data, team_command)
+    my_tree = create_striker_tree(field_data, team_command)
     my_tree.setup_with_descendants()
 
     try:
         while True:
             vision.update()
-            print('\nNew Iteration')
+            print(py_trees.display.unicode_tree(my_tree, show_status=True))
             for node in my_tree.tick():
-                print(node.name)
+                pass
+                #print(node.name)
             blue_control.update()
     except KeyboardInterrupt:
         pass
