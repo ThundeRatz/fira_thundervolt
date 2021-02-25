@@ -37,6 +37,7 @@ def main():
 
             if my_tree.status == py_trees.common.Status.SUCCESS:
                 print('Success!!')
+                #break
 
     except KeyboardInterrupt:
         my_tree.plot_field()

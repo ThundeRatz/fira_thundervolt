@@ -16,6 +16,8 @@ class WaitToStrike(ExecutionNode):
 
     def setup(self):
         line_field_dist = abs(-data.FIELD_LENGTH / 2 - self.x_partition)
+        self.goal_y = None
+
 
         division_field = fields.LineField(
             target = (-data.FIELD_LENGTH / 2, 0),
@@ -72,7 +74,7 @@ class WaitToStrike(ExecutionNode):
 
     def initialise(self):
         self.action.initialize(self.parameters.robot_id, self.vector_field)
-        self.goal_y = None
+        #self.goal_y = None
 
 
     def update(self):
@@ -84,15 +86,15 @@ class WaitToStrike(ExecutionNode):
             else:
                 self.goal_y = ball_y - 3 * data.ROBOT_SIZE
         elif self.goal_y > 0:
+            if ball_y >= data.ROBOT_SIZE:
+                self.goal_y = ball_y - 3 * data.ROBOT_SIZE
+            else:
+                self.goal_y = ball_y + 3 * data.ROBOT_SIZE
+        elif self.goal_y <= 0:
             if ball_y <= -data.ROBOT_SIZE:
                 self.goal_y = ball_y + 3 * data.ROBOT_SIZE
             else:
                 self.goal_y = ball_y - 3 * data.ROBOT_SIZE
-        elif self.goal_y <= 0:
-            if ball_y > data.ROBOT_SIZE:
-                self.goal_y = ball_y - 3 * data.ROBOT_SIZE
-            else:
-                self.goal_y = ball_y + 3 * data.ROBOT_SIZE
 
         goal = (self.x_partition + data.ROBOT_SIZE, self.goal_y)
         self.attracting_field.target = goal
