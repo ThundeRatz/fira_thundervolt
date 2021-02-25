@@ -65,13 +65,9 @@ class LineAction(Action):
         # Calculates the goal projection on the line
         u = np.array(point_goal) - self.pointA
         u_proj_line = np.dot(u, self.line_dir)
-        print(f'line_dir {self.line_dir}')
-        print(f'U: {u}')
-        print(f'u_proj: {u_proj_line}')
 
         if u_proj_line < 0.0:
             goal = self.pointA
-            print('setei em A')
         elif u_proj_line > np.linalg.norm(self.pointB - self.pointA):
             goal = self.pointB
         else:
@@ -89,8 +85,6 @@ class LineAction(Action):
         actual_ang = field_data.robots[self.robot_id].position.theta
         actual_dir = from_polar(actual_ang)
 
-        print(f'GOAL: {self.goal}')
-
         # Calculate the robot to goal vector and coordinates ont the line basis
         goal_vector = self.goal - actual_point
         goal_proj_line = np.dot(goal_vector, self.line_dir)
@@ -105,17 +99,11 @@ class LineAction(Action):
 
         actual_goal_dir = versor(goal_vector)
 
-        print(f'Line: {actual_line_dir}')
-        print(f'To goal: {actual_goal_dir}')
-
         weight = gaussian(goal_proj_axis, std_dev=self.line_dist_std_dev)
         desired_dir = actual_line_dir * weight + actual_goal_dir * (1-weight)
 
         if abs(goal_proj_line) < self.tolerance_lin:
             desired_dir = actual_line_dir
-
-        print(f'Actual: {actual_dir}')
-        print(f'Desired: {desired_dir}')
 
         # Calculate the linear response based on the robot to goal projection on the line direction
         response_lin = -self.controller_lin.update(abs(goal_proj_line))
@@ -124,8 +112,6 @@ class LineAction(Action):
         if abs(vectors_angle(actual_dir, desired_dir)) > np.pi/2:
             desired_dir *= -1
             response_lin *= -1
-
-        print(f'New desired: {desired_dir}')
 
         angular_error = vectors_angle(actual_dir, desired_dir)
 
