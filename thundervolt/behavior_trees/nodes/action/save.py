@@ -5,7 +5,7 @@ from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.line_action import LineAction
 
-GOAL_LINE_X = data.FIELD_LENGTH/2 - data.ROBOT_SIZE
+GOAL_LINE_X = data.FIELD_LENGTH/2 - 0.75 * data.ROBOT_SIZE
 GOAL_LINE_Y = data.GOAL_AREA_WIDTH/2 - data.ROBOT_SIZE
 
 class SaveGoal(ExecutionNode):
@@ -17,7 +17,7 @@ class SaveGoal(ExecutionNode):
     def setup(self):
         self.action = LineAction(
                         kp_ang=8.0, ki_ang=0.001, kd_ang=3.0, tolerance_ang=0.03,
-                        kp_lin=350.0, ki_lin=0.001, kd_lin=2.0, tolerance_lin=0.005,
+                        kp_lin=350.0, ki_lin=0.001, kd_lin=2.0, tolerance_lin=0.01,
                         saturation_ang=(6*np.pi/6), max_integral_ang=np.pi/20, integral_fade_ang=0.75,
                         saturation_lin=(350 * GOAL_LINE_Y), max_integral_lin=1.0, integral_fade_lin=0.75,
                         line_dist_std_dev=0.03, linear_decay_std_dev=np.pi/30)
