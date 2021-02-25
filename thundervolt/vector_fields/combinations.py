@@ -101,6 +101,63 @@ class WallField(VectorField):
             field.decay_dist = self.decay_dist
             field.multiplier = self.multiplier
 
+class AreaField(VectorField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.max_dist = kwargs.get('max_dist', None)
+        self.decay_dist = kwargs.get('decay_dist', None)
+
+        self.multiplier = kwargs.get('multiplier', 1)
+        self.update_rule = kwargs.get('update_rule', None)
+
+        top_line = LineField(
+            target = (-data.FIELD_LENGTH / 2, 0.05),
+            theta = 0.0,
+            size = data.GOAL_AREA_DEPTH,
+            side = 'negative',
+            repelling = True,
+            max_dist = self.max_dist,
+            decay_dist = self.decay_dist,
+            multiplier = self.multiplier,
+        )
+
+        botton_line = LineField(
+            target = (-data.FIELD_LENGTH / 2, -0.05),
+            theta = 0.0,
+            size = data.GOAL_AREA_DEPTH,
+            side = 'positive',
+            repelling = True,
+            max_dist = self.max_dist,
+            decay_dist = self.decay_dist,
+            multiplier = self.multiplier,
+        )
+
+        front_line = LineField(
+            target = (-data.FIELD_LENGTH / 2, data.GOAL_AREA_WIDTH/2),
+            theta = -np.pi / 2,
+            size = data.GOAL_AREA_WIDTH,
+            only_forward = True,
+            side = 'negative',
+            repelling = True,
+            max_dist = self.max_dist,
+            decay_dist = self.decay_dist,
+            multiplier = self.multiplier,
+        )
+
+        self.add(top_line)
+        self.add(botton_line)
+        self.add(front_line)
+
+    def update(self, field_data, robot_id):
+        if callable(self.update_rule):
+            self.update_rule(self, field_data, robot_id)
+
+        for field in self.field_childrens:
+            field.max_dist = self.max_dist
+            field.decay_dist = self.decay_dist
+            field.multiplier = self.multiplier
+
 
 class ObstaclesField(VectorField):
     def __init__(self, **kwargs):
@@ -142,8 +199,6 @@ class ObstaclesField(VectorField):
             iterator += 1
 
 
-VERTICAL_THRESHOLD = 0.475
-
 class TangentObstaclesField(VectorField):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -184,8 +239,8 @@ class TangentObstaclesField(VectorField):
         v_dir = from_polar(robot_theta + np.pi/2)
 
         if np.dot(u_dir, robot_vel) < 0:
-            u_dir += -1
-            v_dir += -1
+            u_dir *= -1
+            v_dir *= -1
 
         obstacles_positions = []
 
@@ -203,19 +258,14 @@ class TangentObstaclesField(VectorField):
             obs_proj_u = np.dot(to_obs, u_dir)
             obs_proj_v = np.dot(to_obs, v_dir)
 
+            if obs_proj_u < 0:
+                self.field_childrens[i].multiplier = self.multiplier / 2
+
             if obs_proj_v > 0:
-                # Obstácue in 1st adn 2nd quadrant
-                if obs_pos[1] < -VERTICAL_THRESHOLD:
-                    clockwise = True
-                else:
-                    clockwise = False
+                clockwise = False
 
             else:
-                # Obstácue in 3rd and 4th quadrant
-                if obs_pos[1] > VERTICAL_THRESHOLD:
-                    clockwise = False
-                else:
-                    clockwise = True
+                clockwise = True
 
             self.field_childrens[i].clockwise = clockwise
             self.field_childrens[i].target = obs_pos
