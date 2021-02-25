@@ -92,8 +92,6 @@ class WaitToStrike(ExecutionNode):
                 self.goal_y = ball_y + 3 * data.ROBOT_SIZE
         elif self.goal_y <= 0:
             if ball_y <= -data.ROBOT_SIZE:
-                self.goal_y = ball_y + 3 * data.ROBOT_SIZE
-            else:
                 self.goal_y = ball_y - 3 * data.ROBOT_SIZE
 
         goal = (self.x_partition + data.ROBOT_SIZE, self.goal_y)
