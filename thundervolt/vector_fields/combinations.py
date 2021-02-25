@@ -142,8 +142,6 @@ class ObstaclesField(VectorField):
             iterator += 1
 
 
-VERTICAL_THRESHOLD = 0.475
-
 class TangentObstaclesField(VectorField):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
