@@ -23,9 +23,11 @@ class GoBehindBall(ExecutionNode):
         self.distance = distance
 
     def setup(self):
-        self.action = FollowFieldAction(kp_ang=6.0, ki_ang=0.0, kd_ang=3.0, kp_lin=200.0, ki_lin=0.0,
-                                        kd_lin=3.0, tolerance_lin=0.15, base_speed=200,
-                                        goal=None, use_front=True)
+        self.action = FollowFieldAction(kp_ang=7.0, ki_ang=0.005, kd_ang=2.0,
+                        kp_lin=50.0, ki_lin=0.01, kd_lin=3.0, tolerance_lin=0.05,
+                        saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
+                        # saturation_lin=(200*0.2), integral_fade_lin=0.75,
+                        base_speed=40, linear_decay_std_dev=np.pi/4)
 
 
     def initialise(self):
@@ -39,9 +41,9 @@ class GoBehindBall(ExecutionNode):
         )
 
         repell_field = combinations.ObstaclesField(
-            max_radius = 0.3,
+            max_radius = 0.15,
             decay_radius = 0.05,
-            multiplier = 1,
+            multiplier = 0.9,
         )
 
         self.ball_repell_field = fields.RadialField(
@@ -62,7 +64,7 @@ class GoBehindBall(ExecutionNode):
         self.my_field.update(self.field_data, self.parameters.robot_id)
         self.ball_repell_field.target = (self.field_data.ball.position.x, self.field_data.ball.position.y)
 
-        goal_x = max(self.field_data.ball.position.x - self.distance, -0.5) # Near our goal area
+        goal_x = max(self.field_data.ball.position.x - self.distance, -0.55) # Near our goal area
 
         self.action.set_goal(np.array([goal_x, self.field_data.ball.position.y]))
         self.attract_field.target = (goal_x, self.field_data.ball.position.y)
