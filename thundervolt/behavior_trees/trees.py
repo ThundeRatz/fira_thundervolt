@@ -24,10 +24,10 @@ from thundervolt.behavior_trees.nodes.conditions import xPlayerLTxBall
 from thundervolt.behavior_trees.nodes.action.go_behind_ball import GoBehindBall
 from thundervolt.behavior_trees.nodes.conditions import xBallLTd
 from thundervolt.behavior_trees.nodes.action.get_ball import GetBall
-from thundervolt.behavior_trees.nodes.action.follow_ball_y import FollowBallVertical
+from thundervolt.behavior_trees.nodes.action.follow_ball_y_defender import FollowBallVerticalDefender
 from thundervolt.behavior_trees.nodes.conditions import FoeCloserToBall
+from thundervolt.behavior_trees.nodes.action.go_back_goal_area import BackToGoalArea
 
-PLAYER_DIST_TO_GOAL = 1.5 * data.ROBOT_SIZE
 PLAYER_DIST_TO_GOAL = 2.2 * data.ROBOT_SIZE
 BALL_DIST_TO_PLAYER = 0.75 * data.ROBOT_SIZE + data.BALL_RADIUS
 BALL_DIST_TO_GOAL = 1.25 * data.ROBOT_SIZE + data.BALL_RADIUS
@@ -35,6 +35,9 @@ AREA_LINE_X = data.FIELD_LENGTH/2 - data.GOAL_AREA_DEPTH
 CLOSE_LINE_Y = data.GOAL_AREA_WIDTH/2
 LINE_X = data.FIELD_LENGTH/2 - 0.8 * data.ROBOT_SIZE
 SPIN_LINE = LINE_X - data.ROBOT_SIZE/2
+
+DEFENDER_LINE = -0.5
+STRIKER_X_LIMIT = -0.2
 
 def create_goalkeeper_tree(field_data, team_command):
     root = py_trees.composites.Selector("Root")
@@ -71,76 +74,63 @@ def create_goalkeeper_tree(field_data, team_command):
 def create_defender_tree(field_data, team_command):
     root = py_trees.composites.Selector("Root")
 
-    ''' Defender-defender mode '''
-    # Defender-defender mode node
-    foe_closer_to_ball_condition = FoeCloserToBall("Foe closer to ball condition", "/defender", field_data)
-    ## Actions opponent closer to ball node --> TESTANDO
-    ### Ball in defense node --> TESTANDO
+    ''' Ball in defense '''
+    # Ball in defense node
     ball_in_defense_condition = xBallLTd("Ball in defense condition", "/defender", field_data, 0.0)
-    #### Actions ball in defense node --> PARECE OK!
-    ##### Ball near goal node --> PARECE OK!
-    ball_near_goal_condition = xBallLTd("Distance (ball, goal) less than d condition", "/defender", field_data, -0.45)
+    ## Ball in defense actions
+    ### Ball near goal node
+    ball_near_goal_condition = xBallLTd("Distance (ball, goal) less than d condition", "/defender", field_data, -data.FIELD_LENGTH/3)
 
-    ###### Corner node -> ATÉ AQUI FUNCIONA +-
+    #### Corner node
     go_near_corner_action = GoNearCorner("Go near corner action", "/defender", field_data, team_command, y_position = 0.45)
-    ####### After go to corner node
-    ######## Spin node
+    ##### After go to corner node
+    ###### Spin node
     spin_condition = BallDistToPlayerLTd("Spin Condition", "/defender", field_data, BALL_DIST_TO_PLAYER)
     spin_action = ClearBall("Clear Ball Action", "/defender", field_data, team_command)
     spin_node = py_trees.composites.Parallel(name="Spin Node", children=[spin_condition, spin_action])
-    ####### Spin node #######
-    ######## Defend corner node
+    ##### Spin node
+    ###### Defend corner node
     defend_corner_action = DefendCorner("Defend corner action", "/defender", field_data, team_command, y_position = 0.45)
-    ######## Defend corner node ########
+    ###### Defend corner node
     after_go_corner_node = py_trees.composites.Selector("After go to corner node", [spin_node, defend_corner_action])
-    ####### After go to corner node #######
+    ##### After go to corner node
     corner_node = py_trees.composites.Sequence(name="Corner node", children=[go_near_corner_action, after_go_corner_node])
-    ######Corner node ###### -> ATÉ AQUI FUNCIONA +-
-
+    #### Corner node
     ball_near_goal_node = py_trees.composites.Parallel(name="Ball near goal node", children=[ball_near_goal_condition, corner_node])
-    ##### Ball near goal node ##### --> PARECE OK!
-    get_ball_action = GetBall("Get ball action", "/defender", field_data, team_command)
-    actions_ball_in_defense_node = py_trees.composites.Selector(name="Actions ball in defense node", children=[ball_near_goal_node, get_ball_action])
-    #### Actions ball in defense node --> PARECE OK!
-    ball_in_defense_node = py_trees.composites.Parallel(name="Ball in defense node", children=[ball_in_defense_condition, actions_ball_in_defense_node])
-    ### Ball in defense node --> TESTANDO
-    ### Defender go back node -> FUnciona, mas ainda precisa calibrar melhor os parametros do GoBehindBall
-    #### Go back conditions
-    go_back_condition1 = xPlayerLTd("GO back condition 1", "/defender", field_data, data.FIELD_LENGTH/4)
-    go_back_inverter1 = py_trees.decorators.Inverter(name="GO back condition 1 Inverter", child=go_back_condition1)
-    go_back_condition2 = xPlayerLTxBall("GO back condition 1", "/defender", field_data)
-    go_back_inverter2 = py_trees.decorators.Inverter(name="GO back condition 2 Inverter", child=go_back_condition2)
-    go_back_conditions_node = py_trees.composites.Selector(name="Go back conditions node", children=[go_back_inverter1, go_back_inverter2])
-    #### Go back conditions ####
-    #### Go back to defense action
-    go_back_to_defense_action = GoBehindBall("Defendr Go back to defense action", "/defender", field_data, team_command, 0.4)
-    #### Go back to defense action
-    defender_go_back_node = py_trees.composites.Parallel("Defender go back node", children=[go_back_conditions_node, go_back_to_defense_action])
-    ### Defender go back node ### --> Parece ok
-    ### Defender follow ball y action --> Parece ok
-    defender_follow_ball_y_action = FollowBallVertical("Defender follow ball y action", "/defender", field_data, team_command, x_position=0.0)
-    ### Defender follow ball y action ### --> Parece ok
-    actions_oponnent_closer_to_ball_node = py_trees.composites.Selector("Actions opponent closer to ball", children=[ball_in_defense_node, defender_go_back_node, defender_follow_ball_y_action])
-    ## Actions opponent closer to ball node ##
-    defender_defender_mode_node = py_trees.composites.Parallel("Defender-defender mode node", children=[foe_closer_to_ball_condition, actions_oponnent_closer_to_ball_node])
-    # Defender-defender mode node
+    ### Ball near goal node
 
-    ''' Defender-assistant mode '''
-    # Defender-assistant mode node -->Testando
-    ## Assistant follow ball y node
+    ### Foe closer node
+    foe_closer_to_ball_condition = FoeCloserToBall("Foe closer to ball condition", "/defender", field_data)
+    ball_x_lt_limit_striker_condition = xBallLTd("Ball x less than limit striker", "/defender", field_data, d_position = STRIKER_X_LIMIT)
+    get_ball_action = GetBall("Get ball action", "/defender", field_data, team_command)
+    foe_closer_node = py_trees.composites.Parallel("Foe closer node", children=[ball_x_lt_limit_striker_condition, foe_closer_to_ball_condition, get_ball_action])
+    ### Foe closer node
+
+    ### Assistant follow ball y node
     assistant_follow_ball_y_condition = xPlayerLTxBall("Assistant go back condition ", "/defender", field_data)
-    assistant_follow_ball_y_action = FollowBallVertical("Assistant follow ball y action", "/defender", field_data, team_command, x_position=-data.FIELD_LENGTH/4)
+    assistant_follow_ball_y_action = FollowBallVerticalDefender("Assistant follow ball y action", "/defender", field_data, team_command, x_position=DEFENDER_LINE)
     assistant_follow_ball_y_node = py_trees.composites.Parallel("Assistant follow ball y node", children=[assistant_follow_ball_y_condition, assistant_follow_ball_y_action])
-    ## Follow ball y 2 node
-    ## Assistant go back action
-    assistant_go_back_action = GoBehindBall("Assistant go back to defense action", "/defender", field_data, team_command, -data.FIELD_LENGTH/4)
-    ## Assistant go back action
-    defender_assistant_mode_node = py_trees.composites.Selector("Defender-assistant mode node", children=[assistant_follow_ball_y_node, assistant_go_back_action])
-    # Defender-assistant mode node --> Falta o caso em que a bola está próximo da área (o assistente nao poderia ir para tras da bola por causa do limite do go behind ball e entao ficaria seguindo a bola, atrapalhandoa jogada)
+    ### Assistant follow ball y node
+
+    ### Assistant go back action
+    assistant_go_back = BackToGoalArea("Go back to area line action", "/defender", field_data, team_command, -data.FIELD_LENGTH/3)
+    ### Assistant go back action
+
+    ball_in_defense_actions = py_trees.composites.Selector("Ball in defense actions", children=[ball_near_goal_node,foe_closer_node, assistant_follow_ball_y_node, assistant_go_back])
+    ## Ball in defense actions
+    ball_in_defense_node = py_trees.composites.Parallel("Ball in defense node", children=[ball_in_defense_condition, ball_in_defense_actions])
+    # Ball in defense node
+    # return ball_in_defense_node
+
+    ''' Ball not in defense '''
+    # Ball in attack node
+    ball_in_attack_node = GoBehindBall("Ball in attack node", "/defender", field_data, team_command, distance = -DEFENDER_LINE)
+    # Ball in attack node
+    # return ball_in_attack_node
 
     # Add children nodes
-    root.add_child(defender_defender_mode_node)
-    root.add_child(defender_assistant_mode_node)
+    root.add_child(ball_in_defense_node)
+    root.add_child(ball_in_attack_node)
 
     return root
 

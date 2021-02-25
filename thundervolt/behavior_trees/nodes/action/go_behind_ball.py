@@ -7,7 +7,7 @@ from thundervolt.vector_fields import fields, combinations
 from thundervolt.actions.follow_field_action import FollowFieldAction
 
 class GoBehindBall(ExecutionNode):
-    def __init__(self, name, role, field_data, team_command, distance):
+    def __init__(self, name, role, field_data, team_command, distance, left_x_lim = -data.FIELD_LENGTH/2 + 2*data.GOAL_DEPTH):
 
         """
         Create an action node to make the robot go behind ball's x position
@@ -17,10 +17,12 @@ class GoBehindBall(ExecutionNode):
             field_data (FieldData): information received from the field (e.g.: position of each player and ball)
             team_command (TeamCommand): velocity commands for a robot
             distance (float): desired distance between player and ball
+            left_x_lim (floar, optional): left x limit. Default to -0.55
         """
         super().__init__(name, role, field_data)
         self.team_command = team_command
         self.distance = distance
+        self.left_x_lim = left_x_lim
 
     def setup(self):
         self.action = FollowFieldAction(kp_ang=7.0, ki_ang=0.005, kd_ang=2.0,
@@ -64,7 +66,7 @@ class GoBehindBall(ExecutionNode):
         self.my_field.update(self.field_data, self.parameters.robot_id)
         self.ball_repell_field.target = (self.field_data.ball.position.x, self.field_data.ball.position.y)
 
-        goal_x = max(self.field_data.ball.position.x - self.distance, -0.55) # Near our goal area
+        goal_x = max(self.field_data.ball.position.x - self.distance, self.left_x_lim) # Near our goal area
 
         self.action.set_goal(np.array([goal_x, self.field_data.ball.position.y]))
         self.attract_field.target = (goal_x, self.field_data.ball.position.y)
