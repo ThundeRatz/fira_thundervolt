@@ -20,15 +20,19 @@ def create_goalkeeper_tree(field_data, team_command):
     back_node = py_trees.composites.Parallel(name="Back Node", children=[back_inverter, back_action])
     root.add_child(back_node)
 
+    after_save_condition = BallDistToPlayerLTd("After Save Condition", "/goalkeeper", field_data, 0.075)
+    after_save_action = ClearBall("After Save Action", "/goalkeeper", field_data, team_command)
+    after_save_node = py_trees.composites.Parallel(name="After Save Node", children=[after_save_condition, after_save_action])
+    save_action = SaveGoal("Save Node", "/goalkeeper", field_data, team_command, 3.0)
+    save_node = py_trees.composites.Sequence(name="Save Node", children=[save_action, after_save_node])
+    root.add_child(save_node)
+
     spin_condition1 = BallDistToPlayerLTd("Spin Condition 1", "/goalkeeper", field_data, 0.075)
     spin_condition2 = BallDistToGoalLTd("Spin Condition 2", "/goalkeeper", field_data, 0.0588)
     spin_inverter = py_trees.decorators.Inverter(name="Spin Inverter", child=spin_condition2)
-    clear_action = ClearBall("Clear Ball Action Node", "/goalkeeper", field_data, team_command)
+    clear_action = ClearBall("Clear Ball Action", "/goalkeeper", field_data, team_command)
     spin_node = py_trees.composites.Parallel(name="Spin Node", children=[spin_condition1, spin_inverter, clear_action])
     root.add_child(spin_node)
-
-    save_node = SaveGoal("Save Node", "/goalkeeper", field_data, team_command, 3.0)
-    root.add_child(save_node)
 
     follow_close_condition = xBallLTd("Follow Close Condition", "/goalkeeper", field_data, -0.6)
     follow_close_action = FollowBallVertical("Follow Node", "/goalkeeper", field_data, team_command,
