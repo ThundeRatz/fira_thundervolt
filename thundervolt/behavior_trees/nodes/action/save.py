@@ -7,7 +7,7 @@ from thundervolt.actions.line_action import LineAction
 
 GOAL_LINE_X = data.FIELD_LENGTH/2 - 0.8 * data.ROBOT_SIZE
 GOAL_LINE_Y = data.GOAL_AREA_WIDTH/2
-LIMIT_VELOCITY = 0.6
+LIMIT_VELOCITY = 0.5
 
 class SaveGoal(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, save_time):
@@ -18,9 +18,9 @@ class SaveGoal(ExecutionNode):
     def setup(self):
         self.action = LineAction(
                         kp_ang=8.0, ki_ang=0.001, kd_ang=3.0, tolerance_ang=0.03,
-                        kp_lin=400.0, ki_lin=0.001, kd_lin=2.0, tolerance_lin=0.01,
+                        kp_lin=350.0, ki_lin=0.001, kd_lin=2.0, tolerance_lin=0.01,
                         saturation_ang=(6*np.pi/6), max_integral_ang=np.pi/20, integral_fade_ang=0.75,
-                        saturation_lin=(400.0 * 2 * GOAL_LINE_Y), max_integral_lin=1.0, integral_fade_lin=0.75,
+                        saturation_lin=None, max_integral_lin=1.0, integral_fade_lin=0.75,
                         line_dist_std_dev=0.03, linear_decay_std_dev=np.pi/30)
 
     def initialise(self):
@@ -42,6 +42,11 @@ class SaveGoal(ExecutionNode):
                 player_to_ball = goal_point[1] - self.field_data.robots[self.parameters.robot_id].position.y
                 if ball_time == 0 or abs(player_to_ball/ball_time) > LIMIT_VELOCITY:
                     goal_point[1] += player_to_ball
+                    self.action.controller_lin.kp = 1000.0
+                else:
+                    self.action.controller_lin.kp = 350.0
+
+                print(player_to_ball/ball_time)
 
                 self.action.set_goal(goal_point)
 
