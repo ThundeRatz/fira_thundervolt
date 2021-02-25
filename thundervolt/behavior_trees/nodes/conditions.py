@@ -46,6 +46,19 @@ class xBallLTd(ExecutionNode):
             return py_trees.common.Status.FAILURE
     pass
 
+# Temporary condition node
+class yBallLTd(ExecutionNode):
+    def __init__(self, name, role, field_data, d_position):
+        super().__init__(name, role, field_data)
+        self.d_position = d_position
+
+    def update(self):
+        if self.field_data.ball.position.y < self.d_position:
+            return py_trees.common.Status.SUCCESS
+        else:
+            return py_trees.common.Status.FAILURE
+    pass
+
 
 class BallDistToGoalLTd(ExecutionNode):
     def __init__(self, name, role, field_data, max_distance):
