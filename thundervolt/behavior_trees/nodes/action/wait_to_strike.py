@@ -96,6 +96,8 @@ class WaitToStrike(ExecutionNode):
             else:
                 self.goal_y = ball_y - 3 * data.ROBOT_SIZE
 
+        self.goal_y = np.clip(self.goal_y, -data.FIELD_WIDTH/2 + data.ROBOT_SIZE, data.FIELD_WIDTH - data.ROBOT_SIZE)
+
         goal = (self.x_partition + data.ROBOT_SIZE, self.goal_y)
         self.attracting_field.target = goal
         self.action.set_goal(np.array(goal))
