@@ -12,13 +12,9 @@ from thundervolt.behavior_trees.nodes.action.clear_ball import ClearBall
 from thundervolt.behavior_trees.nodes.action.save import SaveGoal
 from thundervolt.behavior_trees.nodes.action.follow_ball_y import FollowBallVertical
 
-# Defender imports - para controle
-from thundervolt.behavior_trees.nodes.action.clear_ball import ClearBall #repetido
-from thundervolt.behavior_trees.nodes.conditions import BallDistToPlayerLTd #repetido
 from thundervolt.behavior_trees.nodes.action.follow_ball_x import FollowBallHorizontal
 from thundervolt.behavior_trees.nodes.action.defend_corner import DefendCorner
 from thundervolt.behavior_trees.nodes.action.go_near_corner import GoNearCorner
-from thundervolt.behavior_trees.nodes.conditions import yBallLTd #Temporario
 from thundervolt.behavior_trees.nodes.conditions import xPlayerLTd
 from thundervolt.behavior_trees.nodes.conditions import xPlayerLTxBall
 from thundervolt.behavior_trees.nodes.action.go_behind_ball import GoBehindBall
@@ -121,7 +117,6 @@ def create_defender_tree(field_data, team_command):
     ## Ball in defense actions
     ball_in_defense_node = py_trees.composites.Parallel("Ball in defense node", children=[ball_in_defense_condition, ball_in_defense_actions])
     # Ball in defense node
-    # return ball_in_defense_node
 
     ''' Ball not in defense '''
     # Ball in attack node
@@ -129,7 +124,6 @@ def create_defender_tree(field_data, team_command):
     look_at_ball_node = LookAtBall("Look at Ball", "/defender", field_data, team_command)
     ball_in_attack_node = py_trees.composites.Sequence(name="Attack node", children=[stay_behind_node, look_at_ball_node])
     # Ball in attack node
-    # return ball_in_attack_node
 
     # Add children nodes
     root.add_child(ball_in_defense_node)
