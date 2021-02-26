@@ -1,12 +1,11 @@
 import test_base  # pylint: disable=import-error
-import numpy as np
 import py_trees
 
 from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import TeamCommand
-from thundervolt.behavior_trees.nodes.action.get_ball import GetBall
+from thundervolt.behavior_trees.trees import create_striker_tree
 
 
 def main():
@@ -14,7 +13,6 @@ def main():
 
     field_data = FieldData()
     team_command = TeamCommand()
-
     vision = FiraVision(team_color_yellow, field_data)
     blue_control = FiraControl(team_color_yellow, team_command)
 
@@ -22,30 +20,23 @@ def main():
 
     bb_client = py_trees.blackboard.Client()
     bb_client.register_key(key="/striker/robot_id", access=py_trees.common.Access.WRITE)
-    bb_client.striker.robot_id = 1
+    bb_client.striker.robot_id = 0
 
-    x_partition = -0.1
-    my_tree = GetBall("Test Node", "/striker", field_data, team_command, x_partition)
-
-    my_tree.setup()
+    my_tree = create_striker_tree(field_data, team_command)
+    my_tree.setup_with_descendants()
 
     try:
         while True:
             vision.update()
-            my_tree.tick_once()
+            print(py_trees.display.unicode_tree(my_tree, show_status=True))
+            for node in my_tree.tick():
+                pass
+                #print(node.name)
             blue_control.update()
-
-            if my_tree.status == py_trees.common.Status.SUCCESS:
-                print("Reach goal!")
-                break
-            if my_tree.status == py_trees.common.Status.FAILURE:
-                print("Failure!")
-                break
-
     except KeyboardInterrupt:
-        blue_control.stop_team()
-        my_tree.plot_field()
+        pass
 
+    blue_control.stop_team()
 
 if __name__ == '__main__':
     main()

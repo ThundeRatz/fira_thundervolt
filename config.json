@@ -8,5 +8,5 @@
         "control_port": 20011
     },
     "team_color_yellow" : false,
-    "use_referee": false
+    "use_referee": true
 }

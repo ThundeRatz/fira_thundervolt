@@ -105,7 +105,7 @@ def test_good_striker_orientation():
 
         field_data.robots[ROBOT_ID].position.x = player_positions[i][0]
         field_data.robots[ROBOT_ID].position.y = player_positions[i][1]
-        field_data.robots[ROBOT_ID].theta = player_orientations[i]
+        field_data.robots[ROBOT_ID].position.theta = player_orientations[i]
         field_data.ball.position.x = ball_positions[i][0]
         field_data.ball.position.y = ball_positions[i][1]
 
