@@ -43,7 +43,7 @@ class SaveGoal(ExecutionNode):
                 player_to_ball = goal_point[1] - self.field_data.robots[self.parameters.robot_id].position.y
 
                 if ((ball_time == 0 and abs(self.field_data.ball.position.y) < data.GOAL_AREA_WIDTH/2) or \
-                        (ball_time > 0 and abs(player_to_ball/ball_time) > LIMIT_VELOCITY)):
+                                        (ball_time > 0 and abs(player_to_ball/ball_time) > LIMIT_VELOCITY)):
                     goal_point[1] += player_to_ball
                     self.action.controller_lin.kp = 1000.0
                 else:
