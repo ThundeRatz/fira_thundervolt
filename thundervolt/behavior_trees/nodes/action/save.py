@@ -49,7 +49,10 @@ class SaveGoal(ExecutionNode):
                     self.action.controller_lin.kp = 1000.0
                 else:
                     self.action.controller_lin.kp = 350.0
+<<<<<<< HEAD
                     goal_point[1] = np.clip(goal_point[1], -data.GOAL_WIDTH, data.GOAL_WIDTH)
+=======
+>>>>>>> ab1dea00ed1f17bf5d6e4ed87b8842cd60964017
 
                 self.action.set_goal(goal_point)
 
