@@ -80,7 +80,7 @@ def create_defender_tree(field_data, team_command):
     ball_in_defense_condition = xBallLTd("Ball in defense condition", "/defender", field_data, 0.0)
     ## Ball in defense actions
     ### Ball near goal node
-    ball_near_goal_condition = xBallLTd("Distance (ball, goal) less than d condition", "/defender", field_data, -data.FIELD_LENGTH/3)
+    ball_near_goal_condition = xBallLTd("Distance (ball, goal) less than d condition", "/defender", field_data, -data.FIELD_LENGTH/2 + data.GOAL_AREA_DEPTH)
 
     #### Corner node
     go_near_corner_action = GoNearCorner("Go near corner action", "/defender", field_data, team_command, y_position = 0.38)

@@ -60,7 +60,7 @@ class GoBehindBall(ExecutionNode):
 
         self.ball_repell_field = fields.RadialField(
             target = (self.field_data.ball.position.x, self.field_data.ball.position.y),
-            max_radius = 0.4,
+            max_radius = 0.2,
             decay_radius = 0.05,
             repelling = True,
         )
