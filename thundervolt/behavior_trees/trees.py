@@ -23,7 +23,7 @@ from thundervolt.behavior_trees.nodes.conditions import xPlayerLTd
 from thundervolt.behavior_trees.nodes.conditions import xPlayerLTxBall
 from thundervolt.behavior_trees.nodes.action.go_behind_ball import GoBehindBall
 from thundervolt.behavior_trees.nodes.conditions import xBallLTd
-from thundervolt.behavior_trees.nodes.action.get_ball import GetBall
+from thundervolt.behavior_trees.nodes.action.get_ball_defender import GetBallDefender
 from thundervolt.behavior_trees.nodes.action.follow_ball_y_defender import FollowBallVerticalDefender
 from thundervolt.behavior_trees.nodes.conditions import FoeCloserToBall
 from thundervolt.behavior_trees.nodes.action.go_back_goal_area import BackToGoalArea
@@ -103,7 +103,7 @@ def create_defender_tree(field_data, team_command):
     ### Foe closer node
     foe_closer_to_ball_condition = FoeCloserToBall("Foe closer to ball condition", "/defender", field_data)
     ball_x_lt_limit_striker_condition = xBallLTd("Ball x less than limit striker", "/defender", field_data, d_position = STRIKER_X_LIMIT)
-    get_ball_action = GetBall("Get ball action", "/defender", field_data, team_command)
+    get_ball_action = GetBallDefender("Get ball action", "/defender", field_data, team_command)
     foe_closer_node = py_trees.composites.Parallel("Foe closer node", children=[ball_x_lt_limit_striker_condition, foe_closer_to_ball_condition, get_ball_action])
     ### Foe closer node
 
