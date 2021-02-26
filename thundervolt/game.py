@@ -27,19 +27,28 @@ class Game():
         self.referee = RefereeComm(referee_ip, referee_port)
 
         self.coach = Coach(self.field_data, self.team_command)
+        self.coach.setup()
+
+        self.last_state = 'STOP'
 
 
     def run(self):
         logging.info("Starting the game!")
 
         while True:
+            # Check if it should respond to referees commands
             if self.use_referee:
                 game_state = self.referee.receive().get('foul', 'STOP')
             else:
                 game_state = 'GAME_ON'
 
+            # Check if the state has changed, an initialise next state
+            if self.last_state != game_state:
+                self._state_initialiser(game_state)
+
             self.vision.update()
 
+            # FSM body
             if game_state == 'GAME_ON':
                 self.coach.update()
 
@@ -47,9 +56,18 @@ class Game():
             elif game_state == 'HALT':
                 self.control.stop_team()
             else:
-                self.control.reset()
                 self.control.stop_team()
                 self.team_command.reset()
+
+
+    def _state_initialiser(self, state):
+        if state == 'GAME_ON':
+            if self.last_state != 'HALT':
+                self.coach.initialise()
+        else:
+            pass
+
+        self.last_state = state
 
 
     def end(self):
