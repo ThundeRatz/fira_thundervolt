@@ -2,7 +2,7 @@ import socket
 from abc import ABC, abstractmethod
 
 class Receiver(ABC):
-    def __init__(self, receiver_ip='224.0.0.1', receiver_port=10002):
+    def __init__(self, receiver_ip, receiver_port):
         """
         Init Client object.
         Extended description of function.

@@ -12,7 +12,7 @@ import numpy as np
 
 
 class FiraVision(Receiver):
-    def __init__(self, team_color_yellow: bool, field_data: FieldData = None, vision_ip='224.0.0.1', vision_port=10002):
+    def __init__(self, team_color_yellow: bool, field_data: FieldData, vision_ip, vision_port):
         super(FiraVision, self).__init__(vision_ip, vision_port)
 
         self.team_color_yellow = team_color_yellow
@@ -97,7 +97,7 @@ class FiraVision(Receiver):
 
 
 class FiraVisionThread(Job):
-    def __init__(self, team_color_yellow: bool, field_data: FieldData = None, vision_ip='224.0.0.1', vision_port=10002):
+    def __init__(self, team_color_yellow: bool, field_data: FieldData, vision_ip, vision_port):
         self.vision = FiraVision(team_color_yellow, field_data, vision_ip, vision_port)
 
         super(FiraVisionThread, self).__init__(self.vision.update)

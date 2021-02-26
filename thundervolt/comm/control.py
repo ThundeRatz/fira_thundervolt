@@ -8,7 +8,7 @@ from ..core.command import TeamCommand
 from .thread_job import Job
 
 class FiraControl(Transmitter):
-    def __init__(self, team_color_yellow: bool, team_command: TeamCommand = None, control_ip='127.0.0.1', control_port=20011):
+    def __init__(self, team_color_yellow: bool, team_command: TeamCommand, control_ip, control_port):
         super(FiraControl, self).__init__(control_ip, control_port)
 
         self.team_color_yellow = team_color_yellow
@@ -92,7 +92,7 @@ class FiraControl(Transmitter):
 
 
 class FiraControlThread(Job):
-    def __init__(self, team_color_yellow: bool, team_command: TeamCommand = None, control_ip='127.0.0.1', control_port=20011):
+    def __init__(self, team_color_yellow: bool, team_command: TeamCommand, control_ip, control_port):
         self.control = FiraControl(team_color_yellow, team_command, control_ip, control_port)
 
         super(FiraControlThread, self).__init__(self.control.update)

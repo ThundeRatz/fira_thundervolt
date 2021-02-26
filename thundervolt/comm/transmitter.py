@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from .protocols import packet_pb2
 
 class Transmitter(ABC):
-    def __init__(self, transmitter_ip='224.0.0.1', transmitter_port=10002):
+    def __init__(self, transmitter_ip, transmitter_port):
         """
         Init Client object.
         Extended description of function.
