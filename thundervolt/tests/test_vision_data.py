@@ -85,7 +85,7 @@ def test_field_from_dict():
 
 
 def test_field_from_dict_with_rotation():
-    vision = FiraVision(team_color_yellow=True, None, 0, 0)
+    vision = FiraVision(True, None, 0, 0)
 
     field_dict = {
         'ball': {
