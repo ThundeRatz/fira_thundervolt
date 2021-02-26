@@ -73,7 +73,6 @@ class xBallLTd(ExecutionNode):
             return py_trees.common.Status.FAILURE
     pass
 
-
 class BallDistToGoalLTd(ExecutionNode):
     def __init__(self, name, role, field_data, max_distance):
         super().__init__(name, role, field_data)
