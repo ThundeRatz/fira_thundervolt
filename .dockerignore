@@ -1,0 +1,15 @@
+**/__pycache__
+**/.pytest_cache
+**/.dockerignore
+**/.git
+**/.gitignore
+**/.editorconfig
+**/.vscode
+**/venv
+**/logfile.log
+**/pytest.ini
+**/run_sim_ref.sh
+**/Dockerfile
+**/integration_test
+**/examples
+README.md
