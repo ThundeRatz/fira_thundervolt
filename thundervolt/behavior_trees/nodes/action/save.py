@@ -38,9 +38,11 @@ class SaveGoal(ExecutionNode):
                 ball_time = ball_distance / ball_velocity[0]
                 goal_point = np.zeros(2)
                 goal_point[1] = ball_position[1] + ball_time * ball_velocity[1]
+                goal_point[1] = np.clip(goal_point[1], -data.GOAL_WIDTH/2, data.GOAL_WIDTH/2)
 
                 player_to_ball = goal_point[1] - self.field_data.robots[self.parameters.robot_id].position.y
-                if ball_time == 0 or abs(player_to_ball/ball_time) > LIMIT_VELOCITY:
+
+                if ((ball_time == 0 and abs(self.field_data.ball.position.y) < data.GOAL_AREA_WIDTH/2) or abs(player_to_ball/ball_time) > LIMIT_VELOCITY):
                     goal_point[1] += player_to_ball
                     self.action.controller_lin.kp = 1000.0
                 else:
