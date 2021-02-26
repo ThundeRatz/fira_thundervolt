@@ -5,6 +5,8 @@ from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.line_action import LineAction
 
+MAX_ERROR = 100     # Random value that needs calibration
+
 class FollowBallVertical(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, x_position=0.0,
                     limit_sup=data.FIELD_WIDTH/2 , limit_inf=-data.FIELD_WIDTH/2):
@@ -40,6 +42,10 @@ class FollowBallVertical(ExecutionNode):
 
     def update(self):
         ball_position = (self.field_data.ball.position.x, self.field_data.ball.position.y)
+
+        if abs(self.action.controller_lin.error_acc) > MAX_ERROR:
+            ball_position = (0.0, 0.0)
+
         self.action.set_goal(ball_position)
         robot_cmd, action_status = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
