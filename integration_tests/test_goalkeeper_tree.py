@@ -9,7 +9,7 @@ from thundervolt.behavior_trees.trees import create_goalkeeper_tree
 
 
 def main():
-    team_color_yellow = True
+    team_color_yellow = False
 
     field_data = FieldData()
     team_command = TeamCommand()
