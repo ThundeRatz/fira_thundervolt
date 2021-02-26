@@ -46,8 +46,6 @@ class SaveGoal(ExecutionNode):
                 else:
                     self.action.controller_lin.kp = 350.0
 
-                print(player_to_ball/ball_time)
-
                 self.action.set_goal(goal_point)
 
                 robot_cmd, action_status = self.action.update(self.field_data)

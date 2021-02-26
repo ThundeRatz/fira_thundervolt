@@ -56,8 +56,6 @@ class DefendCorner(ExecutionNode):
         if np.linalg.norm(robot_position - ball_position) > self.ball_max_dist:
             return py_trees.common.Status.FAILURE
 
-        print('No failure')
-
         if action_status:
             return py_trees.common.Status.SUCCESS
         else:
