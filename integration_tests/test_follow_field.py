@@ -1,4 +1,4 @@
-import test_base
+import test_base # pylint: disable=import-error
 import numpy as np
 import logging
 
