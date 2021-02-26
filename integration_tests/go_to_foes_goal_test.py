@@ -24,7 +24,8 @@ def main():
     bb_client.register_key(key="/goalkeeper/robot_id", access=py_trees.common.Access.WRITE)
     bb_client.goalkeeper.robot_id = 1
 
-    my_tree = GoToFoesGoal("Test Node", "/goalkeeper", field_data, team_command)
+    distance = 0.2
+    my_tree = GoToFoesGoal("Test Node", "/goalkeeper", field_data, team_command, distance)
 
     my_tree.setup()
 
@@ -36,6 +37,9 @@ def main():
 
             if my_tree.status == py_trees.common.Status.SUCCESS:
                 print("Reach goal!")
+                break
+            if my_tree.status == py_trees.common.Status.FAILURE:
+                print("Failure!")
                 break
 
     except KeyboardInterrupt:

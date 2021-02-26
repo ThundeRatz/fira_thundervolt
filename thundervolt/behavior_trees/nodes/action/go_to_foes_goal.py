@@ -10,7 +10,7 @@ from thundervolt.vector_fields.combinations import WallField, ObstaclesField, Ta
 from thundervolt.vector_fields.plotter import FieldPlotter
 
 class GoToFoesGoal(ExecutionNode):
-    def __init__(self, name, role, field_data, team_command):
+    def __init__(self, name, role, field_data, team_command, distance):
 
         """
         Action node to go to foes goal
@@ -23,6 +23,7 @@ class GoToFoesGoal(ExecutionNode):
 
         super().__init__(name, role, field_data)
         self.team_command = team_command
+        self.distance = distance
 
     def setup(self):
         self.vector_field = VectorField(name="Go to Foes Goal!")
@@ -70,11 +71,20 @@ class GoToFoesGoal(ExecutionNode):
         self.action.initialize(self.parameters.robot_id, self.vector_field)
 
     def update(self):
+        ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
+        player_pos = np.array((
+            self.field_data.robots[self.parameters.robot_id].position.x,
+            self.field_data.robots[self.parameters.robot_id].position.y
+        ))
+
+        ball_player = np.linalg.norm(ball_pos - player_pos)
         self.vector_field.update(self.field_data, self.parameters.robot_id)
 
         robot_cmd, action_status = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
 
+        if ball_player > self.distance:
+            return py_trees.common.Status.FAILURE
         if action_status:
             return py_trees.common.Status.SUCCESS
         else:
