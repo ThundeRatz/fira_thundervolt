@@ -22,6 +22,10 @@ class Coach(object):
         self.bb_client.register_key(key="/defender/robot_id", access=py_trees.common.Access.WRITE)
         self.bb_client.register_key(key="/striker/robot_id", access=py_trees.common.Access.WRITE)
 
+        self.goalkeeper_id = 0
+        self.defender_id = 1
+        self.striker_id = 2
+
         self.bb_client.goalkeeper.robot_id = 0
         self.bb_client.defender.robot_id = 1
         self.bb_client.striker.robot_id = 2
@@ -42,27 +46,31 @@ class Coach(object):
         closer_to_ball = self._ordered_closest_robots_to_point(ball_pos)
         closer_to_goal = self._ordered_closest_robots_to_point(goal_pos)
 
-        striker_id = closer_to_ball[0]
+        self.striker_id = closer_to_ball[0]
 
-        if closer_to_goal[0] != striker_id:
-            goalkeeper_id = closer_to_goal[0]
+        if closer_to_goal[0] != self.striker_id:
+            self.goalkeeper_id = closer_to_goal[0]
         else:
-            goalkeeper_id = closer_to_goal[1]
+            self.goalkeeper_id = closer_to_goal[1]
 
-        defender_id = closer_to_ball[1]
-        if defender_id == goalkeeper_id:
-            defender_id = closer_to_ball[2]
+        self.defender_id = closer_to_ball[1]
+        if self.defender_id == self.goalkeeper_id:
+            self.defender_id = closer_to_ball[2]
 
-        self.bb_client.goalkeeper.robot_id = goalkeeper_id
-        self.bb_client.defender.robot_id = defender_id
-        self.bb_client.striker.robot_id = striker_id
+        self.bb_client.goalkeeper.robot_id = self.goalkeeper_id
+        self.bb_client.defender.robot_id = self.defender_id
+        self.bb_client.striker.robot_id = self.striker_id
 
-        logging.info(f"Goalkeeper: {goalkeeper_id}")
-        logging.info(f"Defender: {defender_id}")
-        logging.info(f"Striker: {striker_id}")
+        logging.info(f"Goalkeeper: {self.goalkeeper_id}")
+        logging.info(f"Defender: {self.defender_id}")
+        logging.info(f"Striker: {self.striker_id}")
 
 
     def update(self):
+        if self._defender_striker_swap_condition():
+            self.defender_bt.stop()
+            self.striker_bt.stop()
+
         self.goalkeeper_bt.tick_once()
         self.defender_bt.tick_once()
         self.striker_bt.tick_once()
@@ -81,14 +89,17 @@ class Coach(object):
 
 
     def _defender_striker_swap_condition(self):
-        # TODO: espécificar as condições de troca
-
-        defender_id = self.bb_client.defender.robot_id
-        striker_id = self.bb_client.striker.robot_id
-
         ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
-        defender_pos = np.array((self.field_data.robots[defender_id].position.x, self.field_data.robots[defender_id].position.y))
-        striker_pos = np.array((self.field_data.robots[striker_id].position.x, self.field_data.robots[striker_id].position.y))
+        defender_pos = np.array((self.field_data.robots[self.defender_id].position.x, self.field_data.robots[self.defender_id].position.y))
+        striker_pos = np.array((self.field_data.robots[self.striker_id].position.x, self.field_data.robots[self.striker_id].position.y))
+
+        if ball_pos[0] > 0.0:
+            if defender_pos[0] < ball_pos[0] < striker_pos[0]:
+                logging.info(f"Swap!")
+                (self.defender_id, self.striker_id) = (self.striker_id, self.defender_id)
+                self.bb_client.defender.robot_id = self.defender_id
+                self.bb_client.striker.robot_id = self.striker_id
+                return True
 
         return False
 
