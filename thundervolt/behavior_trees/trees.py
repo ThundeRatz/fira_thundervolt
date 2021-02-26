@@ -3,39 +3,34 @@ import py_trees
 from thundervolt.core import data
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import TeamCommand
-from thundervolt.behavior_trees.nodes.action.back_to_goal import BackToGoal
-from thundervolt.behavior_trees.nodes.action.clear_ball import ClearBall
-from thundervolt.behavior_trees.nodes.action.save import SaveGoal
-from thundervolt.behavior_trees.nodes.action.follow_ball_y import FollowBallVertical
-from thundervolt.behavior_trees.nodes.action.go_to_foes_goal import GoToFoesGoal
-from thundervolt.behavior_trees.nodes.action.get_ball import GetBall
-from thundervolt.behavior_trees.nodes.action.wait_to_strike import WaitToStrike
 from thundervolt.behavior_trees.nodes.conditions import *
-
-from thundervolt.behavior_trees.nodes.action.follow_ball_x import FollowBallHorizontal
-from thundervolt.behavior_trees.nodes.action.defend_corner import DefendCorner
-from thundervolt.behavior_trees.nodes.action.go_near_corner import GoNearCorner
-from thundervolt.behavior_trees.nodes.conditions import xPlayerLTd
-from thundervolt.behavior_trees.nodes.conditions import xPlayerLTxBall
-from thundervolt.behavior_trees.nodes.action.go_behind_ball import GoBehindBall
-from thundervolt.behavior_trees.nodes.conditions import xBallLTd
-from thundervolt.behavior_trees.nodes.action.get_ball_defender import GetBallDefender
-from thundervolt.behavior_trees.nodes.action.follow_ball_y_defender import FollowBallVerticalDefender
-from thundervolt.behavior_trees.nodes.conditions import FoeCloserToBall
-from thundervolt.behavior_trees.nodes.action.go_back_goal_area import BackToGoalArea
+from thundervolt.behavior_trees.nodes.action.save import SaveGoal
+from thundervolt.behavior_trees.nodes.action.get_ball import GetBall
+from thundervolt.behavior_trees.nodes.action.clear_ball import ClearBall
+from thundervolt.behavior_trees.nodes.action.back_to_goal import BackToGoal
 from thundervolt.behavior_trees.nodes.action.look_at_ball import LookAtBall
+from thundervolt.behavior_trees.nodes.action.defend_corner import DefendCorner
+from thundervolt.behavior_trees.nodes.action.wait_to_strike import WaitToStrike
+from thundervolt.behavior_trees.nodes.action.go_near_corner import GoNearCorner
+from thundervolt.behavior_trees.nodes.action.go_behind_ball import GoBehindBall
+from thundervolt.behavior_trees.nodes.action.go_to_foes_goal import GoToFoesGoal
+from thundervolt.behavior_trees.nodes.action.go_back_goal_area import BackToGoalArea
+from thundervolt.behavior_trees.nodes.action.get_ball_defender import GetBallDefender
+from thundervolt.behavior_trees.nodes.action.follow_ball_vertical import FollowBallVertical
+from thundervolt.behavior_trees.nodes.action.follow_ball_horizontal import FollowBallHorizontal
+from thundervolt.behavior_trees.nodes.action.follow_ball_vertical_defender import FollowBallVerticalDefender
 
-PLAYER_DIST_TO_GOAL = 2.2 * data.ROBOT_SIZE
-BALL_DIST_TO_PLAYER = 0.75 * data.ROBOT_SIZE + data.BALL_RADIUS
-BALL_DIST_TO_GOAL = 1.25 * data.ROBOT_SIZE + data.BALL_RADIUS
-AREA_LINE_X = data.FIELD_LENGTH/2 - data.GOAL_AREA_DEPTH
-CLOSE_LINE_Y = data.GOAL_AREA_WIDTH/2
-LINE_X = data.FIELD_LENGTH/2 - 0.8 * data.ROBOT_SIZE
-SPIN_LINE = LINE_X -data.ROBOT_SIZE/2
-DEFENDER_AREA_X = -data.FIELD_LENGTH/2
+PLAYER_DIST_TO_GOAL = 2.2 * data.ROBOT_SIZE                         # Max distance from the goal to the goalkeeper go back
+BALL_DIST_TO_PLAYER = 0.75 * data.ROBOT_SIZE + data.BALL_RADIUS     # Minimal distance from ball for striker to attack
+BALL_DIST_TO_GOAL = 1.25 * data.ROBOT_SIZE + data.BALL_RADIUS       # Maximum ball distance to goal to spin
+AREA_LINE_X = data.FIELD_LENGTH/2 - data.GOAL_AREA_DEPTH            # Goal Area X Line
+CLOSE_LINE_Y = data.GOAL_AREA_WIDTH/2                               # X Line for follow action node when near ball
+LINE_X = data.FIELD_LENGTH/2 - 0.8 * data.ROBOT_SIZE                # X Line for follow action node when far from the ball
+SPIN_LINE = LINE_X - data.ROBOT_SIZE/2                              # Max x position the ball can reach before the goalkeeper spins
 
-DEFENDER_LINE = -0.5
-STRIKER_X_LIMIT = -0.2
+DEFENDER_AREA_X = -data.FIELD_LENGTH/7                              # Minimal x position that the striker can reach
+DEFENDER_LINE = -0.5                                                # Line position that the defender will follow in front of the area
+
 
 def create_goalkeeper_tree(field_data, team_command):
     root = py_trees.composites.Selector("Root")
@@ -69,6 +64,7 @@ def create_goalkeeper_tree(field_data, team_command):
 
     return root
 
+
 def create_defender_tree(field_data, team_command):
     root = py_trees.composites.Selector("Root")
 
@@ -99,7 +95,7 @@ def create_defender_tree(field_data, team_command):
 
     ### Foe closer node
     foe_closer_to_ball_condition = FoeCloserToBall("Foe closer to ball condition", "/defender", field_data)
-    ball_x_lt_limit_striker_condition = xBallLTd("Ball x less than limit striker", "/defender", field_data, d_position = STRIKER_X_LIMIT)
+    ball_x_lt_limit_striker_condition = xBallLTd("Ball x less than limit striker", "/defender", field_data, d_position = DEFENDER_AREA_X)
     get_ball_action = GetBallDefender("Get ball action", "/defender", field_data, team_command)
     foe_closer_node = py_trees.composites.Parallel("Foe closer node", children=[ball_x_lt_limit_striker_condition, foe_closer_to_ball_condition, get_ball_action])
     ### Foe closer node
@@ -132,6 +128,7 @@ def create_defender_tree(field_data, team_command):
 
     return root
 
+
 def create_striker_tree(field_data, team_command):
     root = py_trees.composites.Selector("Root")
 
@@ -143,19 +140,18 @@ def create_striker_tree(field_data, team_command):
         strike_condition_one, strike_condition_two, strike_condition_three, strike_action
     ])
     root.add_child(strike_parallel)
-    
+
     get_ball_condition_one = xPlayerLTxBall("Get Ball Condition 1", "/striker", field_data)
-    get_ball_condition_two = xBallLTd("Get Ball Condition 2", "/striker", field_data, 0.0)
+    get_ball_condition_two = xBallLTd("Get Ball Condition 2", "/striker", field_data, DEFENDER_AREA_X)
     get_ball_inverter = py_trees.decorators.Inverter(name="Get Ball Inverter", child=get_ball_condition_two)
     get_ball_selector = py_trees.composites.Selector(name="Get Ball Selector", children=[
         get_ball_condition_one, get_ball_inverter
     ])
-    get_ball_action = GetBall("Get Ball Action", "/striker", field_data, team_command, 0.0)
-    #get_ball_parallel = py_trees.composites.Parallel(name="Get Ball Node", children=[get_ball_condition_one, get_ball_inverter, get_ball_action])
+    get_ball_action = GetBall("Get Ball Action", "/striker", field_data, team_command, DEFENDER_AREA_X)
     get_ball_parallel = py_trees.composites.Parallel(name="Get Ball Node", children=[get_ball_selector, get_ball_action])
     root.add_child(get_ball_parallel)
 
-    wait_to_strike_node = WaitToStrike("Wait to Strike Node", "/striker", field_data, team_command, 0.0)
+    wait_to_strike_node = WaitToStrike("Wait to Strike Node", "/striker", field_data, team_command, DEFENDER_AREA_X)
     root.add_child(wait_to_strike_node)
 
     return root
