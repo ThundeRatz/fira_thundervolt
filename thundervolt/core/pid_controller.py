@@ -144,7 +144,6 @@ class pidController:
         response = self.kp*(error + self.ki*self.error_acc + self.kd*dedt)
 
         if self.saturation is not None and abs(response) >= self.saturation:
-            # logging.debug('Control response larger than saturation')
-            pass
+            logging.debug('Control response larger than saturation')
 
         return response
