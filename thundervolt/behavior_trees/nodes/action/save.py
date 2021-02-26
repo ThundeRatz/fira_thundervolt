@@ -4,8 +4,10 @@ import py_trees
 from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.line_action import LineAction
+from thundervolt.core import data
 
 LIMIT_VELOCITY = 0.5
+MIN_DIST = data.ROBOT_SIZE
 
 class SaveGoal(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, save_time, goal_line_x, goal_line_y):
@@ -40,13 +42,14 @@ class SaveGoal(ExecutionNode):
                 goal_point[1] = ball_position[1] + ball_time * ball_velocity[1]
 
                 player_to_ball = goal_point[1] - self.field_data.robots[self.parameters.robot_id].position.y
-                if ball_time == 0 or abs(player_to_ball/ball_time) > LIMIT_VELOCITY:
+
+                if (abs(player_to_ball) > MIN_DIST or abs(goal_point[1]) < data.GOAL_WIDTH + data.ROBOT_SIZE) and \
+                                            (ball_time == 0 or abs(player_to_ball/ball_time) > LIMIT_VELOCITY):
                     goal_point[1] += player_to_ball
                     self.action.controller_lin.kp = 1000.0
                 else:
                     self.action.controller_lin.kp = 350.0
-
-                print(player_to_ball/ball_time)
+                    goal_point[1] = np.clip(goal_point[1], -data.GOAL_WIDTH, data.GOAL_WIDTH)
 
                 self.action.set_goal(goal_point)
 
