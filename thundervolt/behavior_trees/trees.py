@@ -27,6 +27,7 @@ from thundervolt.behavior_trees.nodes.action.get_ball import GetBall
 from thundervolt.behavior_trees.nodes.action.follow_ball_y_defender import FollowBallVerticalDefender
 from thundervolt.behavior_trees.nodes.conditions import FoeCloserToBall
 from thundervolt.behavior_trees.nodes.action.go_back_goal_area import BackToGoalArea
+from thundervolt.behavior_trees.nodes.action.look_at_ball import LookAtBall
 
 PLAYER_DIST_TO_GOAL = 2.2 * data.ROBOT_SIZE
 BALL_DIST_TO_PLAYER = 0.75 * data.ROBOT_SIZE + data.BALL_RADIUS
@@ -82,7 +83,7 @@ def create_defender_tree(field_data, team_command):
     ball_near_goal_condition = xBallLTd("Distance (ball, goal) less than d condition", "/defender", field_data, -data.FIELD_LENGTH/3)
 
     #### Corner node
-    go_near_corner_action = GoNearCorner("Go near corner action", "/defender", field_data, team_command, y_position = 0.45)
+    go_near_corner_action = GoNearCorner("Go near corner action", "/defender", field_data, team_command, y_position = 0.38)
     ##### After go to corner node
     ###### Spin node
     spin_condition = BallDistToPlayerLTd("Spin Condition", "/defender", field_data, BALL_DIST_TO_PLAYER)
@@ -124,7 +125,9 @@ def create_defender_tree(field_data, team_command):
 
     ''' Ball not in defense '''
     # Ball in attack node
-    ball_in_attack_node = GoBehindBall("Ball in attack node", "/defender", field_data, team_command, distance = -DEFENDER_LINE)
+    stay_behind_node = GoBehindBall("Ball in attack node", "/defender", field_data, team_command, distance = -DEFENDER_LINE)
+    look_at_ball_node = LookAtBall("Look at Ball", "/defender", field_data, team_command)
+    ball_in_attack_node = py_trees.composites.Sequence(name="Attack node", children=[stay_behind_node, look_at_ball_node])
     # Ball in attack node
     # return ball_in_attack_node
 

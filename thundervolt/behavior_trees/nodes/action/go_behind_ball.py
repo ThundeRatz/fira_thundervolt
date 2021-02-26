@@ -25,11 +25,11 @@ class GoBehindBall(ExecutionNode):
         self.left_x_lim = left_x_lim
 
     def setup(self):
-        self.action = FollowFieldAction(kp_ang=7.0, ki_ang=0.005, kd_ang=2.0,
-                        kp_lin=50.0, ki_lin=0.01, kd_lin=3.0, tolerance_lin=0.05,
-                        saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
-                        # saturation_lin=(200*0.2), integral_fade_lin=0.75,
-                        base_speed=40, linear_decay_std_dev=np.pi/4)
+        self.action = FollowFieldAction(kp_ang=6.0, ki_ang=0.0005, kd_ang=2.0,
+                        kp_lin=50.0, ki_lin=0.0, kd_lin=3.0, tolerance_lin=0.1,
+                        saturation_ang=(8*np.pi/3), max_integral_ang=0.3, integral_fade_ang=0.5,
+                        saturation_lin=(50*0.2), max_integral_lin=0.5, integral_fade_lin=0.5,
+                        use_front = False, linear_decay_std_dev=np.pi/4)
 
 
     def initialise(self):
@@ -42,11 +42,21 @@ class GoBehindBall(ExecutionNode):
             repelling = False,
         )
 
-        repell_field = combinations.ObstaclesField(
-            max_radius = 0.15,
-            decay_radius = 0.05,
-            multiplier = 0.9,
-        )
+        avoid_obstacles = combinations.TangentObstaclesField(
+                            radius = 1.5,
+                            max_radius = 0.25,
+                            decay_radius = 0.1,
+                            multiplier = 1.0)
+
+        avoid_colision = combinations.ObstaclesField(
+                            max_radius=0.15,
+                            decay_radius=0.05,
+                            multiplier=0.9)
+
+        avoid_walls = combinations.WallField(
+                        max_dist=0.2,
+                        decay_dist=0.05,
+                        multiplier=0.9)
 
         self.ball_repell_field = fields.RadialField(
             target = (self.field_data.ball.position.x, self.field_data.ball.position.y),
@@ -56,20 +66,22 @@ class GoBehindBall(ExecutionNode):
         )
 
         self.my_field = fields.VectorField()
-        self.my_field.add(repell_field)
+        self.my_field.add(avoid_obstacles)
+        self.my_field.add(avoid_colision)
+        self.my_field.add(avoid_walls)
         self.my_field.add(self.ball_repell_field)
         self.my_field.add(self.attract_field)
 
         self.action.initialize(self.parameters.robot_id, self.my_field)
 
     def update(self):
-        self.my_field.update(self.field_data, self.parameters.robot_id)
         self.ball_repell_field.target = (self.field_data.ball.position.x, self.field_data.ball.position.y)
 
         goal_x = max(self.field_data.ball.position.x - self.distance, self.left_x_lim) # Near our goal area
 
         self.action.set_goal(np.array([goal_x, self.field_data.ball.position.y]))
         self.attract_field.target = (goal_x, self.field_data.ball.position.y)
+        self.my_field.update(self.field_data, self.parameters.robot_id)
 
         robot_cmd, action_status = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
