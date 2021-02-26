@@ -4,19 +4,16 @@ import py_trees
 from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.follow_field_action import FollowFieldAction
-from thundervolt.vector_fields.fields import VectorField, RadialField
+from thundervolt.vector_fields.fields import VectorField, OrientedAttractingField
 from thundervolt.vector_fields.combinations import WallField, ObstaclesField, TangentObstaclesField
 
 from thundervolt.vector_fields.plotter import FieldPlotter
 
-GOAL_LINE_X = data.FIELD_LENGTH/2 - data.ROBOT_SIZE*0.8
-GOAL_LINE_Y = data.GOAL_WIDTH/2
-
-class BackToGoal(ExecutionNode):
-    def __init__(self, name, role, field_data, team_command):
+class GoToFoesGoal(ExecutionNode):
+    def __init__(self, name, role, field_data, team_command, distance):
 
         """
-        Action node to go back to goal
+        Action node to go to foes goal
         Args:
             name (str): Behaviour name.
             role (str): Robot role namespace for black board client.
@@ -26,9 +23,10 @@ class BackToGoal(ExecutionNode):
 
         super().__init__(name, role, field_data)
         self.team_command = team_command
+        self.distance = distance
 
     def setup(self):
-        self.vector_field = VectorField(name="Back to Goal!")
+        self.vector_field = VectorField(name="Go to Foes Goal!")
 
         repelling_field = ObstaclesField(
             max_radius = 0.17,
@@ -43,20 +41,10 @@ class BackToGoal(ExecutionNode):
                             multiplier = 1.2
         )
 
-        self.attracting_field = RadialField(
-            target = (-GOAL_LINE_X, 0),
-            max_radius = 2.0,
-            decay_radius = 0.3,
-            repelling = False,
-            multiplier=1.0
-        )
-
-        self.ball_repelling_field = RadialField(
-            target = (self.field_data.ball.position.x, self.field_data.ball.position.y),
-            max_radius = 0.25,
-            decay_radius = 0.03,
-            repelling = True,
-            multiplier = 0.8
+        attracting_field = OrientedAttractingField(
+            target = (data.FIELD_LENGTH/2 + data.GOAL_DEPTH, 0.0),
+            direction=(1.0, 0.0),
+            nodes_radius=0.1,
         )
 
         avoid_walls = WallField(
@@ -65,36 +53,38 @@ class BackToGoal(ExecutionNode):
                         multiplier=0.7
         )
 
-        self.vector_field.add(self.attracting_field)
+        self.vector_field.add(attracting_field)
         self.vector_field.add(repelling_field)
         self.vector_field.add(avoid_obstacles)
         self.vector_field.add(avoid_walls)
-        self.vector_field.add(self.ball_repelling_field)
+        #self.vector_field.add(goal_line_field)
 
         self.action = FollowFieldAction(
                         kp_ang=9.0, ki_ang=0.009, kd_ang=2.5,
-                        kp_lin=200.0, ki_lin=0.01, kd_lin=3.0, tolerance_lin=0.10,
+                        kp_lin=200.0, ki_lin=0.01, kd_lin=3.0, tolerance_lin=data.GOAL_DEPTH+data.ROBOT_SIZE/2+data.BALL_RADIUS,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
                         saturation_lin=(200*0.2), max_integral_lin=0.5, integral_fade_lin=0.75,
-                        base_speed=300, linear_decay_std_dev=np.pi/6, use_front=False, goal=(-GOAL_LINE_X, 0)
+                        base_speed=300, linear_decay_std_dev=np.pi/6, use_front=False, goal=(data.FIELD_LENGTH/2+data.GOAL_DEPTH, 0)
         )
 
     def initialise(self):
         self.action.initialize(self.parameters.robot_id, self.vector_field)
 
     def update(self):
-        self.ball_repelling_field.target = (self.field_data.ball.position.x, self.field_data.ball.position.y)
+        ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
+        player_pos = np.array((
+            self.field_data.robots[self.parameters.robot_id].position.x,
+            self.field_data.robots[self.parameters.robot_id].position.y
+        ))
 
-        goal_y_position = np.clip(self.field_data.ball.position.y, -GOAL_LINE_Y, GOAL_LINE_Y)
-        goal_position = (-GOAL_LINE_X, goal_y_position)
-        self.attracting_field.target = goal_position
-        self.action.set_goal(goal_position)
-
+        ball_player = np.linalg.norm(ball_pos - player_pos)
         self.vector_field.update(self.field_data, self.parameters.robot_id)
 
         robot_cmd, action_status = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
 
+        if ball_player > self.distance:
+            return py_trees.common.Status.FAILURE
         if action_status:
             return py_trees.common.Status.SUCCESS
         else:

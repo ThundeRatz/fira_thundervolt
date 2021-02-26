@@ -9,11 +9,8 @@ from thundervolt.vector_fields.combinations import WallField, ObstaclesField, Ta
 
 from thundervolt.vector_fields.plotter import FieldPlotter
 
-GOAL_LINE_X = data.FIELD_LENGTH/2 - data.ROBOT_SIZE*0.8
-GOAL_LINE_Y = data.GOAL_WIDTH/2
-
-class BackToGoal(ExecutionNode):
-    def __init__(self, name, role, field_data, team_command):
+class BackToGoalArea(ExecutionNode):
+    def __init__(self, name, role, field_data, team_command, x_position=-0.5):
 
         """
         Action node to go back to goal
@@ -26,6 +23,7 @@ class BackToGoal(ExecutionNode):
 
         super().__init__(name, role, field_data)
         self.team_command = team_command
+        self.x_position = x_position
 
     def setup(self):
         self.vector_field = VectorField(name="Back to Goal!")
@@ -44,7 +42,7 @@ class BackToGoal(ExecutionNode):
         )
 
         self.attracting_field = RadialField(
-            target = (-GOAL_LINE_X, 0),
+            target = (self.x_position, 0),
             max_radius = 2.0,
             decay_radius = 0.3,
             repelling = False,
@@ -76,7 +74,7 @@ class BackToGoal(ExecutionNode):
                         kp_lin=200.0, ki_lin=0.01, kd_lin=3.0, tolerance_lin=0.10,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
                         saturation_lin=(200*0.2), max_integral_lin=0.5, integral_fade_lin=0.75,
-                        base_speed=300, linear_decay_std_dev=np.pi/6, use_front=False, goal=(-GOAL_LINE_X, 0)
+                        base_speed=100, linear_decay_std_dev=np.pi/6, use_front=False, goal=(self.x_position, 0)
         )
 
     def initialise(self):
@@ -85,8 +83,8 @@ class BackToGoal(ExecutionNode):
     def update(self):
         self.ball_repelling_field.target = (self.field_data.ball.position.x, self.field_data.ball.position.y)
 
-        goal_y_position = np.clip(self.field_data.ball.position.y, -GOAL_LINE_Y, GOAL_LINE_Y)
-        goal_position = (-GOAL_LINE_X, goal_y_position)
+        goal_y_position = self.field_data.ball.position.y
+        goal_position = (self.x_position, goal_y_position)
         self.attracting_field.target = goal_position
         self.action.set_goal(goal_position)
 

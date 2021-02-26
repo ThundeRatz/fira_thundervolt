@@ -29,7 +29,7 @@ class GoodStrikerOrientation(ExecutionNode):
         player_pos = np.zeros(2)
         player_pos[0] = self.field_data.robots[self.parameters.robot_id].position.x
         player_pos[1] = self.field_data.robots[self.parameters.robot_id].position.y
-        player_theta = utils.assert_half_angle(self.field_data.robots[self.parameters.robot_id].theta)
+        player_theta = utils.assert_half_angle(self.field_data.robots[self.parameters.robot_id].position.theta)
         ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
 
         player_ball = ball_pos - player_pos
@@ -72,7 +72,6 @@ class xBallLTd(ExecutionNode):
         else:
             return py_trees.common.Status.FAILURE
     pass
-
 
 class BallDistToGoalLTd(ExecutionNode):
     def __init__(self, name, role, field_data, max_distance):

@@ -6,7 +6,7 @@ from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import TeamCommand
-from thundervolt.behavior_trees.nodes.action.get_ball import GetBall
+from thundervolt.behavior_trees.nodes.action.wait_to_strike import WaitToStrike
 
 
 def main():
@@ -24,8 +24,8 @@ def main():
     bb_client.register_key(key="/striker/robot_id", access=py_trees.common.Access.WRITE)
     bb_client.striker.robot_id = 1
 
-    x_partition = -0.1
-    my_tree = GetBall("Test Node", "/striker", field_data, team_command, x_partition)
+    x_partition = -0.2
+    my_tree = WaitToStrike("Test Node", "/striker", field_data, team_command, x_partition)
 
     my_tree.setup()
 
@@ -36,15 +36,13 @@ def main():
             blue_control.update()
 
             if my_tree.status == py_trees.common.Status.SUCCESS:
-                print("Reach goal!")
-                break
-            if my_tree.status == py_trees.common.Status.FAILURE:
-                print("Failure!")
-                break
+                print('Success!!')
+                #break
 
     except KeyboardInterrupt:
-        blue_control.stop_team()
         my_tree.plot_field()
+    
+    blue_control.stop_team()
 
 
 if __name__ == '__main__':
