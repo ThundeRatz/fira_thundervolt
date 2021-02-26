@@ -6,7 +6,7 @@ from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import TeamCommand
-from thundervolt.behavior_trees.nodes.action.follow_ball_x import FollowBallHorizontal
+from thundervolt.behavior_trees.nodes.action.follow_ball_horizontal import FollowBallHorizontal
 
 
 def main():
