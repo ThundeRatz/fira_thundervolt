@@ -6,13 +6,19 @@ import json
 import os
 
 def main():
+    parser = argparse.ArgumentParser(description='ThunderVolt')
+
+    parser.add_argument('-v', '--verbose', action='store_true', help='Verbose output (optional)')
+
+    args = parser.parse_args()
+
     # Config logging
-    logging.config.fileConfig('logging.conf')
-    log_format_msg = "\r%(asctime)s %(hostname)s %(name)s | %(levelname)s %(message)s"
-    coloredlogs.install(level=logging.DEBUG, fmt=log_format_msg)
+    if args.verbose:
+        logging.config.fileConfig('logging.conf')
+        log_format_msg = "\r%(asctime)s %(hostname)s %(name)s | %(levelname)s %(message)s"
+        coloredlogs.install(level=logging.DEBUG, fmt=log_format_msg)
 
     # Loads config from file
-    parser = argparse.ArgumentParser(description='ThunderVolt')
     parser.add_argument('--config_file', default='config.json')
 
     args = parser.parse_args()
