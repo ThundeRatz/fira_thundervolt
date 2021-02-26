@@ -42,11 +42,11 @@ class Game():
             else:
                 game_state = 'GAME_ON'
 
+            self.vision.update()
+
             # Check if the state has changed, an initialise next state
             if self.last_state != game_state:
                 self._state_initialiser(game_state)
-
-            self.vision.update()
 
             # FSM body
             if game_state == 'GAME_ON':
