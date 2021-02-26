@@ -79,8 +79,6 @@ class GoNearCorner(ExecutionNode):
 
     def update(self):
 
-        # if self.field_data.ball.position.x < -data.FIELD_LENGTH/3:
-        #     self.goal_x = self.field_data.ball.position.x
 
         self.goal_x = np.clip(self.field_data.ball.position.x, -data.FIELD_LENGTH/2, self.limit_dir)
 
