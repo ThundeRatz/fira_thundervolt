@@ -28,7 +28,7 @@ CLOSE_LINE_Y = data.GOAL_AREA_WIDTH/2                               # X Line for
 LINE_X = data.FIELD_LENGTH/2 - 0.8 * data.ROBOT_SIZE                # X Line for follow action node when far from the ball
 SPIN_LINE = LINE_X - data.ROBOT_SIZE/2                              # Max x position the ball can reach before the goalkeeper spins
 
-DEFENDER CORNER_Y = 0.4
+DEFENDER_CORNER_Y = 0.4
 DEFENDER_AREA_X = -data.FIELD_LENGTH/6                              # Minimal x position that the striker can reach
 DEFENDER_LINE = -0.52                                               # Line position that the defender will follow in front of the area
 
@@ -77,7 +77,7 @@ def create_defender_tree(field_data, team_command):
     ball_near_goal_condition = xBallLTd("Ball x in defense goal area", "/defender", field_data, -data.FIELD_LENGTH/2 + data.GOAL_AREA_DEPTH + 0.05)  # plus a 5 cm tolerance
 
     #### Corner node
-    go_near_corner_action = GoNearCorner("Go near corner action", "/defender", field_data, team_command, y_position = DEFENDER CORNER_Y)
+    go_near_corner_action = GoNearCorner("Go near corner action", "/defender", field_data, team_command, y_position = DEFENDER_CORNER_Y)
     ##### After go to corner node
     ###### Spin node
     spin_condition = BallDistToPlayerLTd("Spin Condition", "/defender", field_data, BALL_DIST_TO_PLAYER)
@@ -85,7 +85,7 @@ def create_defender_tree(field_data, team_command):
     spin_node = py_trees.composites.Parallel(name="Spin Node", children=[spin_condition, spin_action])
     ##### Spin node
     ###### Defend corner node
-    defend_corner_action = DefendCorner("Defend corner action", "/defender", field_data, team_command, y_position = DEFENDER CORNER_Y)
+    defend_corner_action = DefendCorner("Defend corner action", "/defender", field_data, team_command, y_position = DEFENDER_CORNER_Y)
     ###### Defend corner node
     after_go_corner_node = py_trees.composites.Selector("After go to corner node", [spin_node, defend_corner_action])
     ##### After go to corner node
