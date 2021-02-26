@@ -40,7 +40,6 @@ class FollowBallVertical(ExecutionNode):
 
     def update(self):
         ball_position = (self.field_data.ball.position.x, self.field_data.ball.position.y)
-
         self.action.set_goal(ball_position)
         robot_cmd, action_status = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
