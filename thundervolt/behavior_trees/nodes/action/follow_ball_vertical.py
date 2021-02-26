@@ -5,6 +5,9 @@ from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.line_action import LineAction
 
+MAX_STUCK_TIME = 5     # Time in seconds
+MIN_ERROR = data.ROBOT_SIZE / 2
+
 class FollowBallVertical(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, x_position=0.0,
                     limit_sup=data.FIELD_WIDTH/2 , limit_inf=-data.FIELD_WIDTH/2):
@@ -40,6 +43,18 @@ class FollowBallVertical(ExecutionNode):
 
     def update(self):
         ball_position = (self.field_data.ball.position.x, self.field_data.ball.position.y)
+
+        if abs(self.field_data.robots[self.parameters.robot_id].position.y) > data.GOAL_WIDTH/2 + data.ROBOT_SIZE or self.field_data.ball.position.x > 0:
+            if self.field_data.ball.position.x > -data.FIELD_LENGTH/2 + data.GOAL_AREA_DEPTH and abs(self.action.controller_lin.prev_error) > MIN_ERROR:
+                if abs(self.action.controller_lin.error_acc/self.action.controller_lin.prev_error) > MAX_STUCK_TIME * 60:
+                    print("Voltando")
+                    ball_position = (0.0, 0.0)
+
+        if (abs(self.action.controller_lin.prev_error) > 0):
+            print(abs(self.action.controller_lin.prev_error), abs(self.action.controller_lin.error_acc/self.action.controller_lin.prev_error))
+        else:
+            print("Error 0")
+
         self.action.set_goal(ball_position)
         robot_cmd, action_status = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
