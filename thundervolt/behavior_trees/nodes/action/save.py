@@ -46,7 +46,6 @@ class SaveGoal(ExecutionNode):
                 if ((ball_time == 0 and abs(self.field_data.ball.position.y) < data.GOAL_AREA_WIDTH/2) or abs(player_to_ball/ball_time) > LIMIT_VELOCITY):
                     goal_point[1] += player_to_ball
                     self.action.controller_lin.kp = 1000.0
-                    print("Dificil", player_to_ball)
                 else:
                     self.action.controller_lin.kp = 350.0
 
