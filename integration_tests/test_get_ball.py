@@ -24,7 +24,8 @@ def main():
     bb_client.register_key(key="/striker/robot_id", access=py_trees.common.Access.WRITE)
     bb_client.striker.robot_id = 1
 
-    my_tree = GetBall("Test Node", "/striker", field_data, team_command)
+    x_partition = -0.1
+    my_tree = GetBall("Test Node", "/striker", field_data, team_command, x_partition)
 
     my_tree.setup()
 
@@ -33,6 +34,13 @@ def main():
             vision.update()
             my_tree.tick_once()
             blue_control.update()
+
+            if my_tree.status == py_trees.common.Status.SUCCESS:
+                print("Reach goal!")
+                break
+            if my_tree.status == py_trees.common.Status.FAILURE:
+                print("Failure!")
+                break
 
     except KeyboardInterrupt:
         blue_control.stop_team()

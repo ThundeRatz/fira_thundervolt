@@ -12,7 +12,7 @@ from thundervolt.vector_fields.plotter import FieldPlotter
 
 
 class GetBall(ExecutionNode):
-    def __init__(self, name, role, field_data, team_command):
+    def __init__(self, name, role, field_data, team_command, x_partition):
         """
         Create an action node to try to get the ball
 
@@ -25,6 +25,8 @@ class GetBall(ExecutionNode):
 
         super().__init__(name, role, field_data)
         self.team_command = team_command
+        self.x_partition = x_partition
+        self.ball_next_pos = None
 
     def setup(self):
         self.vector_field = VectorField(name='Get Ball Field')
@@ -41,8 +43,8 @@ class GetBall(ExecutionNode):
                             multiplier=0.9)
 
         avoid_walls = WallField(
-                        max_dist=0.2,
-                        decay_dist=0.05,
+                        max_dist=0.35,
+                        decay_dist=0.1,
                         multiplier=0.9)
 
         nodes_radius = 0.08
@@ -56,16 +58,16 @@ class GetBall(ExecutionNode):
 
             robot_pos = np.array((field_data.robots[robot_id].position.x, field_data.robots[robot_id].position.y))
             approx_robot_speed = base_speed * data.WHEEL_RADIUS * 0.8
-            ball_next_pos = ball_pos + ball_vel * (np.linalg.norm(robot_pos - ball_pos)) / approx_robot_speed
+            self.ball_next_pos = ball_pos + ball_vel * (np.linalg.norm(robot_pos - ball_pos)) / approx_robot_speed
 
-            ball_next_pos[0] = np.clip(ball_next_pos[0], -data.FIELD_LENGTH/2, data.FIELD_LENGTH/2)
-            ball_next_pos[1] = np.clip(ball_next_pos[1], -data.FIELD_WIDTH/2, data.FIELD_WIDTH/2)
+            self.ball_next_pos[0] = np.clip(self.ball_next_pos[0], -data.FIELD_LENGTH/2, data.FIELD_LENGTH/2)
+            self.ball_next_pos[1] = np.clip(self.ball_next_pos[1], -data.FIELD_WIDTH/2, data.FIELD_WIDTH/2)
 
-            ball_to_goal = np.array((data.FIELD_LENGTH/2, 0)) - ball_next_pos
+            ball_to_goal = np.array((data.FIELD_LENGTH/2, 0)) - self.ball_next_pos
 
             # Check if ball to goal direction leaves enough space for robot positioning
             allowed_direction = utils.versor(ball_to_goal) * (data.BALL_RADIUS + 2 * data.ROBOT_SIZE)
-            dist_to_wall = data.FIELD_WIDTH/2 - abs(ball_next_pos[1])
+            dist_to_wall = data.FIELD_WIDTH/2 - abs(self.ball_next_pos[1])
 
 
             if allowed_direction[1] > 0:
@@ -83,7 +85,7 @@ class GetBall(ExecutionNode):
             if ball_pos[1] > -enable_threshold:
                 field.disable_negative = False
 
-            field.target = ball_next_pos
+            field.target = self.ball_next_pos
             field.direction = allowed_direction
 
         get_ball = OrientedAttractingField(
@@ -112,10 +114,14 @@ class GetBall(ExecutionNode):
         self.action.initialize(self.parameters.robot_id, self.vector_field)
 
     def update(self):
+        player_x = self.field_data.robots[self.parameters.robot_id].position.x
+
         self.vector_field.update(self.field_data, self.parameters.robot_id)
         robot_cmd, action_status = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
 
+        if (player_x > self.ball_next_pos[0]) and (self.ball_next_pos[0] < self.x_partition):
+            return py_trees.common.Status.FAILURE
         if action_status:
             return py_trees.common.Status.SUCCESS
         else:
