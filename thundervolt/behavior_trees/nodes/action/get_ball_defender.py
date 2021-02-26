@@ -123,7 +123,7 @@ class GetBallDefender(ExecutionNode):
             return py_trees.common.Status.SUCCESS
 
         elif self.field_data.ball.position.x < MIN_X_POSITION:
-            return py_trees.common.Status.RUNNING
+            return py_trees.common.Status.FAILURE
 
         return py_trees.common.Status.RUNNING
 
