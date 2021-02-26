@@ -7,7 +7,9 @@ from thundervolt.comm.control import FiraControl
 from thundervolt.core.data import FieldData
 from thundervolt.core.command import TeamCommand
 from thundervolt.behavior_trees.nodes.action.save import SaveGoal
+from thundervolt.core import data
 
+LINE_X = data.FIELD_LENGTH/2 - 0.8 * data.ROBOT_SIZE
 
 def main():
     team_color_yellow = False
@@ -23,7 +25,7 @@ def main():
     bb_client.register_key(key="/goalkeeper/robot_id", access=py_trees.common.Access.WRITE)
     bb_client.goalkeeper.robot_id = 0
 
-    my_tree = SaveGoal("Test Node", "/goalkeeper", field_data, team_command, 3.0)
+    my_tree = SaveGoal("Test Node", "/goalkeeper", field_data, team_command, 3.0, LINE_X, data.GOAL_WIDTH/2)
     my_tree.setup()
 
     try:
