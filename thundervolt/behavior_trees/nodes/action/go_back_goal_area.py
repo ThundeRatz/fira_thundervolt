@@ -90,7 +90,7 @@ class BackToGoalArea(ExecutionNode):
         self.action = FollowFieldAction(
                         kp_ang=7.0, ki_ang=0.005, kd_ang=2.0,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
-                        base_speed=40, linear_decay_std_dev=np.pi/4)
+                        base_speed=30, linear_decay_std_dev=np.pi/4)
 
 
     def initialise(self):
