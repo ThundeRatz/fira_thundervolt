@@ -27,7 +27,7 @@ class GoBehindBall(ExecutionNode):
     def setup(self):
         self.action = FollowFieldAction(kp_ang=6.0, ki_ang=0.0005, kd_ang=2.0,
                         kp_lin=50.0, ki_lin=0.0, kd_lin=3.0, tolerance_lin=0.1,
-                        saturation_ang=(8*np.pi/3), max_integral_ang=0.3, integral_fade_ang=0.5,
+                        saturation_ang=(8*np.pi/3), max_integral_ang=0.01, integral_fade_ang=0.5,
                         saturation_lin=(50*0.2), max_integral_lin=0.5, integral_fade_lin=0.5,
                         use_front = False, linear_decay_std_dev=np.pi/4)
 

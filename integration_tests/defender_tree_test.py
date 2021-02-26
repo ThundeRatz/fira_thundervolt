@@ -30,7 +30,9 @@ def main():
             vision.update()
             print('\nNew Iteration')
             for node in my_tree.tick():
-                print(node.name)
+                pass
+                # print(node.name)
+            print(py_trees.display.ascii_tree(my_tree, show_only_visited=False, show_status=True))
             blue_control.update()
     except KeyboardInterrupt:
         pass
