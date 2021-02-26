@@ -1,4 +1,5 @@
 import socket
+import struct
 from abc import ABC, abstractmethod
 
 class Receiver(ABC):
@@ -18,11 +19,7 @@ class Receiver(ABC):
         self.receiver_port = receiver_port
 
         # Create socket
-        self.receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        self.receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.receiver_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 128)
-        self.receiver_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 1)
-        self.receiver_socket.bind((self.receiver_ip, self.receiver_port))
+        self.receiver_socket = self._create_socket()
 
     @abstractmethod
     def receive(self):
@@ -33,3 +30,32 @@ class Receiver(ABC):
         data, _ = self.receiver_socket.recvfrom(1024)
 
         return data
+
+
+    def _create_socket(self):
+        sock = socket.socket(
+            socket.AF_INET,
+            socket.SOCK_DGRAM,
+            socket.IPPROTO_UDP
+        )
+
+        sock.setsockopt(
+            socket.SOL_SOCKET,
+            socket.SO_REUSEADDR, 1
+        )
+
+        sock.bind((self.receiver_ip, self.receiver_port))
+
+        mreq = struct.pack(
+            "4sl",
+            socket.inet_aton(self.receiver_ip),
+            socket.INADDR_ANY
+        )
+
+        sock.setsockopt(
+            socket.IPPROTO_IP,
+            socket.IP_ADD_MEMBERSHIP,
+            mreq
+        )
+
+        return sock
