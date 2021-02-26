@@ -62,20 +62,24 @@ def create_striker_tree(field_data, team_command):
     strike_condition_one = xPlayerLTxBall("Strike Condition 1", "/striker", field_data)
     strike_condition_two = BallDistToPlayerLTd("Strike Condition 2", "/striker", field_data, BALL_DIST_TO_PLAYER)
     strike_condition_three = GoodStrikerOrientation("Strike Condition 3", "/striker", field_data, np.pi/6, 0.0)
-    strike_action = GoToFoesGoal("Strike Action", "/striker", field_data, team_command)
+    strike_action = GoToFoesGoal("Strike Action", "/striker", field_data, team_command, BALL_DIST_TO_PLAYER)
     strike_parallel = py_trees.composites.Parallel(name="Strike Parallel", children=[
         strike_condition_one, strike_condition_two, strike_condition_three, strike_action
     ])
     root.add_child(strike_parallel)
     
     get_ball_condition_one = xPlayerLTxBall("Get Ball Condition 1", "/striker", field_data)
-    get_ball_condition_two = xBallLTd("Get Ball Condition 2", "/striker", field_data, DEFENDER_AREA_X)
+    get_ball_condition_two = xBallLTd("Get Ball Condition 2", "/striker", field_data, 0.0)
     get_ball_inverter = py_trees.decorators.Inverter(name="Get Ball Inverter", child=get_ball_condition_two)
-    get_ball_action = GetBall("Get Ball Action", "/striker", field_data, team_command)
-    get_ball_parallel = py_trees.composites.Parallel(name="Get Ball Node", children=[get_ball_condition_one, get_ball_inverter, get_ball_action])
+    get_ball_selector = py_trees.composites.Selector(name="Get Ball Selector", children=[
+        get_ball_condition_one, get_ball_inverter
+    ])
+    get_ball_action = GetBall("Get Ball Action", "/striker", field_data, team_command, 0.0)
+    #get_ball_parallel = py_trees.composites.Parallel(name="Get Ball Node", children=[get_ball_condition_one, get_ball_inverter, get_ball_action])
+    get_ball_parallel = py_trees.composites.Parallel(name="Get Ball Node", children=[get_ball_selector, get_ball_action])
     root.add_child(get_ball_parallel)
 
-    wait_to_strike_node = WaitToStrike("Wait to Strike Node", "/striker", field_data, team_command, DEFENDER_AREA_X/2)
+    wait_to_strike_node = WaitToStrike("Wait to Strike Node", "/striker", field_data, team_command, 0.0)
     root.add_child(wait_to_strike_node)
 
     return root
