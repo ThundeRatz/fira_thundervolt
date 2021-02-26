@@ -6,7 +6,6 @@ from thundervolt.core import data
 from thundervolt.actions.line_action import LineAction
 
 LIMIT_VELOCITY = 0.5
-MIN_DIST = data.ROBOT_SIZE
 
 class SaveGoal(ExecutionNode):
     def __init__(self, name, role, field_data, team_command, save_time, goal_line_x, goal_line_y):
