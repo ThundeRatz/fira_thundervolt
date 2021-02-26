@@ -5,7 +5,7 @@ from thundervolt.core.data import EntityData, FieldData
 
 
 def test_entity_from_dict():
-    vision = FiraVision(team_color_yellow=False)
+    vision = FiraVision(False, None, 0, 0)
     entity_dict = {}
 
     entity_dict['x'] = 4
@@ -28,7 +28,7 @@ def test_entity_from_dict():
 
 
 def test_entity_from_dict_with_rotation():
-    vision = FiraVision(team_color_yellow=True)
+    vision = FiraVision(True, None, 0, 0)
     entity_dict = {}
 
     entity_dict['x'] = 5
@@ -51,7 +51,7 @@ def test_entity_from_dict_with_rotation():
 
 
 def test_field_from_dict():
-    vision = FiraVision(team_color_yellow=False)
+    vision = FiraVision(False, None, 0, 0)
 
     field_dict = {
         'ball': {
