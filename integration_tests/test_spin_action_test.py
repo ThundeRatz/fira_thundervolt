@@ -26,7 +26,7 @@ def main():
         blue_control.transmit_robot(TEST_ROBOT, robot_cmd.left_speed, robot_cmd.right_speed)
 
         if action_state == True:
-            logging.debug("Yay finished!\r\n")
+            logging.info("Yay finished!\r\n")
             break
 
     blue_control.transmit_robot(TEST_ROBOT, 0, 0)

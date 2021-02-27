@@ -1,5 +1,6 @@
 import test_base  # pylint: disable=import-error
 import py_trees
+import logging
 
 from thundervolt.comm.vision import FiraVision
 from thundervolt.comm.control import FiraControl
@@ -28,11 +29,11 @@ def main():
     try:
         while True:
             vision.update()
-            print('\nNew Iteration')
+            logging.info('\nNew Iteration')
             for node in my_tree.tick():
                 pass
-                # print(node.name)
-            print(py_trees.display.ascii_tree(my_tree, show_only_visited=False, show_status=True))
+                # logging.info(node.name)
+            logging.info("\n" + py_trees.display.ascii_tree(my_tree, show_only_visited=False, show_status=True))
             blue_control.update()
     except KeyboardInterrupt:
         pass
