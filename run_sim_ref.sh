@@ -2,4 +2,4 @@
 
 xhost +local:docker
 
-docker run --rm --privileged --net=host thunderatz/firasim
+docker run --rm --privileged --net=host thunderatz/firasim:light
