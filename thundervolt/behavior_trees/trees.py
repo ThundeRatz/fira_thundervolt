@@ -30,7 +30,7 @@ SPIN_LINE = LINE_X - data.ROBOT_SIZE/2                              # Max x posi
 
 DEFENDER_CORNER_Y = 0.4
 DEFENDER_AREA_X = -data.FIELD_LENGTH/6                              # Minimal x position that the striker can reach
-DEFENDER_LINE = -0.52                                               # Line position that the defender will follow in front of the area
+DEFENDER_LINE = -0.5                                               # Line position that the defender will follow in front of the area
 
 
 def create_goalkeeper_tree(field_data, team_command):
