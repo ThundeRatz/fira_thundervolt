@@ -6,7 +6,7 @@ from thundervolt.core import data
 from thundervolt.core import utils
 from thundervolt.actions.follow_field_action import FollowFieldAction
 from thundervolt.vector_fields.fields import VectorField, OrientedAttractingField
-from thundervolt.vector_fields.combinations import ObstaclesField, TangentObstaclesField, WallField
+from thundervolt.vector_fields.combinations import ObstaclesField, TangentObstaclesField, WallField, AreaField
 
 from thundervolt.vector_fields.plotter import FieldPlotter
 
@@ -48,6 +48,12 @@ class GetBallDefender(ExecutionNode):
                         max_dist=0.2,
                         decay_dist=0.05,
                         multiplier=0.9)
+
+        area_field = AreaField(
+            max_dist = 0.3,
+            decay_dist = 1.0,
+            multiplier = 1.0,
+        )
 
         nodes_radius = 0.08
         base_speed = 45
@@ -103,6 +109,7 @@ class GetBallDefender(ExecutionNode):
         self.vector_field.add(avoid_obstacles)
         self.vector_field.add(avoid_obstacles_2)
         self.vector_field.add(avoid_walls)
+        self.vector_field.add(area_field)
         self.vector_field.add(get_ball)
 
         self.action = FollowFieldAction(
