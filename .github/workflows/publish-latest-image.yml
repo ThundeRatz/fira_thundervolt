@@ -1,0 +1,24 @@
+name: Publish image to Github Container Registry
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to GitHub Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Build the Docker image
+        run: docker build . -f Dockerfile -t ghcr.io/thunderatz/fira_thundervolt:latest
+
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push Docker image to Github package registry
+        run: docker push ghcr.io/thunderatz/fira_thundervolt:latest
+

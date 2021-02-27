@@ -1,0 +1,12 @@
+{
+    "network" : {
+        "vision_ip": "224.0.0.1",
+        "vision_port": 10002,
+        "referee_ip": "224.5.23.2",
+        "referee_port": 10003,
+        "control_ip": "127.0.0.1",
+        "control_port": 20011
+    },
+    "team_color_yellow" : false,
+    "use_referee": true
+}

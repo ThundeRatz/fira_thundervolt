@@ -1,0 +1,12 @@
+{
+    "network" : {
+        "vision_ip": "VISION_IP",
+        "vision_port": "VISION_PORT",
+        "referee_ip": "REFEREE_IP",
+        "referee_port": "REFEREE_PORT",
+        "control_ip": "CONTROL_IP",
+        "control_port": "CONTROL_PORT"
+    },
+    "team_color_yellow" : "TEAM_COLOR_YELLOW",
+    "use_referee": "USE_REFEREE"
+}
