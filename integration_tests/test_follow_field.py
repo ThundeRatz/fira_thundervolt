@@ -56,7 +56,7 @@ def main():
             blue_control.transmit_robot(TEST_ROBOT, robot_cmd.left_speed, robot_cmd.right_speed)
 
             if action_state == True:
-                logging.debug("Next goal")
+                logging.info("Next goal")
     except KeyboardInterrupt:
         blue_control.transmit_robot(TEST_ROBOT, 0, 0)
 

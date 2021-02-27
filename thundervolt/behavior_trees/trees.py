@@ -95,7 +95,7 @@ def create_defender_tree(field_data, team_command):
     ### Ball near goal node
 
     ### Get ball node
-    ball_x_lt_limit_striker_condition = xBallLTd("Ball x less than limit striker", "/defender", field_data, d_position = DEFENDER_AREA_X)
+    ball_x_lt_limit_striker_condition = xBallLTd("Ball x less than limit striker", "/defender", field_data, d_position = 0.0)
     get_ball_action = GetBallDefender("Get ball action", "/defender", field_data, team_command, min_position = DEFENDER_LINE - 0.05) # minus a 5 cm tolerance
     get_ball_node = py_trees.composites.Parallel("Get ball node", children=[ball_x_lt_limit_striker_condition, get_ball_action])
     ### Get ball node

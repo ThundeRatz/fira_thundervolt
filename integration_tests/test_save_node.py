@@ -33,7 +33,7 @@ def main():
             vision.update()
             my_tree.tick_once()
             if my_tree.status == py_trees.common.Status.SUCCESS:
-                logging.debug('Success!!')
+                logging.info('Success!!')
             elif my_tree.status == py_trees.common.Status.FAILURE:
                 blue_control.stop_team()
             else:
