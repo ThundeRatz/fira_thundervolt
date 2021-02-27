@@ -67,10 +67,6 @@ class Coach(object):
 
 
     def update(self):
-        if self._defender_striker_swap_condition():
-            self.defender_bt.stop()
-            self.striker_bt.stop()
-
         self.goalkeeper_bt.tick_once()
         self.defender_bt.tick_once()
         self.striker_bt.tick_once()
@@ -86,20 +82,3 @@ class Coach(object):
         indexes.sort(key=lambda i: distance[i])
 
         return tuple(indexes)
-
-
-    def _defender_striker_swap_condition(self):
-        ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
-        defender_pos = np.array((self.field_data.robots[self.defender_id].position.x, self.field_data.robots[self.defender_id].position.y))
-        striker_pos = np.array((self.field_data.robots[self.striker_id].position.x, self.field_data.robots[self.striker_id].position.y))
-
-        if ball_pos[0] > 0.0:
-            if defender_pos[0] < ball_pos[0] < striker_pos[0]:
-                logging.info(f"Swap!")
-                (self.defender_id, self.striker_id) = (self.striker_id, self.defender_id)
-                self.bb_client.defender.robot_id = self.defender_id
-                self.bb_client.striker.robot_id = self.striker_id
-                return True
-
-        return False
-
