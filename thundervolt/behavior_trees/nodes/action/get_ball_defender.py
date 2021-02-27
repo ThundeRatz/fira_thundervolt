@@ -37,12 +37,12 @@ class GetBallDefender(ExecutionNode):
                             radius = 1.5,
                             max_radius = 0.25,
                             decay_radius = 0.1,
-                            multiplier = 1.0)
+                            multiplier = 0.9)
 
         avoid_obstacles_2 = ObstaclesField(
                             max_radius=0.15,
                             decay_radius=0.05,
-                            multiplier=0.9)
+                            multiplier=0.8)
 
         avoid_walls = WallField(
                         max_dist=0.2,

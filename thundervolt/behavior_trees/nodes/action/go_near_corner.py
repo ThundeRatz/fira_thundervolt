@@ -49,7 +49,7 @@ class GoNearCorner(ExecutionNode):
         repell_field = combinations.ObstaclesField(
             max_radius = 0.2,
             decay_radius = 0.1,
-            multiplier = 1,
+            multiplier = 0.8,
         )
 
         area_field = combinations.AreaField(
