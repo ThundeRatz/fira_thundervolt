@@ -4,13 +4,16 @@ import py_trees
 from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.actions.follow_field_action import FollowFieldAction
-from thundervolt.vector_fields.fields import VectorField, RadialField
+from thundervolt.vector_fields.fields import VectorField, RadialField, LineField, OrientedAttractingField
 from thundervolt.vector_fields.combinations import WallField, ObstaclesField, TangentObstaclesField
 
 from thundervolt.vector_fields.plotter import FieldPlotter
 
+X_DIRECTION_TOLERANCE = 0.05
+Y_DIRECTION_TOLERANCE = 0.15
+
 class BackToGoalArea(ExecutionNode):
-    def __init__(self, name, role, field_data, team_command, x_position=-0.5):
+    def __init__(self, name, role, field_data, team_command, x_position=-0.55):
 
         """
         Action node to go back to goal
@@ -28,25 +31,39 @@ class BackToGoalArea(ExecutionNode):
     def setup(self):
         self.vector_field = VectorField(name="Back to Goal!")
 
+        avoid_area = LineField(
+            target = (-data.FIELD_LENGTH / 2, 0),
+            theta = -np.pi / 2,
+            size = data.GOAL_AREA_WIDTH / 2 + 0.1,
+            only_forward = False,
+            side = 'negative',
+            repelling = True,
+            max_dist = 0.25,
+            decay_dist = 0.01,
+            multiplier = 0.5,
+        )
+
         repelling_field = ObstaclesField(
             max_radius = 0.17,
-            decay_radius = 0.08,
-            multiplier = 0.9
+            decay_radius = 0.1,
+            multiplier = 1.0
         )
 
         avoid_obstacles = TangentObstaclesField(
-                            radius = 0.7,
-                            max_radius = 0.3,
-                            decay_radius = 0.08,
-                            multiplier = 1.2
+                            radius = 1.5,
+                            max_radius = 0.25,
+                            decay_radius = 0.1,
+                            multiplier = 1.0
         )
 
-        self.attracting_field = RadialField(
+        self.attracting_field = OrientedAttractingField(
             target = (self.x_position, 0),
+            direction=(0,1),
+            nodes_radius = 0.1,
+            damping = 1/250,
             max_radius = 2.0,
-            decay_radius = 0.3,
-            repelling = False,
-            multiplier=1.0
+            decay_radius = 0.01,
+            multiplier = 1.0
         )
 
         self.ball_repelling_field = RadialField(
@@ -54,7 +71,7 @@ class BackToGoalArea(ExecutionNode):
             max_radius = 0.25,
             decay_radius = 0.03,
             repelling = True,
-            multiplier = 0.8
+            multiplier = 0.9
         )
 
         avoid_walls = WallField(
@@ -66,27 +83,35 @@ class BackToGoalArea(ExecutionNode):
         self.vector_field.add(self.attracting_field)
         self.vector_field.add(repelling_field)
         self.vector_field.add(avoid_obstacles)
+        self.vector_field.add(avoid_area)
         self.vector_field.add(avoid_walls)
         self.vector_field.add(self.ball_repelling_field)
 
         self.action = FollowFieldAction(
-                        kp_ang=9.0, ki_ang=0.009, kd_ang=2.5,
-                        kp_lin=200.0, ki_lin=0.01, kd_lin=3.0, tolerance_lin=0.10,
+                        kp_ang=7.0, ki_ang=0.005, kd_ang=2.0,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
-                        saturation_lin=(200*0.2), max_integral_lin=0.5, integral_fade_lin=0.75,
-                        base_speed=100, linear_decay_std_dev=np.pi/6, use_front=False, goal=(self.x_position, 0)
-        )
+                        base_speed=30, linear_decay_std_dev=np.pi/4)
+
 
     def initialise(self):
         self.action.initialize(self.parameters.robot_id, self.vector_field)
 
     def update(self):
-        self.ball_repelling_field.target = (self.field_data.ball.position.x, self.field_data.ball.position.y)
+        ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
+        robot_pos = np.array((self.field_data.robots[self.parameters.robot_id].position.x, self.field_data.robots[self.parameters.robot_id].position.y))
 
-        goal_y_position = self.field_data.ball.position.y
-        goal_position = (self.x_position, goal_y_position)
+        if abs(robot_pos[0] - self.x_position) < X_DIRECTION_TOLERANCE and abs(robot_pos[1] - ball_pos[1]) < Y_DIRECTION_TOLERANCE:
+            return py_trees.common.Status.SUCCESS
+
+        self.ball_repelling_field.target = ball_pos
+
+        goal_position = (self.x_position, ball_pos[1])
         self.attracting_field.target = goal_position
-        self.action.set_goal(goal_position)
+        # self.action.set_goal(goal_position)
+        if self.field_data.robots[self.parameters.robot_id].position.y > ball_pos[1]:
+            self.attracting_field.direction = (0,-1)
+        else:
+            self.attracting_field.direction = (0,1)
 
         self.vector_field.update(self.field_data, self.parameters.robot_id)
 

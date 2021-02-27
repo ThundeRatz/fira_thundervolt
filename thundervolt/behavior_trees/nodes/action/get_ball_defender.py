@@ -10,11 +10,9 @@ from thundervolt.vector_fields.combinations import ObstaclesField, TangentObstac
 
 from thundervolt.vector_fields.plotter import FieldPlotter
 
-MAX_X_POSITION = 0.15
-MIN_X_POSITION = -0.5
 
 class GetBallDefender(ExecutionNode):
-    def __init__(self, name, role, field_data, team_command):
+    def __init__(self, name, role, field_data, team_command, max_position = 0.15, min_position = -0.5):
         """
         Create an action node to try to get the ball
         Terminates when ball reaches attack field
@@ -28,6 +26,9 @@ class GetBallDefender(ExecutionNode):
 
         super().__init__(name, role, field_data)
         self.team_command = team_command
+
+        self.max_position = max_position
+        self.min_position = min_position
 
     def setup(self):
         self.vector_field = VectorField(name='Get Ball Field')
@@ -119,10 +120,10 @@ class GetBallDefender(ExecutionNode):
         robot_cmd, action_status = self.action.update(self.field_data)
         self.team_command.commands[self.parameters.robot_id] = robot_cmd
 
-        if self.field_data.ball.position.x > MAX_X_POSITION:
+        if self.field_data.ball.position.x > self.max_position:
             return py_trees.common.Status.SUCCESS
 
-        elif self.field_data.ball.position.x < MIN_X_POSITION:
+        elif self.field_data.ball.position.x < self.min_position:
             return py_trees.common.Status.FAILURE
 
         return py_trees.common.Status.RUNNING
