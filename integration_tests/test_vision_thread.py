@@ -18,7 +18,7 @@ def main():
             print(test_field_data)
             time.sleep(1)
     except KeyboardInterrupt:
-        logging.debug("Ending")
+        logging.info("Ending")
 
 
 if __name__ == '__main__':

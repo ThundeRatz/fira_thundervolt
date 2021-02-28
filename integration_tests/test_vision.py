@@ -16,7 +16,7 @@ def main():
             # Acess test
             print(f"\r\nPosição z da bola: {vision_data['ball']['z']}\r\n")
     except KeyboardInterrupt:
-        logging.debug("Ending")
+        logging.info("Ending")
 
 
 if __name__ == '__main__':

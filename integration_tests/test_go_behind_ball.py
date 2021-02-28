@@ -34,7 +34,7 @@ def main():
             my_tree.tick_once()
             blue_control.update()
             if my_tree.status == py_trees.common.Status.SUCCESS:
-                logging.debug("End")
+                logging.info("End")
                 break
 
     except KeyboardInterrupt:

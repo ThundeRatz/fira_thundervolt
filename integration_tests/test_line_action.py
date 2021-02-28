@@ -35,7 +35,7 @@ def main():
             goal[0] = vision_data.ball.position.x
             goal[1] = vision_data.ball.position.y
             action.set_goal(goal)
-            logging.debug("Next Goal")
+            logging.info("Next Goal")
 
         blue_control.transmit_robot(TEST_ROBOT, robot_cmd.left_speed, robot_cmd.right_speed)
 
