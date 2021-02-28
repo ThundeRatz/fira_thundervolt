@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import random
 
 from .core.utils import vectors_angle
 from .comm.vision import FiraVision
@@ -22,16 +23,16 @@ class Game():
         control_port = int(config['network']['control_port'])
         replacer_ip = config['network']['replacer_ip']
         replacer_port = int(config['network']['replacer_port'])
-        team_color_yellow = bool(int(config['team_color_yellow']))
+        self.team_color_yellow = bool(int(config['team_color_yellow']))
         self.use_referee = bool(int(config['use_referee']))
 
         self.field_data = FieldData()
         self.team_command = TeamCommand()
 
-        self.vision = FiraVision(team_color_yellow, self.field_data, vision_ip, vision_port)
-        self.control = FiraControl(team_color_yellow, self.team_command, control_ip, control_port)
+        self.vision = FiraVision(self.team_color_yellow, self.field_data, vision_ip, vision_port)
+        self.control = FiraControl(self.team_color_yellow, self.team_command, control_ip, control_port)
         self.referee = RefereeComm(referee_ip, referee_port)
-        self.replacer = ReplacerComm(team_color_yellow, replacer_ip, replacer_port)
+        self.replacer = ReplacerComm(self.team_color_yellow, replacer_ip, replacer_port)
 
         self.coach = Coach(self.field_data, self.team_command)
         self.coach.setup()
@@ -45,7 +46,9 @@ class Game():
         while True:
             # Check if it should respond to referees commands
             if self.use_referee:
-                game_state = self.referee.receive().get('foul', 'STOP')
+                referee_data = self.referee.receive()
+                game_state = referee_data.get('foul', 'STOP')
+                team_color = referee_data.get('teamcolor')
             else:
                 game_state = 'GAME_ON'
 
@@ -53,7 +56,7 @@ class Game():
 
             # Check if the state has changed, an initialise next state
             if self.last_state != game_state:
-                self._state_initialiser(game_state)
+                self._state_initialiser(game_state, team_color)
 
             # FSM body
             if game_state == 'GAME_ON':
@@ -67,21 +70,30 @@ class Game():
                 self.team_command.reset()
 
 
-    def _state_initialiser(self, state):
+    def _state_initialiser(self, state, team_color):
         if state == 'GAME_ON':
             if self.last_state != 'HALT':
                 self.coach.initialise()
         elif state == 'PENALTY_KICK':
-            robot_place = data.EntityData()
-            robot_place.position.x = data.FIELD_LENGTH/4 - data.ROBOT_SIZE * 1.2
-            robot_place.position.y = - data.ROBOT_SIZE * 0.3
+            if not ((team_color == 'YELLOW') ^ (self.team_color_yellow)):
+                y_signal = -1 if random.randint(0, 1) == 0 else 1
+                x_signal = -1 if team_color == 'YELLOW' else 1
 
-            ball_entrypoint = np.array([data.FIELD_LENGTH/2, data.GOAL_WIDTH/2 - data.BALL_RADIUS * 2.6])
-            kick_angle = vectors_angle(ball_entrypoint - np.array([robot_place.position.x, robot_place.position.y])) * 180 / np.pi
+                robot_place = data.EntityData()
+                robot_place.position.x = x_signal * (data.FIELD_LENGTH/4 - data.ROBOT_SIZE * 1.2)
+                robot_place.position.y = y_signal * data.ROBOT_SIZE * 0.3
 
-            robot_place.position.theta = kick_angle
-            kicker_id = 0
-            self.replacer.place_team([(robot_place, kicker_id)])
+                ball_entry_point = np.array([
+                    x_signal * (data.FIELD_LENGTH/2),
+                    -y_signal * (data.GOAL_WIDTH/2 - data.BALL_RADIUS * 2.6)
+                ])
+
+                kick_angle = vectors_angle(ball_entry_point - np.array([robot_place.position.x, robot_place.position.y])) * 180 / np.pi
+                robot_place.position.theta = kick_angle
+
+                kicker_id = 0
+
+                self.replacer.place_team([(robot_place, kicker_id)])
         else:
             pass
 
