@@ -38,6 +38,7 @@ class Game():
         self.coach.setup()
 
         self.last_state = 'STOP'
+        self.defend_penalty = False
 
 
     def run(self):
@@ -72,8 +73,9 @@ class Game():
 
     def _state_initialiser(self, state, team_color):
         if state == 'GAME_ON':
-            if self.last_state == 'PENALTY_KICK' and ((team_color == 'YELLOW') ^ (self.team_color_yellow)):
+            if self.defend_penalty:
                 self.coach.initialise_penalti_defense()
+                self.defend_penalty = False
             elif self.last_state != 'HALT':
                 self.coach.initialise()
         elif state == 'PENALTY_KICK':
@@ -120,6 +122,8 @@ class Game():
                 replacement_list.append((assistent_place, assistent_id))
 
                 self.replacer.place_team(replacement_list)
+            else:
+                self.defend_penalty = True
         else:
             pass
 
