@@ -5,7 +5,9 @@
         "referee_ip": "REFEREE_IP",
         "referee_port": "REFEREE_PORT",
         "control_ip": "CONTROL_IP",
-        "control_port": "CONTROL_PORT"
+        "control_port": "CONTROL_PORT",
+        "replacer_ip": "REPLACER_IP",
+        "replacer_port": "REPLACER_PORT"
     },
     "team_color_yellow" : "TEAM_COLOR_YELLOW",
     "use_referee": "USE_REFEREE"
