@@ -30,7 +30,7 @@ class Coach(object):
 
 
     def initialise(self):
-         """
+        """
         Calculate robots roles when the game starts
         """
 
