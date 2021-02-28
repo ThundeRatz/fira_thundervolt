@@ -3,6 +3,7 @@ import py_trees
 
 from ..execution_node import ExecutionNode
 from thundervolt.core import data
+from thundervolt.vector_fields.plotter import FieldPlotter
 from thundervolt.vector_fields import fields, combinations
 from thundervolt.actions.follow_field_action import FollowFieldAction
 
@@ -49,7 +50,7 @@ class GoNearCorner(ExecutionNode):
         repell_field = combinations.ObstaclesField(
             max_radius = 0.2,
             decay_radius = 0.1,
-            multiplier = 1,
+            multiplier = 0.8,
         )
 
         area_field = combinations.AreaField(
@@ -97,3 +98,8 @@ class GoNearCorner(ExecutionNode):
 
     def terminate(self, new_status):
         pass
+
+    def plot_field(self):
+        self.vector_field.update(self.field_data, self.parameters.robot_id)
+        my_plotter = FieldPlotter('Go near corner Field')
+        my_plotter.plot(self.vector_field)

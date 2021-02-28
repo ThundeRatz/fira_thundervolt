@@ -46,14 +46,14 @@ class BackToGoalArea(ExecutionNode):
         repelling_field = ObstaclesField(
             max_radius = 0.17,
             decay_radius = 0.1,
-            multiplier = 1.0
+            multiplier = 0.9
         )
 
         avoid_obstacles = TangentObstaclesField(
                             radius = 1.5,
                             max_radius = 0.25,
                             decay_radius = 0.1,
-                            multiplier = 1.0
+                            multiplier = 0.8
         )
 
         self.attracting_field = OrientedAttractingField(

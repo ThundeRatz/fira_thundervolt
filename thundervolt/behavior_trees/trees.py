@@ -29,7 +29,7 @@ LINE_X = data.FIELD_LENGTH/2 - 0.8 * data.ROBOT_SIZE                # X Line for
 SPIN_LINE = LINE_X - data.ROBOT_SIZE/2                              # Max x position the ball can reach before the goalkeeper spins
 
 DEFENDER_CORNER_Y = 0.4
-DEFENDER_AREA_X = -data.FIELD_LENGTH/6                              # Minimal x position that the striker can reach
+DEFENDER_AREA_X = -data.FIELD_LENGTH/3                             # Minimal x position that the striker can reach
 DEFENDER_LINE = -0.5                                               # Line position that the defender will follow in front of the area
 
 
@@ -95,8 +95,8 @@ def create_defender_tree(field_data, team_command):
     ### Ball near goal node
 
     ### Get ball node
-    ball_x_lt_limit_striker_condition = xBallLTd("Ball x less than limit striker", "/defender", field_data, d_position = 0.0)
-    get_ball_action = GetBallDefender("Get ball action", "/defender", field_data, team_command, min_position = DEFENDER_LINE - 0.05) # minus a 5 cm tolerance
+    ball_x_lt_limit_striker_condition = xBallLTd("Ball x less than limit striker", "/defender", field_data, d_position = 0.25)
+    get_ball_action = GetBallDefender("Get ball action", "/defender", field_data, team_command, max_position= data.FIELD_LENGTH/4, min_position = DEFENDER_LINE - 0.05) # minus a 5 cm tolerance
     get_ball_node = py_trees.composites.Parallel("Get ball node", children=[ball_x_lt_limit_striker_condition, get_ball_action])
     ### Get ball node
 
