@@ -62,6 +62,39 @@ class Coach(object):
         logging.info(f"Striker: {self.striker_id}")
 
 
+    def initialise_penalti_defense(self):
+        """
+        Calculate robots roles when the game starts
+        """
+
+        ball_pos = np.array((self.field_data.ball.position.x, self.field_data.ball.position.y))
+        goal_pos = np.array((-data.FIELD_LENGTH / 2, 0))
+
+        closer_to_ball = self._ordered_closest_robots_to_point(ball_pos)
+        closer_to_goal = self._ordered_closest_robots_to_point(goal_pos)
+
+        self.goalkeeper_id = closer_to_goal[0]
+
+        if closer_to_ball[0] != self.goalkeeper_id:
+            self.striker_id = closer_to_ball[0]
+        else:
+            self.striker_id = closer_to_ball[1]
+
+        self.defender_id = closer_to_goal[1]
+        if self.defender_id == self.striker_id:
+            self.defender_id = closer_to_goal[2]
+
+        self.bb_client.goalkeeper.robot_id = self.goalkeeper_id
+        self.bb_client.defender.robot_id = self.defender_id
+        self.bb_client.striker.robot_id = self.striker_id
+
+        self._create_trees()
+
+        logging.info(f"Goalkeeper: {self.goalkeeper_id}")
+        logging.info(f"Defender: {self.defender_id}")
+        logging.info(f"Striker: {self.striker_id}")
+
+
     def update(self):
         if self._defender_striker_swap_condition():
             self._create_trees()

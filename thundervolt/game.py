@@ -72,7 +72,9 @@ class Game():
 
     def _state_initialiser(self, state, team_color):
         if state == 'GAME_ON':
-            if self.last_state != 'HALT':
+            if self.last_state == 'PENALTY_KICK' and ((team_color == 'YELLOW') ^ (self.team_color_yellow)):
+                self.coach.initialise_penalti_defense()
+            elif self.last_state != 'HALT':
                 self.coach.initialise()
         elif state == 'PENALTY_KICK':
             if not ((team_color == 'YELLOW') ^ (self.team_color_yellow)):
