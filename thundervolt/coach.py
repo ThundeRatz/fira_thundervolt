@@ -40,16 +40,16 @@ class Coach(object):
         closer_to_ball = self._ordered_closest_robots_to_point(ball_pos)
         closer_to_goal = self._ordered_closest_robots_to_point(goal_pos)
 
-        self.striker_id = closer_to_ball[0]
+        self.goalkeeper_id = closer_to_goal[0]
 
-        if closer_to_goal[0] != self.striker_id:
-            self.goalkeeper_id = closer_to_goal[0]
+        if closer_to_ball[0] != self.goalkeeper_id:
+            self.striker_id = closer_to_ball[0]
         else:
-            self.goalkeeper_id = closer_to_goal[1]
+            self.striker_id = closer_to_ball[1]
 
-        self.defender_id = closer_to_ball[1]
-        if self.defender_id == self.goalkeeper_id:
-            self.defender_id = closer_to_ball[2]
+        self.defender_id = closer_to_goal[1]
+        if self.defender_id == self.striker_id:
+            self.defender_id = closer_to_goal[2]
 
         self.bb_client.goalkeeper.robot_id = self.goalkeeper_id
         self.bb_client.defender.robot_id = self.defender_id
@@ -91,21 +91,23 @@ class Coach(object):
         swap = False
         # First swap condition
         if (ball_pos[0] - defender_pos[0] > data.ROBOT_SIZE / 2) and (defender_pos[0] - striker_pos[0] > data.ROBOT_SIZE / 2) \
-            and (abs(ball_pos[1] - defender_pos[1]) < data.ROBOT_SIZE):
+                and (abs(ball_pos[1] - defender_pos[1]) < data.ROBOT_SIZE):
             swap = True
 
         # Second swap condition
         if 0 < ball_pos[0] < data.FIELD_LENGTH / 2 - data.GOAL_AREA_DEPTH * 1.25:
             if (striker_pos[0] - ball_pos[0] > data.ROBOT_SIZE / 2) and (ball_pos[0] - defender_pos[0] > data.ROBOT_SIZE / 2) \
-                and (abs(ball_pos[1] - defender_pos[1]) < data.ROBOT_SIZE):
+                    and (abs(ball_pos[1] - defender_pos[1]) < data.ROBOT_SIZE):
                 swap = True
 
-        # Third swap condition
-        # Can't use yet, causing instability with first swap condition
-        # if ball_pos[0] > data.FIELD_LENGTH / 8:
-        #     if (ball_pos[0] - defender_pos[0] > data.ROBOT_SIZE / 2) and (abs(striker_pos[1]) > data.FIELD_WIDTH / 3) and \
-        #         (abs(defender_pos[1]) < data.GOAL_WIDTH / 2) and (abs(ball_pos[1] < data.GOAL_WIDTH / 2)):
-        #         swap = True
+        if ball_pos[0] > data.FIELD_LENGTH / 8:
+            if (ball_pos[0] - defender_pos[0] > data.ROBOT_SIZE / 2) and (abs(striker_pos[1]) > data.GOAL_AREA_WIDTH / 2) and \
+                    (abs(defender_pos[1]) < data.GOAL_WIDTH / 2) and (abs(ball_pos[1] < data.GOAL_WIDTH / 2)) \
+                    and (abs(ball_pos[1] - defender_pos[1]) < data.ROBOT_SIZE):
+                swap = True
+
+        if (striker_pos[0] - defender_pos[0] > data.ROBOT_SIZE / 2) and (defender_pos[0] - ball_pos[0] > data.ROBOT_SIZE / 2):
+            swap = True
 
         if swap:
             logging.info(f"Swap!")

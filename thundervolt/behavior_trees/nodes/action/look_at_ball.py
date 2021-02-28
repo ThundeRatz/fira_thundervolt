@@ -48,6 +48,9 @@ class LookAtBall(ExecutionNode):
 
         if action_status:
             return py_trees.common.Status.SUCCESS
+        elif (ball_position[0] - robot_position[0] < data.ROBOT_SIZE) or \
+                (abs(robot_position[1] - ball_position[1]) > data.ROBOT_SIZE):
+            return py_trees.common.Status.FAILURE
         else:
             return py_trees.common.Status.RUNNING
 

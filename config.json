@@ -5,7 +5,9 @@
         "referee_ip": "224.5.23.2",
         "referee_port": 10003,
         "control_ip": "127.0.0.1",
-        "control_port": 20011
+        "control_port": 20011,
+        "replacer_ip": "224.5.23.2",
+        "replacer_port": 10004
     },
     "team_color_yellow" : false,
     "use_referee": true
