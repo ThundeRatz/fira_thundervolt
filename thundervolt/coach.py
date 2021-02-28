@@ -40,16 +40,16 @@ class Coach(object):
         closer_to_ball = self._ordered_closest_robots_to_point(ball_pos)
         closer_to_goal = self._ordered_closest_robots_to_point(goal_pos)
 
-        self.defender_id = closer_to_ball[0]
+        self.striker_id = closer_to_ball[0]
 
-        if closer_to_goal[0] != self.defender_id:
+        if closer_to_goal[0] != self.striker_id:
             self.goalkeeper_id = closer_to_goal[0]
         else:
             self.goalkeeper_id = closer_to_goal[1]
 
-        self.striker_id = closer_to_ball[1]
-        if self.striker_id == self.goalkeeper_id:
-            self.striker_id = closer_to_ball[2]
+        self.defender_id = closer_to_ball[1]
+        if self.defender_id == self.goalkeeper_id:
+            self.defender_id = closer_to_ball[2]
 
         self.bb_client.goalkeeper.robot_id = self.goalkeeper_id
         self.bb_client.defender.robot_id = self.defender_id
