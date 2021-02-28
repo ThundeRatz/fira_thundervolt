@@ -38,7 +38,7 @@ def main():
                 break
 
     except KeyboardInterrupt:
-        team_command.reset()
+        my_tree.plot_field()
 
     blue_control.stop_team()
 

@@ -89,8 +89,23 @@ class Coach(object):
         striker_pos = np.array((self.field_data.robots[self.striker_id].position.x, self.field_data.robots[self.striker_id].position.y))
 
         swap = False
-        if (ball_pos[0] - defender_pos[0] > data.ROBOT_SIZE / 2) and (defender_pos[0] - striker_pos[0] > data.ROBOT_SIZE / 2):
+        # First swap condition
+        if (ball_pos[0] - defender_pos[0] > data.ROBOT_SIZE / 2) and (defender_pos[0] - striker_pos[0] > data.ROBOT_SIZE / 2) \
+            and (abs(ball_pos[1] - defender_pos[1]) < data.ROBOT_SIZE):
             swap = True
+
+        # Second swap condition
+        if 0 < ball_pos[0] < data.FIELD_LENGTH / 2 - data.GOAL_AREA_DEPTH * 1.25:
+            if (striker_pos[0] - ball_pos[0] > data.ROBOT_SIZE / 2) and (ball_pos[0] - defender_pos[0] > data.ROBOT_SIZE / 2) \
+                and (abs(ball_pos[1] - defender_pos[1]) < data.ROBOT_SIZE):
+                swap = True
+
+        # Third swap condition
+        # Can't use yet, causing instability with first swap condition
+        # if ball_pos[0] > data.FIELD_LENGTH / 8:
+        #     if (ball_pos[0] - defender_pos[0] > data.ROBOT_SIZE / 2) and (abs(striker_pos[1]) > data.FIELD_WIDTH / 3) and \
+        #         (abs(defender_pos[1]) < data.GOAL_WIDTH / 2) and (abs(ball_pos[1] < data.GOAL_WIDTH / 2)):
+        #         swap = True
 
         if swap:
             logging.info(f"Swap!")
