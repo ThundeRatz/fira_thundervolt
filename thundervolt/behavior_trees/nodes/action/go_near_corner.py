@@ -53,16 +53,19 @@ class GoNearCorner(ExecutionNode):
             multiplier = 0.8,
         )
 
-        area_field = combinations.AreaField(
-            max_dist = 0.3,
-            decay_dist = 1.0,
-            multiplier = 3.5,
-        )
+        avoid_area = fields.LineField(
+                        target = -data.FIELD_LENGTH/2 - data.GOAL_DEPTH,
+                        theta = np.pi/2,
+                        size = data.GOAL_AREA_WIDTH/2,
+                        repelling = True,
+                        max_dist = data.GOAL_DEPTH + data.GOAL_AREA_DEPTH + data.ROBOT_SIZE,
+                        decay_dist = data.GOAL_DEPTH + data.GOAL_AREA_DEPTH,
+                        multiplier = 1)
 
         self.vector_field = fields.VectorField()
         self.vector_field.add(repell_field)
         self.vector_field.add(self.attract_field)
-        self.vector_field.add(area_field)
+        self.vector_field.add(avoid_area)
 
 
     def initialise(self):
