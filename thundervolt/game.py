@@ -79,21 +79,45 @@ class Game():
                 y_signal = -1 if random.randint(0, 1) == 0 else 1
                 x_signal = -1 if team_color == 'YELLOW' else 1
 
-                robot_place = data.EntityData()
-                robot_place.position.x = x_signal * (data.FIELD_LENGTH/4 - data.ROBOT_SIZE * 1.2)
-                robot_place.position.y = y_signal * data.ROBOT_SIZE * 0.3
+                replacement_list = []
+
+                # Penalty kicker
+                kicker_id = 0
+                kicker_place = data.EntityData()
+                kicker_place.position.x = x_signal * (data.FIELD_LENGTH/4 - data.ROBOT_SIZE * 1.2)
+                kicker_place.position.y = y_signal * data.ROBOT_SIZE * 0.3
 
                 ball_entry_point = np.array([
                     x_signal * (data.FIELD_LENGTH/2),
                     -y_signal * (data.GOAL_WIDTH/2 - data.BALL_RADIUS * 2.6)
                 ])
 
-                kick_angle = vectors_angle(ball_entry_point - np.array([robot_place.position.x, robot_place.position.y])) * 180 / np.pi
-                robot_place.position.theta = kick_angle
+                kick_angle = vectors_angle(ball_entry_point - np.array([kicker_place.position.x, kicker_place.position.y])) * 180 / np.pi
+                kicker_place.position.theta = kick_angle
 
-                kicker_id = 0
+                replacement_list.append((kicker_place, kicker_id))
 
-                self.replacer.place_team([(robot_place, kicker_id)])
+                # Goalkeeper
+                goalkeeper_id = 1
+                goalkeeper_place = data.EntityData()
+                goalkeeper_place.position.x = -x_signal * data.FIELD_LENGTH/2
+                goalkeeper_place.position.y = y_signal * 0
+                goalkeeper_place.position.theta = 90
+
+                replacement_list.append((goalkeeper_place, goalkeeper_id))
+
+                # Assistent
+                assistent_id = 2
+                assistent_place = data.EntityData()
+                assistent_place.position.x = -x_signal * data.ROBOT_SIZE * 1.5
+                assistent_place.position.y = -y_signal * (data.FIELD_WIDTH/2 - 0.125)
+
+                assistent_angle = vectors_angle(ball_entry_point - np.array([assistent_place.position.x, assistent_place.position.y])) * 180 / np.pi
+                assistent_place.position.theta = assistent_angle
+
+                replacement_list.append((assistent_place, assistent_id))
+
+                self.replacer.place_team(replacement_list)
         else:
             pass
 
