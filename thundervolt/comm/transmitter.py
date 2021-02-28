@@ -30,4 +30,4 @@ class Transmitter(ABC):
 
         data = packet.SerializeToString()
 
-        self.transmitter_socket.sendto(data,(self.transmitter_ip, self.transmitter_port))
+        self.transmitter_socket.sendto(data, (self.transmitter_ip, self.transmitter_port))
