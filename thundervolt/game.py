@@ -50,7 +50,7 @@ class Game():
                 game_state = referee_data.get('foul', 'STOP')
                 team_color = referee_data.get('teamcolor')
             else:
-                team_color = referee_data.get('NONE')
+                team_color = 'NONE'
                 game_state = 'GAME_ON'
 
             self.vision.update()
