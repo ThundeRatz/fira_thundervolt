@@ -57,14 +57,11 @@ class GoToFoesGoal(ExecutionNode):
         self.vector_field.add(repelling_field)
         self.vector_field.add(avoid_obstacles)
         self.vector_field.add(avoid_walls)
-        #self.vector_field.add(goal_line_field)
 
         self.action = FollowFieldAction(
                         kp_ang=9.0, ki_ang=0.009, kd_ang=2.5,
-                        kp_lin=200.0, ki_lin=0.01, kd_lin=3.0, tolerance_lin=data.GOAL_DEPTH+data.ROBOT_SIZE/2+data.BALL_RADIUS,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
-                        saturation_lin=(200*0.2), max_integral_lin=0.5, integral_fade_lin=0.75,
-                        base_speed=300, linear_decay_std_dev=np.pi/6, use_front=False, goal=(data.FIELD_LENGTH/2+data.GOAL_DEPTH, 0)
+                        base_speed=300, linear_decay_std_dev=np.pi/4, use_front=False, goal=None
         )
 
     def initialise(self):
@@ -95,5 +92,5 @@ class GoToFoesGoal(ExecutionNode):
 
     def plot_field(self):
         self.vector_field.update(self.field_data, self.parameters.robot_id)
-        my_plotter = FieldPlotter('Back to goal field!')
+        my_plotter = FieldPlotter('Go to foes goal')
         my_plotter.plot(self.vector_field)

@@ -5,7 +5,7 @@ from ..execution_node import ExecutionNode
 from thundervolt.core import data
 from thundervolt.core import utils
 from thundervolt.actions.follow_field_action import FollowFieldAction
-from thundervolt.vector_fields.fields import VectorField, OrientedAttractingField
+from thundervolt.vector_fields.fields import VectorField, OrientedAttractingField, LineField
 from thundervolt.vector_fields.combinations import ObstaclesField, TangentObstaclesField, WallField, AreaField
 
 from thundervolt.vector_fields.plotter import FieldPlotter
@@ -37,7 +37,7 @@ class GetBallDefender(ExecutionNode):
                             radius = 1.5,
                             max_radius = 0.25,
                             decay_radius = 0.1,
-                            multiplier = 0.9)
+                            multiplier = 0.8)
 
         avoid_obstacles_2 = ObstaclesField(
                             max_radius=0.15,
@@ -49,14 +49,18 @@ class GetBallDefender(ExecutionNode):
                         decay_dist=0.05,
                         multiplier=0.9)
 
-        area_field = AreaField(
-            max_dist = 0.3,
-            decay_dist = 1.0,
-            multiplier = 1.0,
-        )
+        avoid_area = LineField(
+                        target = -data.FIELD_LENGTH/2 - data.GOAL_DEPTH,
+                        theta = np.pi/2,
+                        size = data.GOAL_AREA_WIDTH/2,
+                        repelling = True,
+                        max_dist = data.GOAL_DEPTH + data.GOAL_AREA_DEPTH + data.ROBOT_SIZE,
+                        decay_dist = data.GOAL_DEPTH + data.GOAL_AREA_DEPTH,
+                        multiplier = 1)
+
 
         nodes_radius = 0.08
-        base_speed = 45
+        base_speed = 50
         disable_threshold = 0.4
         enable_threshold = 0.35
 
@@ -109,15 +113,13 @@ class GetBallDefender(ExecutionNode):
         self.vector_field.add(avoid_obstacles)
         self.vector_field.add(avoid_obstacles_2)
         self.vector_field.add(avoid_walls)
-        self.vector_field.add(area_field)
+        self.vector_field.add(avoid_area)
         self.vector_field.add(get_ball)
 
         self.action = FollowFieldAction(
-                        kp_ang=7.0, ki_ang=0.005, kd_ang=2.0,
-                        # kp_lin=200.0, ki_lin=0.03, kd_lin=3.0, tolerance_lin=0.005,
+                        kp_ang=7.0, ki_ang=0.005, kd_ang=1.5,
                         saturation_ang=(8*np.pi/3), integral_fade_ang=0.75,
-                        # saturation_lin=(200*0.2), integral_fade_lin=0.75,
-                        base_speed=base_speed, linear_decay_std_dev=np.pi/4)
+                        base_speed=base_speed, linear_decay_std_dev=np.pi/5)
 
     def initialise(self):
         self.action.initialize(self.parameters.robot_id, self.vector_field)
