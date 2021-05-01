@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>fira_thundervolt</name>
+  <version>0.0.0</version>
+  <description>The fira_thundervolt package</description>
+
+  <maintainer email="comp@thunderatz.org">ThundeRatz</maintainer>
+
+  <license>MIT</license>
+
+  <depend>rospy</depend>
+  <depend>py_trees</depend>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+  </export>
+</package>
